@@ -10,9 +10,9 @@ const Island = ({ island, onClick, isSelected, hasCursor }) => {
     <g onClick={onClick} style={{ cursor: 'pointer' }}>
       <circle cx={cx} cy={cy} r={r} fill="black" stroke={strokeColor} strokeWidth={strokeWidth} />
       {hasCursor && (
-        <circle cx={cx} cy={cy} r={r + 5} fill="none" stroke="#0ff" strokeWidth="1" strokeDasharray="4 3">
+        <rect x={cx - (r + 6)} y={cy - (r + 6)} width={(r + 6) * 2} height={(r + 6) * 2} fill="none" stroke="#0ff" strokeWidth="1" strokeDasharray="4 3">
           <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite" />
-        </circle>
+        </rect>
       )}
       <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fill="#0f0" fontSize="16" fontWeight="bold">
         {island.value}

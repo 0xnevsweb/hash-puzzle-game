@@ -9,8 +9,8 @@
         "download_dir": null,
         "source": null
     },
-    "trial_name": "Task__q6x8JDT",
-    "trials_dir": "jobs/2026-05-19__17-13-49",
+    "trial_name": "Task__seQjsXK",
+    "trials_dir": "jobs/2026-05-19__18-07-07",
     "timeout_multiplier": 1.0,
     "agent_timeout_multiplier": null,
     "verifier_timeout_multiplier": null,
@@ -47,5 +47,5 @@
         "disable": false
     },
     "artifacts": [],
-    "job_id": "8e80d1dd-7ceb-43cd-a768-fd7ca163dc13"
+    "job_id": "d6791401-4f4a-4b4f-a733-1ea616541b02"
 }

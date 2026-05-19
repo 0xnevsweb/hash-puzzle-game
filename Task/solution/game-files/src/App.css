@@ -1,14 +1,14 @@
 .app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
   background-color: black;
   font-family: monospace;
+  margin: 0;
+  padding: 0;
 }
 .controls {
-  margin-bottom: 20px;
+  position: fixed;
+  top: 605px;
+  left: 5px;
+  z-index: 10;
 }
 select, button {
   background-color: black;
@@ -48,6 +48,7 @@ select:hover, button:hover {
   padding: 5px 10px;
   border: 1px solid #f00;
   font-family: monospace;
+  z-index: 100;
 }
 @keyframes blink {
   0%, 100% { opacity: 1; }

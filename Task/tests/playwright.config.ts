@@ -15,9 +15,10 @@ export default defineConfig({
     trace: "off",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  // Serve /app where the solution (and task root in sandbox) puts index.html.
+  // Vite emits the production build to /app/dist. `serve` is resolved out of
+  // the symlinked /tests/node_modules (see Task/tests/test.sh).
   webServer: {
-    command: "npx serve /app/build -p 3000",
+    command: "./node_modules/.bin/serve /app/dist -p 3000",
     url: "http://localhost:3000",
     reuseExistingServer: false,
     timeout: 15_000,

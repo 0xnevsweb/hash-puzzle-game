@@ -57,12 +57,6 @@ const App = () => {
 
   return (
     <div className="app">
-      <div className="controls">
-        <select value={currentPuzzleId} onChange={(e) => setCurrentPuzzleId(Number(e.target.value))}>
-          {puzzles.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-        </select>
-        <button onClick={resetPuzzle}>Reset</button>
-      </div>
       <Board
         islands={islands}
         bridges={bridges}
@@ -72,6 +66,12 @@ const App = () => {
         cursorPos={cursorPos}
         setCursorPos={setCursorPos}
       />
+      <div className="controls">
+        <select value={currentPuzzleId} onChange={(e) => setCurrentPuzzleId(Number(e.target.value))}>
+          {puzzles.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        <button onClick={resetPuzzle}>Reset</button>
+      </div>
       {victory && <div className="victory-banner">SOLVED!</div>}
       {errorMsg && <div className="error-message">{errorMsg}</div>}
     </div>

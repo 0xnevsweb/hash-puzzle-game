@@ -1,0 +1,22 @@
+[WebServer] [43m[1m WARN [22m[49m Checking for updates failed (use `--debug` to see full error)
+
+Running 6 tests using 1 worker
+
+  ✓  1 [chromium] › e2e/example.spec.ts:3:1 › initial render (2.8s)
+  ✓  2 [chromium] › e2e/example.spec.ts:9:1 › mouse adds and removes bridge (633ms)
+  ✓  3 [chromium] › e2e/example.spec.ts:25:1 › invalid move shows error (560ms)
+  ✓  4 [chromium] › e2e/example.spec.ts:33:1 › victory banner appears (775ms)
+  ✓  5 [chromium] › e2e/example.spec.ts:48:1 › reset clears bridges (577ms)
+  ✓  6 [chromium] › e2e/example.spec.ts:59:1 › puzzle change resets board (1.7s)
+
+  6 passed (17.2s)
+
+ RUN  v2.1.9 /tests
+
+ ✓ unit/hashiLogic.spec.ts (16 tests) 12ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  22:08:17
+   Duration  2.25s (transform 168ms, setup 0ms, collect 136ms, tests 12ms, environment 1.61s, prepare 220ms)
+

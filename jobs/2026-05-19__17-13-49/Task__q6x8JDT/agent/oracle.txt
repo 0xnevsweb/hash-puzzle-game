@@ -1,1 +1,0 @@
-cp: cannot stat '/oracle/game-files/*': No such file or directory

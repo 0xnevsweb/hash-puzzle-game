@@ -36,7 +36,7 @@ function areAdjacentAndClear(islands, a, b) {
 function doesCross(newBridge, existingBridges, islands) {
   const [a, b] = newBridge;
   const horizontal = (a.y === b.y);
-  for (let [key, count] of existingBridges.entries()) {
+  for (let key of existingBridges.keys()) {
     const [x1,y1,x2,y2] = key.split(',').map(Number);
     const otherBridge = [{x:x1,y:y1}, {x:x2,y:y2}];
     const otherHorizontal = (y1 === y2);
@@ -97,7 +97,7 @@ export function checkConnectivity(islands, bridges) {
   if (islands.length === 0) return true;
   const adj = new Map();
   for (let island of islands) adj.set(island.id, []);
-  for (let [key, count] of bridges.entries()) {
+  for (let key of bridges.keys()) {
     const [x1,y1,x2,y2] = key.split(',').map(Number);
     const from = islands.find(i => i.x === x1 && i.y === y1);
     const to = islands.find(i => i.x === x2 && i.y === y2);
@@ -125,7 +125,7 @@ export function isVictory(islands, bridges) {
     if (counts.get(island.id) !== island.value) return false;
   }
   const bridgePairs = [];
-  for (let [key, count] of bridges.entries()) {
+  for (let key of bridges.keys()) {
     const [x1,y1,x2,y2] = key.split(',').map(Number);
     const from = islands.find(i => i.x === x1 && i.y === y1);
     const to = islands.find(i => i.x === x2 && i.y === y2);

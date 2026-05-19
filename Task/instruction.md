@@ -24,6 +24,15 @@ Build a React single-page app that implements a Hashi (Bridges) puzzle game. The
 
 ## Visual
 
-- Render the board as an SVG element (800×600 pixels). Islands are SVG circles, bridges are SVG lines. Each grid unit is 40px.
+- Render the board as an SVG element (800×600 pixels) anchored at the viewport top-left (no centering, no body/page padding). Pixel position of an island = `(grid_x * 40, grid_y * 40)`. Islands are SVG `<circle>` elements; bridges are SVG `<line>` elements. Each grid unit is 40px.
 - Double bridges appear as two parallel lines. Single bridges appear as one line.
-- The keyboard cursor must be clearly visible at all times.
+- The keyboard cursor must be clearly visible at all times. It must **not** be drawn as an additional `<circle>` (use a `<rect>`, stroke filter, group transform, or any non-`<circle>` element) so that the board's `<circle>` count equals the island count.
+
+## Module API
+
+Game logic lives at `/app/src/utils/hashiLogic.js` and must export the following named functions. Bridges are represented as `Map<string, number>` keyed by the canonical string `"x1,y1,x2,y2"` where the endpoint with the smaller `(x, then y)` sorts first; coordinates are **grid units**, not pixels.
+
+- `canAddBridge(islands, bridges, from, to, delta)` → `{ valid: boolean, error: string | null }`. Validates a proposed bridge addition of `delta` (typically `1`) between two island objects `{id, x, y, value}`. Error string must be one of the four messages listed under **Interaction** above.
+- `computeCurrentCounts(islands, bridges)` → `Map<islandId, number>` of the current total bridge count for each island.
+- `checkConnectivity(islands, bridges)` → `boolean`. True iff every island is reachable from every other via bridges.
+- `isVictory(islands, bridges)` → `boolean`. True iff every island's count equals its value, no bridges cross, and the graph is connected.
