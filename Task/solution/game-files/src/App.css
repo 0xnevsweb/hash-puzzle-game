@@ -1,0 +1,55 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: black;
+  font-family: monospace;
+}
+.controls {
+  margin-bottom: 20px;
+}
+select, button {
+  background-color: black;
+  color: #0f0;
+  border: 1px solid #0f0;
+  padding: 5px 10px;
+  margin: 0 5px;
+  font-family: monospace;
+  cursor: pointer;
+}
+select:hover, button:hover {
+  background-color: #0f0;
+  color: black;
+}
+.victory-banner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: black;
+  color: #0f0;
+  font-size: 48px;
+  font-weight: bold;
+  border: 2px solid #0f0;
+  padding: 20px;
+  z-index: 1000;
+  text-align: center;
+  animation: blink 1s step-end infinite;
+}
+.error-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #300;
+  color: #f00;
+  padding: 5px 10px;
+  border: 1px solid #f00;
+  font-family: monospace;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

@@ -1,0 +1,10 @@
+body {
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  background-color: black;
+  color: #0f0;
+  overflow: hidden;
+}
+* {
+  user-select: none;
+}

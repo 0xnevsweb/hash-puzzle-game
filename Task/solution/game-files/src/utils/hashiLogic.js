@@ -1,0 +1,144 @@
+export function getBridgeCount(bridges, a, b) {
+  const key = getKey(a, b);
+  return bridges.get(key) || 0;
+}
+
+function getKey(a, b) {
+  if (a.x < b.x || (a.x === b.x && a.y < b.y)) {
+    return `${a.x},${a.y},${b.x},${b.y}`;
+  }
+  return `${b.x},${b.y},${a.x},${a.y}`;
+}
+
+function areAdjacentAndClear(islands, a, b) {
+  if (a.x === b.x) {
+    const ymin = Math.min(a.y, b.y);
+    const ymax = Math.max(a.y, b.y);
+    for (let island of islands) {
+      if (island.id !== a.id && island.id !== b.id && island.x === a.x && island.y > ymin && island.y < ymax) {
+        return false;
+      }
+    }
+    return true;
+  } else if (a.y === b.y) {
+    const xmin = Math.min(a.x, b.x);
+    const xmax = Math.max(a.x, b.x);
+    for (let island of islands) {
+      if (island.id !== a.id && island.id !== b.id && island.y === a.y && island.x > xmin && island.x < xmax) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+function doesCross(newBridge, existingBridges, islands) {
+  const [a, b] = newBridge;
+  const horizontal = (a.y === b.y);
+  for (let [key, count] of existingBridges.entries()) {
+    const [x1,y1,x2,y2] = key.split(',').map(Number);
+    const otherBridge = [{x:x1,y:y1}, {x:x2,y:y2}];
+    const otherHorizontal = (y1 === y2);
+    if (horizontal && !otherHorizontal) {
+      const newY = a.y;
+      const newX1 = Math.min(a.x, b.x);
+      const newX2 = Math.max(a.x, b.x);
+      const vertX = otherBridge[0].x;
+      const vertY1 = Math.min(otherBridge[0].y, otherBridge[1].y);
+      const vertY2 = Math.max(otherBridge[0].y, otherBridge[1].y);
+      if (vertX > newX1 && vertX < newX2 && newY > vertY1 && newY < vertY2) return true;
+    } else if (!horizontal && otherHorizontal) {
+      const newX = a.x;
+      const newY1 = Math.min(a.y, b.y);
+      const newY2 = Math.max(a.y, b.y);
+      const horY = otherBridge[0].y;
+      const horX1 = Math.min(otherBridge[0].x, otherBridge[1].x);
+      const horX2 = Math.max(otherBridge[0].x, otherBridge[1].x);
+      if (horY > newY1 && horY < newY2 && newX > horX1 && newX < horX2) return true;
+    }
+  }
+  return false;
+}
+
+export function canAddBridge(islands, bridges, from, to, delta = 1) {
+  if (from.id === to.id) return { valid: false, error: "Cannot connect island to itself" };
+  if (from.x !== to.x && from.y !== to.y) return { valid: false, error: "Cannot connect non-adjacent islands" };
+  if (!areAdjacentAndClear(islands, from, to)) return { valid: false, error: "Cannot connect non-adjacent islands" };
+  const key = getKey(from, to);
+  const current = bridges.get(key) || 0;
+  if (current + delta > 2) return { valid: false, error: "Max 2 bridges per pair" };
+  const newCounts = computeCurrentCounts(islands, bridges);
+  const newFromCount = newCounts.get(from.id) + delta;
+  const newToCount = newCounts.get(to.id) + delta;
+  if (newFromCount > from.value) return { valid: false, error: "Island would exceed its number" };
+  if (newToCount > to.value) return { valid: false, error: "Island would exceed its number" };
+  const newBridge = [from, to];
+  if (doesCross(newBridge, bridges, islands)) return { valid: false, error: "Bridges would cross" };
+  return { valid: true, error: null };
+}
+
+export function computeCurrentCounts(islands, bridges) {
+  const counts = new Map();
+  for (let island of islands) counts.set(island.id, 0);
+  for (let [key, count] of bridges.entries()) {
+    const [x1,y1,x2,y2] = key.split(',').map(Number);
+    const from = islands.find(i => i.x === x1 && i.y === y1);
+    const to = islands.find(i => i.x === x2 && i.y === y2);
+    if (from && to) {
+      counts.set(from.id, (counts.get(from.id) || 0) + count);
+      counts.set(to.id, (counts.get(to.id) || 0) + count);
+    }
+  }
+  return counts;
+}
+
+export function checkConnectivity(islands, bridges) {
+  if (islands.length === 0) return true;
+  const adj = new Map();
+  for (let island of islands) adj.set(island.id, []);
+  for (let [key, count] of bridges.entries()) {
+    const [x1,y1,x2,y2] = key.split(',').map(Number);
+    const from = islands.find(i => i.x === x1 && i.y === y1);
+    const to = islands.find(i => i.x === x2 && i.y === y2);
+    if (from && to) {
+      adj.get(from.id).push(to.id);
+      adj.get(to.id).push(from.id);
+    }
+  }
+  const visited = new Set();
+  const stack = [islands[0].id];
+  while (stack.length) {
+    const id = stack.pop();
+    if (visited.has(id)) continue;
+    visited.add(id);
+    for (let neighbor of adj.get(id)) {
+      if (!visited.has(neighbor)) stack.push(neighbor);
+    }
+  }
+  return visited.size === islands.length;
+}
+
+export function isVictory(islands, bridges) {
+  const counts = computeCurrentCounts(islands, bridges);
+  for (let island of islands) {
+    if (counts.get(island.id) !== island.value) return false;
+  }
+  const bridgePairs = [];
+  for (let [key, count] of bridges.entries()) {
+    const [x1,y1,x2,y2] = key.split(',').map(Number);
+    const from = islands.find(i => i.x === x1 && i.y === y1);
+    const to = islands.find(i => i.x === x2 && i.y === y2);
+    if (from && to) bridgePairs.push([from, to]);
+  }
+  for (let i = 0; i < bridgePairs.length; i++) {
+    for (let j = i+1; j < bridgePairs.length; j++) {
+      const tempMap = new Map();
+      tempMap.set(getKey(bridgePairs[i][0], bridgePairs[i][1]), 1);
+      tempMap.set(getKey(bridgePairs[j][0], bridgePairs[j][1]), 1);
+      if (doesCross(bridgePairs[i], tempMap, islands)) return false;
+    }
+  }
+  if (!checkConnectivity(islands, bridges)) return false;
+  return true;
+}
