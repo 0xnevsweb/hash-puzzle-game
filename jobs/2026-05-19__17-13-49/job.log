@@ -1,0 +1,3 @@
+Skipping image OS validation for hb__task: docker inspect returned 1
+Trial Task__q6x8JDT cancelled
+Cleanup interrupted for Task__q6x8JDT, but environment stop is shielded and will complete

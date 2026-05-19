@@ -32,9 +32,9 @@ UNIT_CODE=$?
 
 # Check both test results and set exit code accordingly
 if [ $E2E_CODE -eq 0 ] && [ $UNIT_CODE -eq 0 ]; then
-    exit 0
+    (exit 0)
 else
-    exit 1
+    (exit 1)
 fi
 
 # The reward section MUST be exactly as below and at the end of the file

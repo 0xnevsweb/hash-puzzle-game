@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cp -r /oracle/game-files/* /app/
+cp -r /solution/game-files/* /app/
 cd /app
 npm install
 npm run build
