@@ -33,11 +33,16 @@ UNIT_CODE=0
 # Run unit tests
 "$VITEST_BIN" run || UNIT_CODE=$?
 
-# Produce reward file (REQUIRED): pass only if both unit and E2E succeed
-if [ "$E2E_CODE" -eq 0 ] && [ "$UNIT_CODE" -eq 0 ]; then
+# Check both test results and set exit code accordingly
+if [ $E2E_CODE -eq 0 ] && [ $UNIT_CODE -eq 0 ]; then
+    (exit 0)
+else
+    (exit 1)
+fi
+
+# The reward section MUST be exactly as below and at the end of the file
+if [ $? -eq 0 ]; then
     echo 1 > /logs/verifier/reward.txt
-    exit 0
 else
     echo 0 > /logs/verifier/reward.txt
-    exit 1
 fi
