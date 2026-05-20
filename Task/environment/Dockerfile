@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libnspr4 libnss3 libpango-1.0-0 libx11-6 libxcb1 \
       libxcomposite1 libxdamage1 libxext6 libxfixes3 \
       libxkbcommon0 libxrandr2 xvfb \
+      tmux \
+      asciinema \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
