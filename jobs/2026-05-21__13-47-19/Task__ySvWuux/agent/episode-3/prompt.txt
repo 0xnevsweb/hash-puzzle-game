@@ -1,0 +1,324 @@
+New Terminal Output:
+
+root@4bf7c83d9c7d:/app# apply_patch<<'PATCH'
+> *** Begin Patch
+> *** Add File: src/utils/hashiLogic.js
+> +// Core Hashi (Bridges) puzzle logic.
+> +// Bridges are stored as Map<string, number> keyed by canonical "x1,y1,x2,y2" (grid units),
+> +// where (x1,y1) is lexicographically <= (x2,y2). Value is 1 or 2.
+> +
+> +export const ERR_NON_ADJACENT = 'Cannot connect non-adjacent islands';
+> +export const ERR_MAX_PER_PAIR = 'Max 2 bridges per pair';
+> +export const ERR_EXCEED_ISLAND = 'Island would exceed its number';
+> +export const ERR_CROSSING = 'Bridges would cross';
+> +
+> +function cmpPoint(a, b) {
+> +  if (a.x !== b.x) return a.x - b.x;
+> +  return a.y - b.y;
+> +}
+> +
+> +export function bridgeKey(from, to) {
+> +  const a = { x: from.x, y: from.y };
+> +  const b = { x: to.x, y: to.y };
+> +  const [p1, p2] = cmpPoint(a, b) <= 0 ? [a, b] : [b, a];
+> +  return `${p1.x},${p1.y},${p2.x},${p2.y}`;
+> +}
+> +
+> +export function parseBridgeKey(key) {
+> +  const [x1, y1, x2, y2] = key.split(',').map((n) => Number(n));
+> +  return { x1, y1, x2, y2 };
+> +}
+> +
+ a.x === b.x || a.y === b.y;
++}
++
++function between(v, a, b) {
++  const min = Math.min(a, b);
++  const max = Math.max(a, b);
++  return v > min && v < max;
++}
++
++function buildIslandLookup(islands) {
++  const byId = new Map();
++  const byCoord = new Map();
++  for (const isl of islands) {
++    byId.set(isl.id, isl);
++    byCoord.set(`${isl.x},${isl.y}`, isl);
++  }
++  return { byId, byCoord };
++}
++
++// Two segments cross if one is vertical and the other horizontal and their interiors intersect.
++function segmentsCross(segA, segB) {
++  // seg: {x1,y1,x2,y2}
++  const aVertical = segA.x1 === segA.x2;
++  const bVertical = segB.x1 === segB.x2;
++  if (aVertical === bVertical) return false; // parallel
++
++  const v = aVertical ? segA : segB;
++  const h = aVertical ? segB : segA;
++
++  // Proper crossing must be strictly inside both segments (not at endpoints).
++  const x = v.x1;
++  const y = h.y1;
++  const inV = between(y, v.y1, v.y2);
++  const inH = between(x, h.x1, h.x2);
++  return inV && inH;
++}
++
++export function wouldCross(bridges, from, to) {
++  const candidate = { x1: from.x, y1: from.y, x2: to.x, y2: to.y };
++  for (const [k, count] of bridges.entries()) {
++    if (!count) continue;
++    const existing = parseBridgeKey(k);
++    if (segmentsCross(candidate, existing)) return true;
++  }
++  return false;
++}
++
++// Returns true only if to is the nearest island to from in that cardinal direction with no island between.
++export function areAdjacent(islands, from, to) {
++  if (from.id === to.id) return false;
++  if (!isAxisAligned(from, to)) return false;
++
++  if (from.x === to.x) {
++    const x = from.x;
++    const dir = Math.sign(to.y - from.y);
++    if (dir === 0) return false;
++    let best = null;
++    let bestDist = Infinity;
++    for (const isl of islands) {
++      if (isl.id === from.id) continue;
++      if (isl.x !== x) continue;
++      const d = isl.y - from.y;
++      if (Math.sign(d) !== dir) continue;
++      const ad = Math.abs(d);
++      if (ad < bestDist) {
++        bestDist = ad;
++        best = isl;
++      }
++    }
++    return best?.id === to.id;
++  }
++
++  // horizontal
++  const y = from.y;
++  const dir = Math.sign(to.x - from.x);
++  if (dir === 0) return false;
++  let best = null;
++  let bestDist = Infinity;
++  for (const isl of islands) {
++    if (isl.id === from.id) continue;
++    if (isl.y !== y) continue;
++    const d = isl.x - from.x;
++    if (Math.sign(d) !== dir) continue;
++    const ad = Math.abs(d);
++    if (ad < bestDist) {
++      bestDist = ad;
++      best = isl;
++    }
++  }
++  return best?.id === to.id;
++}
++
++export function computeCurrentCounts(islands, bridges) {
++  const counts = new Map();
++  for (const isl of islands) counts.set(isl.id, 0);
++
++  // For each bridge, add its count to both endpoints.
++  const { byCoord } = buildIslandLookup(islands);
++  for (const [k, n] of bridges.entries()) {
++    if (!n) continue;
++    const { x1, y1, x2, y2 } = parseBridgeKey(k);
++    const a = byCoord.get(`${x1},${y1}`);
++    const b = byCoord.get(`${x2},${y2}`);
++    if (!a || !b) continue;
++    counts.set(a.id, (counts.get(a.id) ?? 0) + n);
++    counts.set(b.id, (counts.get(b.id) ?? 0) + n);
++  }
++  return counts;
++}
++
++export function canAddBridge(islands, bridges, from, to, delta) {
++  // delta is +1 or -1 relative change (used for cycling or removal).
++  if (!areAdjacent(islands, from, to)) {
++    return { valid: false, error: ERR_NON_ADJACENT };
++  }
++  const key = bridgeKey(from, to);
++  const existing = bridges.get(key) ?? 0;
++  const next = existing + delta;
++
++  if (next < 0) return { valid: true, error: null };
++  if (next > 2) return { valid: false, error: ERR_MAX_PER_PAIR };
++  if (next === 0) {
++    // Removing never creates crossing / exceed errors.
++    return { valid: true, error: null };
++  }
++
++  // Crossing check only when adding (existing==0 or 1 and delta==+1).
++  if (delta > 0 && wouldCross(bridges, from, to)) {
+
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+id);
+> +        setSelectedId(null);
+> +        return;
+> +      }
+> +      if (kbFromId === cur.id) return;
+> +      const from = findIslandById(islands, kbFromId);
+> +      if (!from) {
+> +        setKbFromId(null);
+> +        return;
+> +      }
+> +      cycleBridge(from, cur);
+> +      setKbFromId(null);
+> +    }
+> +  }
+> +
+> +  const cursorIsland = cursorId == null ? null : findIslandById(islands, cursorId);
+> +  const kbFromIsland = kbFromId == null ? null : findIslandById(islands, kbFromId);
+> +
+> +  return (
+> +    <div
+> +      ref={rootRef}
+> +      tabIndex={0}
+> +      onKeyDown={onKeyDown}
+> +      style={{ outline: 'none' }}
+> +    >
+> +      <div style={{ padding: 8 }}>
+> +        <label>
+> +          Puzzle:{' '}
+> +          <select
+> +            value={puzzleName}
+> +            onChange={(e) => setPuzzleName(e.target.value)}
+> +            style={{
+> +              background: 'black',
+> +              color: '#0f0',
+> +              border: '1px solid #0f0',
+> +              fontFamily: 'monospace',
+> +            }}
+> +          >
+> +            <option value="Easy">Easy</option>
+> +            <option value="Medium">Medium</option>
+> +            <option value="Hard">Hard</option>
+> +          </select>
+> +        </label>
+> +        <button
+> +          onClick={() => {
+> +            setBridges(new Map());
+> +            setSelectedId(null);
+> +            setKbFromId(null);
+> +            setError(null);
+> +          }}
+> +          style={{
+> +            marginLeft: 12,
+> +            background: 'black',
+> +            color: '#0f0',
+> +            border: '1px solid #0f0',
+> +            fontFamily: 'monospace',
+> +            cursor: 'pointer',
+> +          }}
+> +        >
+> +          Reset
+> +        </button>
+> +        {error ? <div className="error-message" style={{ marginTop: 8 }}>[ERROR] {error}</div> : null}
+> +        {solved ? <div className="victory-banner" style={{ marginTop: 8 }}>SOLVED!</div> : null}
+> +      </div>
+> +
+> +      <svg
+> +        width={SVG_W}
+> +        height={SVG_H}
+> +        viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+> +        style={{ display: 'block' }}
+> +      >
+> +        {/* Bridges */}
+> +        <g stroke="#0f0" strokeWidth={3} strokeLinecap="round">
+> +          {bridgeLines.map((ln) => (
+> +            <line
+> +              key={`${ln.key}:${ln.idx}`}
+> +              x1={ln.x1}
+> +              y1={ln.y1}
+> +              x2={ln.x2}
+> +              y2={ln.y2}
+> +            />
+> +          ))}
+> +        </g>
+> +
+> +        {/* Keyboard cursor (must not be a circle) */}
+> +        {cursorIsland ? (() => {
+> +          const p = islandPx(cursorIsland);
+> +          const size = 26;
+> +          return (
+> +            <rect
+> +              x={p.cx - size / 2}
+> +              y={p.cy - size / 2}
+> +              width={size}
+> +              height={size}
+> +              fill="none"
+> +              stroke="#0f0"
+> +              strokeWidth={2}
+> +              strokeDasharray="4 3"
+> +            />
+> +          );
+> +        })() : null}
+> +
+> +        {/* Islands */}
+> +        <g>
+> +          {islands.map((isl) => {
+> +            const { cx, cy } = islandPx(isl);
+> +            const isSelected = selectedId === isl.id;
+> +            const isKbFrom = kbFromId === isl.id;
+> +            const current = counts.get(isl.id) ?? 0;
+> +            return (
+> +              <g key={isl.id}>
+> +                <circle
+> +                  cx={cx}
+> +                  cy={cy}
+> +                  r={14}
+> +                  fill="black"
+> +                  stroke={isSelected || isKbFrom ? '#0f0' : '#0a0'}
+> +                  strokeWidth={isSelected || isKbFrom ? 3 : 2}
+> +                  onClick={(e) => onIslandClick(e, isl)}
+> +                  onContextMenu={(e) => onIslandContextMenu(e, isl)}
+> +                  style={{ cursor: 'pointer' }}
+> +                />
+> +                <text
+> +                  x={cx}
+> +                  y={cy + 5}
+> +                  textAnchor="middle"
+> +                  fontFamily="monospace"
+> +                  fontSize={14}
+> +                  fill="#0f0"
+> +                  style={{ userSelect: 'none' }}
+> +                >
+> +                  {isl.value}
+> +                </text>
+> +                {/* Small current-count hint (still green, minimal) */}
+> +                <text
+> +                  x={cx}
+> +                  y={cy + 28}
+> +                  textAnchor="middle"
+> +                  fontFamily="monospace"
+> +                  fontSize={10}
+> +                  fill="#0a0"
+> +                  style={{ userSelect: 'none' }}
+> +                >
+> +                  {current}/{isl.value}
+> +                </text>
+> +              </g>
+> +            );
+> +          })}
+> +        </g>
+> +      </svg>
+> +    </div>
+> +  );
+> +}
+> +
+> *** End Patch
+> PATCH
+bash: apply_patch: command not found
+root@4bf7c83d9c7d:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+

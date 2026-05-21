@@ -1,0 +1,41 @@
+Current Terminal Screen:
+  }
+  return true;
+}
+
+export function isVictory(islands, bridges) {
+  const counts = computeCurrentCounts(islands, bridges);
+  for (const isl of islands) {
+    if ((counts.get(isl.id) ?? 0) !== isl.value) return false;
+  }
+  if (!noCrossings(bridges)) return false;
+  if (!checkConnectivity(islands, bridges)) return false;
+  return true;
+}
+root@1d44877febc0:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.27 kB
+dist/assets/index-CbEo1OPm.css    0.65 kB │ gzip:  0.32 kB
+dist/assets/index-CPpgoyEY.js   150.06 kB │ gzip: 48.73 kB
+✓ built in 13.06s
+root@1d44877febc0:/app#
+root@1d44877febc0:/app# ls -la dist || true
+total 28
+drwxr-xr-x 3 root root 4096 May 21 17:50 .
+drwxr-xr-x 1 root root 4096 May 21 17:50 ..
+drwxr-xr-x 2 root root 4096 May 21 17:50 assets
+-rw-rw-r-- 1 root root  216 May 21 17:50 favicon.svg
+-rw-r--r-- 1 root root  404 May 21 17:50 index.html
+-rw-rw-r-- 1 root root   23 May 21 17:50 robots.txt
+root@1d44877febc0:/app# find dist -maxdepth 2 -type f -print
+dist/index.html
+dist/favicon.svg
+dist/robots.txt
+dist/assets/index-CPpgoyEY.js
+dist/assets/index-CbEo1OPm.css
+root@1d44877febc0:/app#

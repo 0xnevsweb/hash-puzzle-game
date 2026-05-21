@@ -1,0 +1,15 @@
+{
+  "analysis": "Build succeeds and required elements/classes exist, but there is one notable spec mismatch: right-click/Ctrl+click should remove an existing bridge directly on that bridge, without requiring a prior island selection. Current implementation only removes when there is a selectedId or keyboardFromId, and bridges themselves are not clickable (only islands). To meet the spec more robustly without adding invisible lines (line count observable), we should make the existing visible bridge line(s) handle contextmenu/click with ctrlKey to remove the bridge, mapping the line back to its bridge key. We'll update bridgeLines rendering to attach handlers on each rendered line that remove that bridge key. Then rebuild.",
+  "plan": "1) Modify App.jsx bridgeLines useMemo to render each line with onContextMenu and onClick (when ctrl/cmd held) that deletes the underlying bridge key from state. For doubles, both lines remove the same bridge. 2) Ensure this does not create extra lines beyond visible ones (we only add handlers to the existing visible lines). 3) Run npm run build again.",
+  "commands": [
+    {
+      "keystrokes": "apply_patch<<'PATCH'\n*** Begin Patch\n*** Update File: src/App.jsx\n@@\n   const bridgeLines = useMemo(() => {\n     const lines = [];\n     for (const [key, n] of bridges.entries()) {\n       if (!n) continue;\n@@\n-      const mkLine = (idx, ox, oy) => (\n+      const mkLine = (idx, ox, oy) => (\n         <line\n           key={`${key}:${idx}`}\n           x1={px1 + ox}\n           y1={py1 + oy}\n           x2={px2 + ox}\n           y2={py2 + oy}\n           stroke=\"#0f0\"\n           strokeWidth={3}\n+          onContextMenu={(e) => {\n+            e.preventDefault();\n+            // Right-click removes the whole bridge (single or double)\n+            setBridges((prev) => {\n+              const m = new Map(prev);\n+              m.delete(key);\n+              return m;\n+            });\n+            clearErrorOnValidMove();\n+            setSelectedId(null);\n+            setKeyboardFromId(null);\n+          }}\n+          onClick={(e) => {\n+            if (!isCtrlClick(e)) return;\n+            e.preventDefault();\n+            setBridges((prev) => {\n+              const m = new Map(prev);\n+              m.delete(key);\n+              return m;\n+            });\n+            clearErrorOnValidMove();\n+            setSelectedId(null);\n+            setKeyboardFromId(null);\n+          }}\n         />\n       );\n*** End Patch\nPATCH\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "npm run build\n",
+      "duration": 5
+    }
+  ],
+  "task_complete": false
+}

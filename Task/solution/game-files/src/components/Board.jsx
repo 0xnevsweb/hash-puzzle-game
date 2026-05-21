@@ -42,27 +42,10 @@ const Board = ({ islands, bridges, onBridgeUpdate, selectedIsland, setSelectedIs
 
 const handleBridgeRightClick = (e, key) => {
   e.preventDefault();
-  const [x1, y1, x2, y2] = key.split(',').map(Number);
-  const islandA = islands.find(i => i.x === x1 && i.y === y1);
-  const islandB = islands.find(i => i.x === x2 && i.y === y2);
-  if (!islandA || !islandB) return;
-  const current = bridges.get(key) || 0;
-  if (current === 2) {
-    // Remove — always allowed
-    const newBridges = new Map(bridges);
-    newBridges.delete(key);
-    onBridgeUpdate(newBridges, null);
-  } else {
-    // Increment 0→1 or 1→2 — validate first
-    const { valid, error } = canAddBridge(islands, bridges, islandA, islandB, 1);
-    if (valid) {
-      const newBridges = new Map(bridges);
-      newBridges.set(key, current + 1);
-      onBridgeUpdate(newBridges, null);
-    } else {
-      onBridgeUpdate(bridges, error);
-    }
-  }
+  if (!bridges.has(key)) return;
+  const newBridges = new Map(bridges);
+  newBridges.delete(key);
+  onBridgeUpdate(newBridges, null);
 };
 
   useEffect(() => {

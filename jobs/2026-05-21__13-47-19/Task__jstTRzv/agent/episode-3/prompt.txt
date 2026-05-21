@@ -1,0 +1,367 @@
+New Terminal Output:
+
+root@1d44877febc0:/app# mkdir -p src/utils
+root@1d44877febc0:/app# cat > src/utils/hashiLogic.js <<'EOF'
+> export const ERROR_NON_ADJACENT = "Cannot connect non-adjacent islands";
+> export const ERROR_MAX_PAIR = "Max 2 bridges per pair";
+> export const ERROR_EXCEED = "Island would exceed its number";
+> export const ERROR_CROSS = "Bridges would cross";
+>
+> export function keyForBridge(a, b) {
+>   // a,b are {x,y} in grid units
+>   const ax = a.x;
+>   const ay = a.y;
+>   const bx = b.x;
+>   const by = b.y;
+>   if (ax < bx || (ax === bx && ay <= by)) return `${ax},${ay},${bx},${by}`;
+>   return `${bx},${by},${ax},${ay}`;
+> }
+>
+> function parseKey(key) {
+>   const [x1, y1, x2, y2] = key.split(',').map((n) => Number(n));
+>   return { x1, y1, x2, y2 };
+> }
+= posToId.get(`${x1},${y1}`);
+    const bId = posToId.get(`${x2},${y2}`);
+    if (aId === undefined || bId === undefined) continue;
+    adj.get(aId).push(bId);
+    adj.get(bId).push(aId);
+  }
+
+  const start = islands[0].id;
+  >
+> function isHorizontal(seg) {
+>   return seg.y1 === seg.y2;
+> }
+>
+> function isVertical(seg) {
+>   return seg.x1 === seg.x2;
+> }
+>
+> function normalizedSeg(seg) {
+>   let { x1, y1, x2, y2 } = seg;
+>   if (x1 === x2) {
+>     if (y1 > y2) [y1, y2] = [y2, y1];
+>   } else if (y1 === y2) {
+>     if (x1 > x2) [x1, x2] = [x2, x1];
+>   }
+>   return { x1, y1, x2, y2 };
+> }
+>
+> function segmentsCross(a, b) {
+>   // Only consider perpendicular crossing at an interior point.
+>   const A = normalizedSeg(a);
+>   const B = normalizedSeg(b);
+>   if (isHorizontal(A) && isVertical(B)) {
+>     const y = A.y1;
+>     const x = B.x1;
+>     const aMinX = Math.min(A.x1, A.x2);
+>     const aMaxX = Math.max(A.x1, A.x2);
+>     const bMinY = Math.min(B.y1, B.y2);
+>     const bMaxY = Math.max(B.y1, B.y2);
+>     const inA = x > aMinX && x < aMaxX;
+>     const inB = y > bMinY && y < bMaxY;
+>     return inA && inB;
+>   }
+>   if (isVertical(A) && isHorizontal(B)) return segmentsCross(B, A);
+>   return false;
+> }
+>
+> export function computeCurrentCounts(islands, bridges) {
+>   const counts = new Map();
+>   for (const isl of islands) counts.set(isl.id, 0);
+>
+>   for (const [k, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const { x1, y1, x2, y2 } = parseKey(k);
+>     const a = islands.find((i) => i.x === x1 && i.y === y1);
+>     const b = islands.find((i) => i.x === x2 && i.y === y2);
+>     if (!a || !b) continue;
+>     counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+>     counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+>   }
+>
+>   return counts;
+> }
+>
+> function isAdjacentVisible(islands, from, to) {
+>   if (from.id === to.id) return false;
+>   if (from.x !== to.x && from.y !== to.y) return false;
+>
+>   const sameRow = from.y === to.y;
+>   const sameCol = from.x === to.x;
+>
+>   if (sameRow) {
+>     const y = from.y;
+>     const minX = Math.min(from.x, to.x);
+>     const maxX = Math.max(from.x, to.x);
+>     for (const isl of islands) {
+>       if (isl.id === from.id || isl.id === to.id) continue;
+>       if (isl.y === y && isl.x > minX && isl.x < maxX) return false;
+>     }
+>     return true;
+>   }
+>
+>   if (sameCol) {
+>     const x = from.x;
+>     const minY = Math.min(from.y, to.y);
+>     const maxY = Math.max(from.y, to.y);
+>     for (const isl of islands) {
+>       if (isl.id === from.id || isl.id === to.id) continue;
+>       if (isl.x === x && isl.y > minY && isl.y < maxY) return false;
+>     }
+>     return true;
+>   }
+>
+>   return false;
+> }
+>
+> function wouldCrossExisting(bridges, from, to, ignoreKey) {
+>   const candidate = normalizedSeg({ x1: from.x, y1: from.y, x2: to.x, y2: to.y });
+>   for (const [k, n] of bridges.entries()) {
+>     if (!n) continue;
+>     if (k === ignoreKey) continue;
+>     const seg = normalizedSeg(parseKey(k));
+>     if (segmentsCross(candidate, seg)) return true;
+>   }
+>   return false;
+> }
+>
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   if (!isAdjacentVisible(islands, from, to)) {
+>     return { valid: false, error: ERROR_NON_ADJACENT };
+>   }
+>
+>   const k = keyForBridge(from, to);
+>   const current = bridges.get(k) ?? 0;
+>   const next = current + delta;
+>
+>   if (next < 0) return { valid: true, error: null };
+>   if (next > 2) return { valid: false, error: ERROR_MAX_PAIR };
+>
+>   const counts = computeCurrentCounts(islands, bridges);
+>   const fromCount = counts.get(from.id) ?? 0;
+>   const toCount = counts.get(to.id) ?? 0;
+>
+>   if (fromCount + delta > from.value || toCount + delta > to.value) {
+>     return { valid: false, error: ERROR_EXCEED };
+>   }
+>
+>   if (wouldCrossExisting(bridges, from, to, k) && next > 0) {
+>     return { valid: false, error: ERROR_CROSS };
+>   }
+>
+>   return { valid: true, error: null };
+> }
+>
+> export function checkConnectivity(islands, bridges) {
+>   if (islands.length <= 1) return true;
+>
+>   const posToId = new Map(islands.map((i) => [`${i.x},${i.y}`, i.id]));
+>   const adj = new Map();
+>   for (const isl of islands) adj.set(isl.id, []);
+>
+>   f
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+lue={2}>Hard</option>
+>           </select>
+>         </label>
+>         <button
+>           onClick={() => {
+>             setBridges(new Map());
+>             setSelectedId(null);
+>             setError(null);
+>             svgRef.current?.focus();
+>           }}
+>         >
+>           Reset
+>         </button>
+>         <span className="status">
+>           Selected: {selectedId === null ? '-' : selectedId}
+>         </span>
+>       </div>
+>
+>       {error ? <div className="error-message">{error}</div> : null}
+>       {victory ? <div className="victory-banner">SOLVED!</div> : null}
+>
+>       <svg
+>         ref={svgRef}
+>         className="board-svg"
+>         width={WIDTH}
+>         height={HEIGHT}
+>         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+>         tabIndex={0}
+>         onContextMenu={onSvgContextMenu}
+>         style={{ outline: 'none' }}
+>       >
+>         {/* Bridges */}
+>         <g className="bridges">
+>           {bridgeEntries.flatMap(([k, n]) => {
+>             const segs = bridgeLinesFor(islandsByPos, k, n);
+>             return segs.map((s, idx) => (
+>               <line
+>                 key={`${k}:${idx}`}
+>                 x1={s.x1}
+>                 y1={s.y1}
+>                 x2={s.x2}
+>                 y2={s.y2}
+>                 stroke="#0f0"
+>                 strokeWidth={4}
+>                 shapeRendering="crispEdges"
+>                 onPointerDown={(e) => onBridgePointerDown(e, k)}
+>                 onContextMenu={(e) => {
+>                   e.preventDefault();
+>                   onBridgePointerDown({ ...e, button: 2 }, k);
+>                 }}
+>               />
+>             ));
+>           })}
+>         </g>
+>
+>         {/* Keyboard cursor (must not be a circle) */}
+>         {(() => {
+>           const cur = islandsById.get(cursorId);
+>           if (!cur) return null;
+>           const p = islandPx(cur);
+>           const size = 30;
+>           return (
+>             <rect
+>               x={p.cx - size / 2}
+>               y={p.cy - size / 2}
+>               width={size}
+>               height={size}
+>               fill="none"
+>               stroke="#0f0"
+>               strokeWidth={2}
+>               strokeDasharray="4 4"
+>             />
+>           );
+>         })()}
+>
+>         {/* Islands */}
+>         <g className="islands">
+>           {islands.map((isl) => {
+>             const p = islandPx(isl);
+>             const isSelected = selectedId === isl.id;
+>             const curCount = counts.get(isl.id) ?? 0;
+>             return (
+>               <g
+>                 key={isl.id}
+>                 transform={`translate(${p.cx},${p.cy})`}
+>                 onClick={(e) => onIslandClick(e, isl)}
+>               >
+>                 <circle
+>                   r={14}
+>                   fill="black"
+>                   stroke={isSelected ? '#9f9' : '#0f0'}
+>                   strokeWidth={2}
+>                 />
+>                 <text
+>                   x={0}
+>                   y={5}
+>                   textAnchor="middle"
+>                   fontFamily="monospace"
+>                   fontSize={14}
+>                   fill="#0f0"
+>                 >
+>                   {isl.value}
+>                 </text>
+>                 <text
+>                   x={0}
+>                   y={28}
+>                   textAnchor="middle"
+>                   fontFamily="monospace"
+>                   fontSize={10}
+>                   fill="#0f0"
+>                 >
+>                   {curCount}/{isl.value}
+>                 </text>
+>               </g>
+>             );
+>           })}
+>         </g>
+>       </svg>
+>     </div>
+>   );
+> }
+> EOF
+root@1d44877febc0:/app# cat > src/index.css <<'EOF'
+> html, body {
+>   margin: 0;
+>   padding: 0;
+>   width: 100%;
+>   height: 100%;
+>   background: #000;
+>   color: #0f0;
+>   font-family: monospace;
+> }
+>
+> #root {
+>   width: 100%;
+>   height: 100%;
+> }
+>
+> .app-root {
+>   position: relative;
+> }
+>
+> .ui-bar {
+>   position: absolute;
+>   left: 0;
+>   top: 0;
+>   padding: 6px 8px;
+>   display: flex;
+>   gap: 10px;
+>   align-items: center;
+>   background: rgba(0, 0, 0, 0.75);
+>   border-bottom: 1px solid #0f0;
+>   z-index: 2;
+> }
+>
+> select, button {
+>   background: #000;
+>   color: #0f0;
+>   border: 1px solid #0f0;
+>   font-family: monospace;
+>   padding: 2px 6px;
+> }
+>
+> button {
+>   cursor: pointer;
+> }
+>
+> .error-message {
+>   position: absolute;
+>   left: 0;
+>   top: 34px;
+>   padding: 6px 8px;
+>   background: rgba(0, 0, 0, 0.85);
+>   border-bottom: 1px solid #0f0;
+>   z-index: 2;
+> }
+>
+> .victory-banner {
+>   position: absolute;
+>   left: 0;
+>   top: 34px;
+>   padding: 6px 8px;
+>   background: rgba(0, 0, 0, 0.85);
+>   border-bottom: 1px solid #0f0;
+>   z-index: 2;
+> }
+>
+> .board-svg {
+>   display: block;
+>   position: absolute;
+>   left: 0;
+>   top: 0;
+>   background: #000;
+> }
+> EOF
+root@1d44877febc0:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming (5) src/App.jsx

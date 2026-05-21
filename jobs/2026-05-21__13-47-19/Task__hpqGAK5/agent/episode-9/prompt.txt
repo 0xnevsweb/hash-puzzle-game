@@ -1,0 +1,29 @@
+Previous response had warnings:
+WARNINGS: - Command 1 should end with newline when followed by another command. Otherwise the two commands will be concatenated together on the same line.
+
+New Terminal Output:
+
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-CEX5aohA.css    0.81 kB │ gzip:  0.42 kB
+dist/assets/index-bnDVhgMQ.js   149.79 kB │ gzip: 48.59 kB
+✓ built in 13.96s
+root@bd2a90a13cb7:/app# perl -0777 -i -pe 's/strokeWidth=\{3\}\n\s*\/>/strokeWidth={3}\n          onContextMenu={(e) => {\n            e.preventDefault();\n
+        setBridges((prev) => {\n              const m = new Map(prev);\n              m.delete(key);\n              return m;\n            });\n            clea
+rErrorOnValidMove();\n            setSelectedId(null);\n            setKeyboardFromId(null);\n          }}\n          onClick={(e) => {\n            if (!isCtrl
+Click(e)) return;\n            e.preventDefault();\n            setBridges((prev) => {\n              const m = new Map(prev);\n              m.delete(key);\n
+            return m;\n            });\n            clearErrorOnValidMove();\n            setSelectedId(null);\n            setKeyboardFromId(null);\n
+}}\n        \/>/s' src/App.jsx
+root@bd2a90a13cb7:/app# grep -n "onContextMenu={(e) =>" -n src/App.jsx | sed -n '1,120p'
+219:          onContextMenu={(e) => {
+307:        onContextMenu={(e) => e.preventDefault()}
+329:              onContextMenu={(e) => onIslandRightOrCtrlClick(e, isl)}
+root@bd2a90a13cb7:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+

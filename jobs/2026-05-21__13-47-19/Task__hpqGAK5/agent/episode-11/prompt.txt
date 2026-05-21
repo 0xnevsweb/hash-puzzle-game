@@ -1,0 +1,41 @@
+Current Terminal Screen:
+            setKeyboardFromId(null);
+          }}
+          onClick={(e) => {
+            if (!isCtrlClick(e)) return;
+            e.preventDefault();
+            setBridges((prev) => {
+              const m = new Map(prev);
+              m.delete(key);
+              return m;
+            });
+            clearErrorOnValidMove();
+            setSelectedId(null);
+            setKeyboardFromId(null);
+          }}
+        />
+      );
+
+      if (n === 1) {
+        lines.push(mkLine(0, 0, 0));
+      } else if (n === 2) {
+        lines.push(mkLine(0, dx, dy));
+        lines.push(mkLine(1, -dx, -dy));
+      }
+    }
+    return lines;
+  }, [bridges]);
+
+  const cursorRect = useMemo(() => {
+    if (cursorId === null) return null;
+    const isl = islands.find((i) => i.id === cursorId);
+    if (!isl) return null;
+    const { cx, cy } = islandCenterPx(isl);
+    const size = 34;
+root@bd2a90a13cb7:/app# ls -la dist/assets | sed -n '1,120p'
+total 160
+drwxr-xr-x 2 root root   4096 May 21 17:55 .
+drwxr-xr-x 3 root root   4096 May 21 17:55 ..
+-rw-r--r-- 1 root root 150020 May 21 17:55 index-BmMaRWS5.js
+-rw-r--r-- 1 root root    806 May 21 17:55 index-CEX5aohA.css
+root@bd2a90a13cb7:/app#
