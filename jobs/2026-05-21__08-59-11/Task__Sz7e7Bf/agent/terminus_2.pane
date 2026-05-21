@@ -1,927 +1,0 @@
-[?2004hroot@e3febcf25c5d:/app# asciinema rec --stdin /logs/agent/recording.cast
-[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
-[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
-[?2004hroot@e3febcf25c5d:/app# clear
-[?2004l[H[J[3J[?2004hroot@e3febcf25c5d:/app# cd /app
-[?2004l[?2004hroot@e3febcf25c5d:/app# ls -la
-[?2004ltotal 72
-drwxr-xr-x  1 root root  4096 May 20 19:14 .
-drwxr-xr-x  1 root root  4096 May 21 12:59 ..
-drwxr-xr-x 39 root root  4096 May 20 19:14 node_modules
--rw-r--r--  1 root root 56042 May 20 19:14 package-lock.json
--rw-rw-r--  1 root root   350 May 19 21:44 package.json
-[?2004hroot@e3febcf25c5d:/app# find . -maxdepth 3 -type f -name package.json -o -name vite.config.* -o -name craco.config.* -o -name webpack.config.*
-[?2004l./node_modules/escalade/package.json
-./node_modules/vite/package.json
-./node_modules/baseline-browser-mapping/package.json
-./node_modules/esbuild/package.json
-./node_modules/rollup/package.json
-./node_modules/yallist/package.json
-./node_modules/node-releases/package.json
-./node_modules/jsesc/package.json
-./node_modules/scheduler/package.json
-./node_modules/react-dom/package.json
-./node_modules/browserslist/package.json
-./node_modules/picocolors/package.json
-./node_modules/react/package.json
-./node_modules/postcss/package.json
-./node_modules/react-refresh/package.json
-./node_modules/caniuse-lite/package.json
-./node_modules/js-tokens/package.json
-./node_modules/gensync/package.json
-./node_modules/electron-to-chromium/package.json
-./node_modules/convert-source-map/package.json
-./node_modules/update-browserslist-db/package.json
-./node_modules/lru-cache/package.json
-./node_modules/debug/package.json
-./node_modules/ms/package.json
-./node_modules/json5/package.json
-./node_modules/nanoid/package.json
-./node_modules/semver/package.json
-./node_modules/loose-envify/package.json
-./node_modules/source-map-js/package.json
-./package.json
-[?2004hroot@e3febcf25c5d:/app# cat package.json
-[?2004l{
-  "name": "hashi-puzzle",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.11"
-  }
-}
-[?2004hroot@e3febcf25c5d:/app# ls -la src || true
-[?2004lls: cannot access 'src': No such file or directory
-[?2004hroot@e3febcf25c5d:/app# find src -maxdepth 3 -type f -print
-[?2004lfind: ‘src’: No such file or directory
-[?2004hroot@e3febcf25c5d:/app# npm install
-[?2004l[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏ls -la
-[1G[0K⠋[1G[0K⠙find . -maxdepth 2 -type f -print
-[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧cat index.html 2>/dev/null || echo "no index.html"
-[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦^C[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸cd /app
-[1G[0K⠼[1G[0K⠴[1G[0K⠦npm install
-[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏ls -la
-[1G[0K⠋[1G[0K⠙find . -maxdepth 2 -type f -print
-[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏cat index.html 2>/dev/null || echo "no index.html"
-[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸C-c
-[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏pwd
-[1G[0K⠋[1G[0K⠙[1G[0K⠹ls -la
-[1G[0K⠸[1G[0K⠼[1G[0K⠴ls -la index.html || true
-[1G[0K⠦[1G[0K⠧mkdir -p src/data src/utils
-[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼C-c
-[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋C-c
-[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦
-[1G[0K⠧[1G[0K⠇[1G[0K⠏ps aux | egrep 'npm|vite' | egrep -v egrep || true
-[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴pkill -f "vite" || true
-[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹pkill -f "npm" || true
-[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇cd /app
-[1G[0K⠏[1G[0K⠋[1G[0K⠙mkdir -p src/data src/utils
-[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇C-c
-[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴
-[1G[0K⠦[1G[0K⠧[1G[0K⠇ps -eo pid,ppid,cmd | egrep 'node|npm|vite' | egrep -v egrep || true
-[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼pkill -9 -f "vite" || true
-[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋pkill -9 -f "npm" || true
-[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦pkill -9 -f "node" || true
-[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸echo READY
-[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸C-c
-[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋reset
-[1G[0K[1mnpm[22m [31merror[39m process terminated
-[1G[0K⠋[1G[0K[1mnpm[22m [31merror[39m [94msignal[39m SIGINT
-[1G[0K⠋[1G[0K[1mnpm[22m [31merror[39m A complete log of this run can be found in: /root/.npm/_logs/2026-05-21T12_59_53_040Z-debug-0.log
-[1G[0K⠋[1G[0K[?2004hroot@e3febcf25c5d:/app# cd /app
-[?2004l[?2004hroot@e3febcf25c5d:/app# npm install
-[?2004lbash
-[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼cd /app
-[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇ps -eo pid,ppid,cmd | egrep 'node|npm|vite' | egrep -v egrep || true
-[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸mkdir -p src/data src/utils
-[1G[0K⠼[1G[0K⠴[1G[0K⠦echo CLEAN_PROMPT
-[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋C-c
-[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧
-[1G[0K⠇[1G[0K⠏ps -eo pid,ppid,cmd | egrep 'node|npm|vite' | egrep -v egrep || true
-[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧cd /app
-[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹mkdir -p src/data src/utils
-[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦cat > index.html <<'EOF'
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hashi Puzzle</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
-EOF
-[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙cat > src/main.jsx <<'EOF'
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
-import './styles.css';
-
-createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-EOF
-[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K⠇[1G[0K⠏[1G[0K⠋[1G[0K⠙[1G[0K⠹[1G[0K⠸[1G[0K⠼[1G[0K⠴[1G[0K⠦[1G[0K⠧[1G[0K
-up to date in 1m
-[1G[0K⠧[1G[0K
-[1G[0K⠧[1G[0K7 packages are looking for funding
-[1G[0K⠧[1G[0K  run `npm fund` for details
-[1G[0K⠧[1G[0K[?2004hroot@e3febcf25c5d:/app# ls -la
-[?2004ltotal 80
-drwxr-xr-x 1 root root  4096 May 20 19:14 .
-drwxr-xr-x 1 root root  4096 May 21 12:59 ..
-drwxr-xr-x 1 root root  4096 May 21 13:02 node_modules
--rw-r--r-- 1 root root 56042 May 21 13:02 package-lock.json
--rw-rw-r-- 1 root root   350 May 19 21:44 package.json
-[?2004hroot@e3febcf25c5d:/app# find . -maxdepth 2 -type f -print
-[?2004l./node_modules/.package-lock.json
-./package-lock.json
-./package.json
-[?2004hroot@e3febcf25c5d:/app# cat index.html 2>/dev/null || echo "no index.html"
-[?2004lno index.html
-[?2004hroot@e3febcf25c5d:/app# C-c
-[?2004lbash: C-c: command not found
-[?2004hroot@e3febcf25c5d:/app# pwd
-[?2004l/app
-[?2004hroot@e3febcf25c5d:/app# ls -la
-[?2004ltotal 80
-drwxr-xr-x 1 root root  4096 May 20 19:14 .
-drwxr-xr-x 1 root root  4096 May 21 12:59 ..
-drwxr-xr-x 1 root root  4096 May 21 13:02 node_modules
--rw-r--r-- 1 root root 56042 May 21 13:02 package-lock.json
--rw-rw-r-- 1 root root   350 May 19 21:44 package.json
-[?2004hroot@e3febcf25c5d:/app# ls -la index.html || true
-[?2004lls: cannot access 'index.html': No such file or directory
-[?2004hroot@e3febcf25c5d:/app# mkdir -p src/data src/utils
-[?2004l[?2004hroot@e3febcf25c5d:/app# C-c
-[?2004lbash: C-c: command not found
-[?2004hroot@e3febcf25c5d:/app# C-c
-[?2004lbash: C-c: command not found
-[?2004hroot@e3febcf25c5d:/app# 
-[?2004l[?2004hroot@e3febcf25c5d:/app# ps aux | egrep 'npm|vite' | egrep -v egrep || true
-[?2004lroot         581  0.0  0.0   3716  1996 pts/1    S+   13:02   0:00 grep -E npm|vite
-[?2004hroot@e3febcf25c5d:/app# pkill -f "vite" || true
-[?2004l[?2004hroot@e3febcf25c5d:/app# pkill -f "npm" || true
-[?2004l[?2004hroot@e3febcf25c5d:/app# cd /app
-[?2004l[?2004hroot@e3febcf25c5d:/app# mkdir -p src/data src/utils
-[?2004l[?2004hroot@e3febcf25c5d:/app# C-c
-[?2004lbash: C-c: command not found
-[?2004hroot@e3febcf25c5d:/app# 
-[?2004l[?2004hroot@e3febcf25c5d:/app# ps -eo pid,ppid,cmd | egrep 'node|npm|vite' | egrep -v egrep || true
-[?2004l    588      59 grep -E node|npm|vite
-[?2004hroot@e3febcf25c5d:/app# pkill -9 -f "vite" || true
-[?2004l[?2004hroot@e3febcf25c5d:/app# pkill -9 -f "npm" || true
-[?2004l[?2004hroot@e3febcf25c5d:/app# pkill -9 -f "node" || true
-[?2004l[?2004hroot@e3febcf25c5d:/app# echo READY
-[?2004lREADY
-[?2004hroot@e3febcf25c5d:/app# C-c
-[?2004lbash: C-c: command not found
-[?2004hroot@e3febcf25c5d:/app# reset
-[?2004lc[?1000l[?25h[?2004hroot@e3febcf25c5d:/app# bash
-[?2004l[?2004hroot@e3febcf25c5d:/app# cd /app
-[?2004l[?2004hroot@e3febcf25c5d:/app# ps -eo pid,ppid,cmd | egrep 'node|npm|vite' | egrep -v egrep || true
-[?2004l    597     595 grep -E node|npm|vite
-[?2004hroot@e3febcf25c5d:/app# mkdir -p src/data src/utils
-[?2004l[?2004hroot@e3febcf25c5d:/app# echo CLEAN_PROMPT
-[?2004lCLEAN_PROMPT
-[?2004hroot@e3febcf25c5d:/app# C-c
-[?2004lbash: C-c: command not found
-[?2004hroot@e3febcf25c5d:/app# 
-[?2004l[?2004hroot@e3febcf25c5d:/app# ps -eo pid,ppid,cmd | egrep 'node|npm|vite' | egrep -v egrep || true
-[?2004l    602     595 grep -E node|npm|vite
-[?2004hroot@e3febcf25c5d:/app# cd /app
-[?2004l[?2004hroot@e3febcf25c5d:/app# mkdir -p src/data src/utils
-[?2004l[?2004hroot@e3febcf25c5d:/app# cat > index.html <<'EOF'
-[?2004l[?2004h> <!doctype html>
-[?2004l[?2004h> <html lang="en">
-[?2004l[?2004h>   <head>
-[?2004l[?2004h>     <meta charset="UTF-8" />
-[?2004l[?2004h>     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-[?2004l[?2004h>     <title>Hashi Puzzle</title>
-[?2004l[?2004h>   </head>
-[?2004l[?2004h>   <body>
-[?2004l[?2004h>     <div id="root"></div>
-[?2004l[?2004h>     <script type="module" src="/src/main.jsx"></script>
-[?2004l[?2004h>   </body>
-[?2004l[?2004h> </html>
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@e3febcf25c5d:/app# cat > src/main.jsx <<'EOF'
-[?2004l[?2004h> import React from 'react';
-[?2004l[?2004h> import { createRoot } from 'react-dom/client';
-[?2004l[?2004h> import App from './App.jsx';
-[?2004l[?2004h> import './styles.css';
-[?2004l[?2004h> 
-[?2004l[?2004h> createRoot(document.getElementById('root')).render(
-[?2004l[?2004h>   <React.StrictMode>
-[?2004l[?2004h>     <App />
-[?2004l[?2004h>   </React.StrictMode>
-[?2004l[?2004h> );
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@e3febcf25c5d:/app# cat > src/data/puzzles.js <<'EOF'
-[?2004l[?2004h> // Grid units; each unit is rendered at 40px.
-[?2004l[?2004h> // Islands: { id, x, y, value } value is required total bridges (1-8)
-[?2004l[?2004h> 
-[?2004l[?2004h> export const PUZZLES = [
-[?2004l[?2004h>   {
-[?2004l[?2004h>     label: 'Easy',
-[?2004l[?2004h>     islands: [
-[?2004l[?2004h>       { id: 'e1', x: 4, y: 3, value: 2 },
-[?2004l[?2004h>       { id: 'e2', x: 10, y: 3, value: 2 },
-[?2004l[?2004h>       { id: 'e3', x: 4, y: 9, value: 2 },
-[?2004l[?2004h>       { id: 'e4', x: 10, y: 9, value: 2 }
-[?2004l[?2004h>     ]
-[?2004l[?2004h>   },
-[?2004l[?2004h>   {
-[?2004l[?2004h>     label: 'Medium',
-[?2004l[?2004h>     islands: [
-[?2004l[?2004h>       { id: 'm1', x: 3, y: 2, value: 3 },
-[?2004l[?2004h>       { id: 'm2', x: 9, y: 2, value: 3 },
-[?2004l[?2004h>       { id: 'm3', x: 12, y: 2, value: 2 },
-[?2004l[?2004h> 
-[?2004l[?2004h>       { id: 'm4', x: 3, y: 6, value: 2 },
-[?2004l[?2004h>       { id: 'm5', x: 9, y: 6, value: 4 },
-[?2004l[?2004h>       { id: 'm6', x: 12, y: 6, value: 2 },
-[?2004l[?2004h> 
-[?2004l[?2004h>       { id: 'm7', x: 3, y: 10, value: 3 },
-[?2004l[?2004h>       { id: 'm8', x: 9, y: 10, value: 3 },
-[?2004l[?2004h>       { id: 'm9', x: 12, y: 10, value: 2 }
-[?2004l[?2004h>     ]
-[?2004l[?2004h>   },
-[?2004l[?2004h>   {
-[?2004l[?2004h>     label: 'Hard',
-[?2004l[?2004h>     islands: [
-[?2004l[?2004h>       { id: 'h1', x: 2, y: 2, value: 2 },
-[?2004l[?2004h>       { id: 'h2', x: 6, y: 2, value: 4 },
-[?2004l[?2004h>       { id: 'h3', x: 10, y: 2, value: 3 },
-[?2004l[?2004h>       { id: 'h4', x: 14, y: 2, value: 2 },
-[?2004l[?2004h> 
-[?2004l[?2004h>       { id: 'h5', x: 2, y: 6, value: 3 },
-[?2004l[?2004h>       { id: 'h6', x: 6, y: 6, value: 5 },
-[?2004l[?2004h>       { id: 'h7', x: 10, y: 6, value: 5 },
-[?2004l[?2004h>       { id: 'h8', x: 14, y: 6, value: 3 },
-[?2004l[?2004h> 
-[?2004l[?2004h>       { id: 'h9', x: 2, y: 10, value: 2 },
-[?2004l[?2004h>       { id: 'h10', x: 6, y: 10, value: 4 },
-[?2004l[?2004h>       { id: 'h11', x: 10, y: 10, value: 3 },
-[?2004l[?2004h>       { id: 'h12', x: 14, y: 10, value: 2 }
-[?2004l[?2004h>     ]
-[?2004l[?2004h>   }
-[?2004l[?2004h> ];
-[?2004l[?2004h> 
-[?2004l[?2004h> export function getPuzzleByLabel(label) {
-[?2004l[?2004h>   return PUZZLES.find((p) => p.label === label) || PUZZLES[0];
-[?2004l[?2004h> }
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@e3febcf25c5d:/app# cat > src/utils/hashiLogic.js <<'EOF'
-[?2004l[?2004h> const ERR_NON_ADJ = 'Cannot connect non-adjacent islands';
-[?2004l[?2004h> const ERR_MAX2 = 'Max 2 bridges per pair';
-[?2004l[?2004h> const ERR_EXCEED = 'Island would exceed its number';
-[?2004l[?2004h> const ERR_CROSS = 'Bridges would cross';
-[?2004l[?2004h> 
-[?2004l[?2004h> export function canonicalBridgeKey(from, to) {
-[?2004l[?2004h>   const a = { x: from.x, y: from.y };
-[?2004l[?2004h>   const b = { x: to.x, y: to.y };
-[?2004l[?2004h>   const first = a.x < b.x || (a.x === b.x && a.y <= b.y) ? a : b;
-[?2004l[?2004h>   const second = first === a ? b : a;
-[?2004l[?2004h>   return `${first.x},${first.y},${second.x},${second.y}`;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export function parseBridgeKey(key) {
-[?2004l[?2004h>   const [x1, y1, x2, y2] = key.split(',').map(Number);
-[?2004l[?2004h>   return { x1, y1, x2, y2 };
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export function isAxisAligned(a, b) {
-[?2004l[?2004h>   return a.x === b.x || a.y === b.y;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export function islandsByCoord(islands) {
-[?2004l[?2004h>   const m = new Map();
-[?2004l[?2004h>   for (const isl of islands) m.set(`${isl.x},${isl.y}`, isl);
-[?2004l[?2004h>   return m;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export function areAdjacent(islands, from, to) {
-[?2004l[?2004h>   if (!isAxisAligned(from, to)) return false;
-[?2004l[?2004h>   if (from.x === to.x) {
-[?2004l[?2004h>     const x = from.x;
-[?2004l[?2004h>     const yMin = Math.min(from.y, to.y);
-[?2004l[?2004h>     const yMax = Math.max(from.y, to.y);
-[?2004l[?2004h>     for (const isl of islands) {
-[?2004l[?2004h>       if (isl.x === x && isl.y > yMin && isl.y < yMax) return false;
-[?2004l[?2004h>     }
-[?2004l[?2004h>     return true;
-[?2004l[?2004h>   }
-[?2004l[?2004h>   const y = from.y;
-[?2004l[?2004h>   const xMin = Math.min(from.x, to.x);
-[?2004l[?2004h>   const xMax = Math.max(from.x, to.x);
-[?2004l[?2004h>   for (const isl of islands) {
-[?2004l[?2004h>     if (isl.y === y && isl.x > xMin && isl.x < xMax) return false;
-[?2004l[?2004h>   }
-[?2004l[?2004h>   return true;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> function segmentForBridge(key) {
-[?2004l[?2004h>   const { x1, y1, x2, y2 } = parseBridgeKey(key);
-[?2004l[?2004h>   if (x1 === x2) {
-[?2004l[?2004h>     return { orient: 'V', x: x1, y1: Math.min(y1, y2), y2: Math.max(y1, y2) };
-[?2004l[?2004h>   }
-[?2004l[?2004h>   return { orient: 'H', y: y1, x1: Math.min(x1, x2), x2: Math.max(x1, x2) };
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export function bridgesWouldCross(bridges) {
-[?2004l[?2004h>   const keys = [...bridges.entries()].filter(([, n]) => n > 0).map(([k]) => k);
-[?2004l[?2004h>   for (let i = 0; i < keys.length; i++) {
-[?2004l[?2004h>     const a = segmentForBridge(keys[i]);
-[?2004l[?2004h>     for (let j = i + 1; j < keys.length; j++) {
-[?2004l[?2004h>       const b = segmentForBridge(keys[j]);
-[?2004l[?2004h>       if (a.orient === b.orient) continue;
-[?2004l[?2004h>       const h = a.orient === 'H' ? a : b;
-[?2004l[?2004h>       const v = a.orient === 'V' ? a : b;
-[?2004l[?2004h>       // Proper crossing only at interior (not at endpoints)
-[?2004l[?2004h>       const crosses = v.x > h.x1 && v.x < h.x2 && h.y > v.y1 && h.y < v.y2;
-[?2004l[?2004h>       if (crosses) return true;
-[?2004l[?2004h>     }
-[?2004l[?2004h>   }
-[?2004l[?2004h>   return false;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export function computeCurrentCounts(islands, bridges) {
-[?2004l[?2004h>   const counts = new Map(islands.map((i) => [i.id, 0]));
-[?2004l[?2004h>   const byCoord = islandsByCoord(islands);
-[?2004l[?2004h> 
-[?2004l[?2004h>   for (const [key, n] of bridges.entries()) {
-[?2004l[?2004h>     if (!n) continue;
-[?2004l[?2004h>     const { x1, y1, x2, y2 } = parseBridgeKey(key);
-[?2004l[?2004h>     const a = byCoord.get(`${x1},${y1}`);
-[?2004l[?2004h>     const b = byCoord.get(`${x2},${y2}`);
-[?2004l[?2004h>     if (!a || !b) continue;
-[?2004l[?2004h>     counts.set(a.id, (counts.get(a.id) || 0) + n);
-[?2004l[?2004h>     counts.set(b.id, (counts.get(b.id) || 0) + n);
-[?2004l[?2004h>   }
-[?2004l[?2004h>   return counts;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export function canAddBridge(islands, bridges, from, to, delta) {
-[?2004l[?2004h>   if (!from || !to || from.id === to.id) return { valid: false, error: ERR_NON_ADJ };
-[?2004l[?2004h>   if (!areAdjacent(islands, from, to)) return { valid: false, error: ERR_NON_ADJ };
-[?2004l[?2004h> 
-[?2004l[?2004h>   const key = canonicalBridgeKey(from, to);
-[?2004l[?2004h>   const cur = bridges.get(key) || 0;
-[?2004l[?2004h>   const next = cur + delta;
-[?2004l[?2004h> 
-[?2004l[?2004h>   if (next < 0) return { valid: true, error: null };
-[?2004l[?2004h>   if (next > 2) return { valid: false, error: ERR_MAX2 };
-[?2004l[?2004h> 
-[?2004l[?2004h>   // capacity check per-island
-[?2004l[?2004h>   const counts = computeCurrentCounts(islands, bridges);
-[?2004l[?2004h>   const fromCount = counts.get(from.id) || 0;
-[?2004l[?2004h>   const toCount = counts.get(to.id) || 0;
-[?2004l[?2004h> 
-[?2004l[?2004h>   if (fromCount + delta > from.value || toCount + delta > to.value) {
-[?2004l[?2004h>     return { valid: false, error: ERR_EXCEED };
-[?2004l[?2004h>   }
-[?2004l[?2004h> 
-[?2004l[?2004h>   // crossing check: simulate
-[?2004l[?2004h>   const test = new Map(bridges);
-[?2004l[?2004h>   if (next === 0) test.delete(key);
-[?2004l[?2004h>   else test.set(key, next);
-[?2004l[?2004h> 
-[?2004l[?2004h>   if (bridgesWouldCross(test)) return { valid: false, error: ERR_CROSS };
-[?2004l[?2004h> 
-[?2004l[?2004h>   return { valid: true, error: null };
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export function checkConnectivity(islands, bridges) {
-[?2004l[?2004h>   if (islands.length <= 1) return true;
-[?2004l[?2004h>   const byCoord = islandsByCoord(islands);
-[?2004l[?2004h>   const adj = new Map(islands.map((i) => [i.id, new Set()]));
-[?2004l[?2004h> 
-[?2004l[?2004h>   for (const [key, n] of bridges.entries()) {
-[?2004l[?2004h>     if (!n) continue;
-[?2004l[?2004h>     const { x1, y1, x2, y2 } = parseBridgeKey(key);
-[?2004l[?2004h>     const a = byCoord.get(`${x1},${y1}`);
-[?2004l[?2004h>     const b = byCoord.get(`${x2},${y2}`);
-[?2004l[?2004h>     if (!a || !b) continue;
-[?2004l[?2004h>     adj.get(a.id).add(b.id);
-[?2004l[?2004h>     adj.get(b.id).add(a.id);
-[?2004l[?2004h>   }
-[?2004l[?2004h> 
-[?2004l[?2004h>   const start = islands[0].id;
-[?2004l[?2004h>   const q = [start];
-[?2004l[?2004h>   const seen = new Set([start]);
-[?2004l[?2004h>   while (q.length) {
-[?2004l[?2004h>     const id = q.shift();
-[?2004l[?2004h>     for (const nb of adj.get(id) || []) {
-[?2004l[?2004h>       if (!seen.has(nb)) {
-[?2004l[?2004h>         seen.add(nb);
-[?2004l[?2004h>         q.push(nb);
-[?2004l[?2004h>       }
-[?2004l[?2004h>     }
-[?2004l[?2004h>   }
-[?2004l[?2004h>   return seen.size === islands.length;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export function isVictory(islands, bridges) {
-[?2004l[?2004h>   if (bridgesWouldCross(bridges)) return false;
-[?2004l[?2004h>   const counts = computeCurrentCounts(islands, bridges);
-[?2004l[?2004h>   for (const isl of islands) {
-[?2004l[?2004h>     if ((counts.get(isl.id) || 0) !== isl.value) return false;
-[?2004l[?2004h>   }
-[?2004l[?2004h>   return checkConnectivity(islands, bridges);
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export const ERROR_TEXTS = {
-[?2004l[?2004h>   ERR_NON_ADJ,
-[?2004l[?2004h>   ERR_MAX2,
-[?2004l[?2004h>   ERR_EXCEED,
-[?2004l[?2004h>   ERR_CROSS
-[?2004l[?2004h> };
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@e3febcf25c5d:/app# cat > src/styles.css <<'EOF'
-[?2004l[?2004h> :root{
-[?2004l[?2004h>   --bg:#000;
-[?2004l[?2004h>   --fg:#00ff66;
-[?2004l[?2004h>   --dim:#00aa44;
-[?2004l[?2004h>   --warn:#ffcc00;
-[?2004l[?2004h> }
-[?2004l[?2004h> html, body {
-[?2004l[?2004h>   margin: 0;
-[?2004l[?2004h>   padding: 0;
-[?2004l[?2004h>   width: 100%;
-[?2004l[?2004h>   height: 100%;
-[?2004l[?2004h>   background: var(--bg);
-[?2004l[?2004h>   color: var(--fg);
-[?2004l[?2004h>   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-[?2004l[?2004h> }
-[?2004l[?2004h> #root{
-[?2004l[?2004h>   width: 100%;
-[?2004l[?2004h>   height: 100%;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> .controls{
-[?2004l[?2004h>   position: fixed;
-[?2004l[?2004h>   left: 0;
-[?2004l[?2004h>   top: 0;
-[?2004l[?2004h>   z-index: 5;
-[?2004l[?2004h>   padding: 8px;
-[?2004l[?2004h>   background: rgba(0,0,0,0.85);
-[?2004l[?2004h>   border-right: 1px solid var(--dim);
-[?2004l[?2004h>   border-bottom: 1px solid var(--dim);
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> select, button{
-[?2004l[?2004h>   background: #000;
-[?2004l[?2004h>   color: var(--fg);
-[?2004l[?2004h>   border: 1px solid var(--dim);
-[?2004l[?2004h>   padding: 6px 8px;
-[?2004l[?2004h>   margin-right: 8px;
-[?2004l[?2004h> }
-[?2004l[?2004h> button:hover, select:hover{ border-color: var(--fg); }
-[?2004l[?2004h> 
-[?2004l[?2004h> .error-message{
-[?2004l[?2004h>   margin-top: 8px;
-[?2004l[?2004h>   color: var(--warn);
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> .victory-banner{
-[?2004l[?2004h>   margin-top: 8px;
-[?2004l[?2004h>   padding: 6px 8px;
-[?2004l[?2004h>   border: 1px solid var(--fg);
-[?2004l[?2004h>   display: inline-block;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> svg.board{
-[?2004l[?2004h>   position: fixed;
-[?2004l[?2004h>   left: 0;
-[?2004l[?2004h>   top: 0;
-[?2004l[?2004h> }
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@e3febcf25c5d:/app# cat > src/App.jsx <<'EOF'
-[?2004l[?2004h> import React, { useEffect, useMemo, useRef, useState } from 'react';
-[?2004l[?2004h> import { PUZZLES, getPuzzleByLabel } from './data/puzzles.js';
-[?2004l[?2004h> import {
-[?2004l[?2004h>   areAdjacent,
-[?2004l[?2004h>   canonicalBridgeKey,
-[?2004l[?2004h>   canAddBridge,
-[?2004l[?2004h>   computeCurrentCounts,
-[?2004l[?2004h>   isVictory,
-[?2004l[?2004h>   parseBridgeKey
-[?2004l[?2004h> } from './utils/hashiLogic.js';
-[?2004l[?2004h> 
-[?2004l[?2004h> const UNIT = 40;
-[?2004l[?2004h> const W = 800;
-[?2004l[?2004h> const H = 600;
-[?2004l[?2004h> 
-[?2004l[?2004h> function px(n) {
-[?2004l[?2004h>   return n * UNIT;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> function bridgeLinesPixels(from, to, count) {
-[?2004l[?2004h>   const x1 = px(from.x);
-[?2004l[?2004h>   const y1 = px(from.y);
-[?2004l[?2004h>   const x2 = px(to.x);
-[?2004l[?2004h>   const y2 = px(to.y);
-[?2004l[?2004h> 
-[?2004l[?2004h>   if (count === 1) return [{ x1, y1, x2, y2 }];
-[?2004l[?2004h>   // double: 2 parallel lines offset 4px perpendicular
-[?2004l[?2004h>   const offset = 4;
-[?2004l[?2004h>   if (from.x === to.x) {
-[?2004l[?2004h>     return [
-[?2004l[?2004h>       { x1: x1 - offset, y1, x2: x2 - offset, y2 },
-[?2004l[?2004h>       { x1: x1 + offset, y1, x2: x2 + offset, y2 }
-[?2004l[?2004h>     ];
-[?2004l[?2004h>   }
-[?2004l[?2004h>   return [
-[?2004l[?2004h>     { x1, y1: y1 - offset, x2, y2: y2 - offset },
-[?2004l[?2004h>     { x1, y1: y1 + offset, x2, y2: y2 + offset }
-[?2004l[?2004h>   ];
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> function getNeighbors(islands, from, dir) {
-[?2004l[?2004h>   // return nearest island in direction if aligned
-[?2004l[?2004h>   let best = null;
-[?2004l[?2004h>   for (const isl of islands) {
-[?2004l[?2004h>     if (isl.id === from.id) continue;
-[?2004l[?2004h>     if (dir === 'left' && isl.y === from.y && isl.x < from.x) {
-[?2004l[?2004h>       if (!best || isl.x > best.x) best = isl;
-[?2004l[?2004h>     }
-[?2004l[?2004h>     if (dir === 'right' && isl.y === from.y && isl.x > from.x) {
-[?2004l[?2004h>       if (!best || isl.x < best.x) best = isl;
-[?2004l[?2004h>     }
-[?2004l[?2004h>     if (dir === 'up' && isl.x === from.x && isl.y < from.y) {
-[?2004l[?2004h>       if (!best || isl.y > best.y) best = isl;
-[?2004l[?2004h>     }
-[?2004l[?2004h>     if (dir === 'down' && isl.x === from.x && isl.y > from.y) {
-[?2004l[?2004h>       if (!best || isl.y < best.y) best = isl;
-[?2004l[?2004h>     }
-[?2004l[?2004h>   }
-[?2004l[?2004h>   return best;
-[?2004l[?2004h> }
-[?2004l[?2004h> 
-[?2004l[?2004h> export default function App() {
-[?2004l[?2004h>   const [puzzleLabel, setPuzzleLabel] = useState(PUZZLES[0].label);
-[?2004l[?2004h>   const puzzle = useMemo(() => getPuzzleByLabel(puzzleLabel), [puzzleLabel]);
-[?2004l[?2004h> 
-[?2004l[?2004h>   const [bridges, setBridges] = useState(() => new Map());
-[?2004l[?2004h>   const [selectedId, setSelectedId] = useState(null);
-[?2004l[?2004h>   const [cursorId, setCursorId] = useState(puzzle.islands[0]?.id || null);
-[?2004l[?2004h>   const [error, setError] = useState(null);
-[?2004l[?2004h> 
-[?2004l[?2004h>   const counts = useMemo(() => computeCurrentCounts(puzzle.islands, bridges), [puzzle.islands, bridges]);
-[?2004l[?2004h>   const victory = useMemo(() => isVictory(puzzle.islands, bridges), [puzzle.islands, bridges]);
-[?2004l[?2004h> 
-[?2004l[?2004h>   const islandsById = useMemo(() => {
-[?2004l[?2004h>     const m = new Map();
-[?2004l[?2004h>     for (const isl of puzzle.islands) m.set(isl.id, isl);
-[?2004l[?2004h>     return m;
-[?2004l[?2004h>   }, [puzzle.islands]);
-[?2004l[?2004h> 
-[?2004l[?2004h>   const svgRef = useRef(null);
-[?2004l[?2004h> 
-[?2004l[?2004h>   useEffect(() => {
-[?2004l[?2004h>     // On puzzle change: fully reset bridges & selection/cursor
-[?2004l[?2004h>     setBridges(new Map());
-[?2004l[?2004h>     setSelectedId(null);
-[?2004l[?2004h>     setCursorId(puzzle.islands[0]?.id || null);
-[?2004l[?2004h>     setError(null);
-[?2004l[?2004h>   }, [puzzleLabel]);
-[?2004l[?2004h> 
-[?2004l[?2004h>   function applyDelta(from, to, delta) {
-[?2004l[?2004h>     const res = canAddBridge(puzzle.islands, bridges, from, to, delta);
-[?2004l[?2004h>     if (!res.valid) {
-[?2004l[?2004h>       setError(res.error);
-[?2004l[?2004h>       return;
-[?2004l[?2004h>     }
-[?2004l[?2004h>     setError(null);
-[?2004l[?2004h> 
-[?2004l[?2004h>     const key = canonicalBridgeKey(from, to);
-[?2004l[?2004h>     const cur = bridges.get(key) || 0;
-[?2004l[?2004h>     const next = cur + delta;
-[?2004l[?2004h>     const nb = new Map(bridges);
-[?2004l[?2004h>     if (next <= 0) nb.delete(key);
-[?2004l[?2004h>     else nb.set(key, next);
-[?2004l[?2004h>     setBridges(nb);
-[?2004l[?2004h>   }
-[?2004l[?2004h> 
-[?2004l[?2004h>   function cycleBridge(from, to) {
-[?2004l[?2004h>     if (!areAdjacent(puzzle.islands, from, to)) {
-[?2004l[?2004h>       setError('Cannot connect non-adjacent islands');
-[?2004l[?2004h>       return;
-[?2004l[?2004h>     }
-[?2004l[?2004h>     const key = canonicalBridgeKey(from, to);
-[?2004l[?2004h>     const cur = bridges.get(key) || 0;
-[?2004l[?2004h>     const next = (cur + 1) % 3; // 0->1->2->0
-[?2004l[?2004h> 
-[?2004l[?2004h>     const delta = next - cur;
-[?2004l[?2004h>     if (delta === 0) {
-[?2004l[?2004h>       setError(null);
-[?2004l[?2004h>       return;
-[?2004l[?2004h>     }
-[?2004l[?2004h> 
-[?2004l[?2004h>     // apply in steps so validation uses correct delta (could be -2 when cycling 2->0)
-[?2004l[?2004h>     if (delta === -2) {
-[?2004l[?2004h>       applyDelta(from, to, -1);
-[?2004l[?2004h>       applyDelta(from, to, -1);
-[?2004l[?2004h>     } else if (delta === 2) {
-[?2004l[?2004h>       applyDelta(from, to, 1);
-[?2004l[?2004h>       applyDelta(from, to, 1);
-[?2004l[?2004h>     } else {
-[?2004l[?2004h>       applyDelta(from, to, delta);
-[?2004l[?2004h>     }
-[?2004l[?2004h>   }
-[?2004l[?2004h> 
-[?2004l[?2004h>   function onIslandClick(id) {
-[?2004l[?2004h>     const isl = islandsById.get(id);
-[?2004l[?2004h>     if (!isl) return;
-[?2004l[?2004h> 
-[?2004l[?2004h>     if (!selectedId) {
-[?2004l[?2004h>       setSelectedId(id);
-[?2004l[?2004h>       setCursorId(id);
-[?2004l[?2004h>       return;
-[?2004l[?2004h>     }
-[?2004l[?2004h>     if (selectedId === id) {
-[?2004l[?2004h>       // reselect; no toggle
-[?2004l[?2004h>       setSelectedId(id);
-[?2004l[?2004h>       return;
-[?2004l[?2004h>     }
-[?2004l[?2004h>     const from = islandsById.get(selectedId);
-[?2004l[?2004h>     const to = isl;
-[?2004l[?2004h>     cycleBridge(from, to);
-[?2004l[?2004h>     setSelectedId(null);
-[?2004l[?2004h>   }
-[?2004l[?2004h> 
-[?2004l[?2004h>   function onBridgeToggle(key) {
-[?2004l[?2004h>     const { x1, y1, x2, y2 } = parseBridgeKey(key);
-[?2004l[?2004h>     const from = puzzle.islands.find((i) => i.x === x1 && i.y === y1);
-[?2004l[?2004h>     const to = puzzle.islands.find((i) => i.x === x2 && i.y === y2);
-[?2004l[?2004h>     if (!from || !to) return;
-[?2004l[?2004h>     cycleBridge(from, to);
-[?2004l[?2004h>   }
-[?2004l[?2004h> 
-[?2004l[?2004h>   function resetPuzzle() {
-[?2004l[?2004h>     setBridges(new Map());
-[?2004l[?2004h>     setSelectedId(null);
-[?2004l[?2004h>     setError(null);
-[?2004l[?2004h>   }
-[?2004l[?2004h> 
-[?2004l[?2004h>   useEffect(() => {
-[?2004l[?2004h>     function onKeyDown(e) {
-[?2004l[?2004h>       if (!puzzle.islands.length) return;
-[?2004l[?2004h> 
-[?2004l[?2004h>       const cur = islandsById.get(cursorId) || puzzle.islands[0];
-[?2004l[?2004h> 
-[?2004l[?2004h>       if (e.key === 'Escape') {
-[?2004l[?2004h>         setSelectedId(null);
-[?2004l[?2004h>         return;
-[?2004l[?2004h>       }
-[?2004l[?2004h> 
-[?2004l[?2004h>       const dirMap = {
-[?2004l[?2004h>         ArrowLeft: 'left',
-[?2004l[?2004h>         ArrowRight: 'right',
-[?2004l[?2004h>         ArrowUp: 'up',
-[?2004l[?2004h>         ArrowDown: 'down'
-[?2004l[?2004h>       };
-[?2004l[?2004h> 
-[?2004l[?2004h>       if (e.key in dirMap) {
-[?2004l                transform={`translate(${px(isl.x)}, ${px(isl.y)})`}
-                onClick={() => onIslandClick(isl.id)}
-                style={{ cursor: 'pointer' }}
-              >
-                <circle
-               [?2004h>         e.preventDefault();
-[?2004l[?2004h>         const next = getNeighbors(puzzle.islands, cur, dirMap[e.key]);
-[?2004l[?2004h>         if (next) setCursorId(next.id);
-[?2004l[?2004h>         return;
-[?2004l[?2004h>       }
-[?2004l[?2004h> 
-[?2004l[?2004h>       if (e.key === 'Enter') {
-[?2004l[?2004h>         e.preventDefault();
-[?2004l[?2004h>         if (!selectedId) {
-[?2004l[?2004h>           setSelectedId(cur.id);
-[?2004l[?2004h>         } else {
-[?2004l[?2004h>           const from = islandsById.get(selectedId);
-[?2004l[?2004h>           const to = cur;
-[?2004l[?2004h>           if (from && to && from.id !== to.id) {
-[?2004l[?2004h>             cycleBridge(from, to);
-[?2004l[?2004h>           }
-[?2004l[?2004h>           setSelectedId(null);
-[?2004l[?2004h>         }
-[?2004l[?2004h>       }
-[?2004l[?2004h>     }
-[?2004l[?2004h> 
-[?2004l[?2004h>     window.addEventListener('keydown', onKeyDown);
-[?2004l[?2004h>     return () => window.removeEventListener('keydown', onKeyDown);
-[?2004l[?2004h>   }, [cursorId, islandsById, puzzle.islands, selectedId, bridges]);
-[?2004l[?2004h> 
-[?2004l[?2004h>   const bridgeEntries = useMemo(() => {
-[?2004l[?2004h>     const arr = [...bridges.entries()].filter(([, n]) => n > 0);
-[?2004l[?2004h>     arr.sort((a, b) => a[0].localeCompare(b[0]));
-[?2004l[?2004h>     return arr;
-[?2004l[?2004h>   }, [bridges]);
-[?2004l[?2004h> 
-[?2004l[?2004h>   return (
-[?2004l[?2004h>     <>
-[?2004l[?2004h>       <div className="controls">
-[?2004l[?2004h>         <label>
-[?2004l[?2004h>           Puzzle:{' '}
-[?2004l[?2004h>           <select
-[?2004l[?2004h>             value={puzzleLabel}
-[?2004l[?2004h>             onChange={(e) => setPuzzleLabel(e.target.value)}
-[?2004l[?2004h>           >
-[?2004l[?2004h>             {PUZZLES.map((p) => (
-[?2004l[?2004h>               <option key={p.label} value={p.label}>
-[?2004l[?2004h>                 {p.label}
-[?2004l[?2004h>               </option>
-[?2004l[?2004h>             ))}
-[?2004l[?2004h>           </select>
-[?2004l[?2004h>         </label>
-[?2004l[?2004h>         <button onClick={resetPuzzle}>Reset</button>
-[?2004l[?2004h> 
-[?2004l[?2004h>         {error ? <div className="error-message">{error}</div> : null}
-[?2004l[?2004h>         {victory ? <div className="victory-banner">SOLVED!</div> : null}
-[?2004l[?2004h>       </div>
-[?2004l[?2004h> 
-[?2004l[?2004h>       <svg
-[?2004l[?2004h>         ref={svgRef}
-[?2004l[?2004h>         className="board"
-[?2004l[?2004h>         width={W}
-[?2004l[?2004h>         height={H}
-[?2004l[?2004h>         viewBox={`0 0 ${W} ${H}`}
-[?2004l[?2004h>       >
-[?2004l[?2004h>         {/* Bridges */}
-[?2004l[?2004h>         <g stroke="#00ff66" strokeWidth="3" strokeLinecap="round">
-[?2004l[?2004h>           {bridgeEntries.map(([key, n]) => {
-[?2004l[?2004h>             const { x1, y1, x2, y2 } = parseBridgeKey(key);
-[?2004l[?2004h>             const a = puzzle.islands.find((i) => i.x === x1 && i.y === y1);
-[?2004l[?2004h>             const b = puzzle.islands.find((i) => i.x === x2 && i.y === y2);
-[?2004l[?2004h>             if (!a || !b) return null;
-[?2004l[?2004h>             const lines = bridgeLinesPixels(a, b, n);
-[?2004l[?2004h> 
-[?2004l[?2004h>             return (
-[?2004l[?2004h>               <g
-[?2004l[?2004h>                 key={key}
-[?2004l[?2004h>                 onContextMenu={(e) => {
-[?2004l[?2004h>                   e.preventDefault();
-[?2004l[?2004h>                   onBridgeToggle(key);
-[?2004l[?2004h>                 }}
-[?2004l[?2004h>                 onClick={(e) => {
-[?2004l[?2004h>                   if (e.ctrlKey) onBridgeToggle(key);
-[?2004l[?2004h>                 }}
-[?2004l[?2004h>                 style={{ cursor: 'pointer' }}
-[?2004l[?2004h>               >
-[?2004l[?2004h>                 {lines.map((ln, idx) => (
-[?2004l[?2004h>                   <line
-[?2004l[?2004h>                     key={idx}
-[?2004l[?2004h>                     x1={ln.x1}
-[?2004l[?2004h>                     y1={ln.y1}
-[?2004l[?2004h>                     x2={ln.x2}
-[?2004l[?2004h>                     y2={ln.y2}
-[?2004l[?2004h>                   />
-[?2004l[?2004h>                 ))}
-[?2004l[?2004h>                 {/* Hit area */}
-[?2004l[?2004h>                 <line
-[?2004l[?2004h>                   x1={px(a.x)}
-[?2004l[?2004h>                   y1={px(a.y)}
-[?2004l[?2004h>                   x2={px(b.x)}
-[?2004l[?2004h>                   y2={px(b.y)}
-[?2004l[?2004h>                   stroke="transparent"
-[?2004l[?2004h>                   strokeWidth="14"
-[?2004l[?2004h>                 />
-[?2004l[?2004h>               </g>
-[?2004l[?2004h>             );
-[?2004l[?2004h>           })}
-[?2004l[?2004h>         </g>
-[?2004l[?2004h> 
-[?2004l[?2004h>         {/* Cursor (not a circle) */}
-[?2004l[?2004h>         {cursorId ? (() => {
-[?2004l[?2004h>           const c = islandsById.get(cursorId);
-[?2004l[?2004h>           if (!c) return null;
-[?2004l[?2004h>           const size = 26;
-[?2004l[?2004h>           return (
-[?2004l[?2004h>             <rect
-[?2004l[?2004h>               x={px(c.x) - size / 2}
-[?2004l[?2004h>               y={px(c.y) - size / 2}
-[?2004l[?2004h>               width={size}
-[?2004l[?2004h>               height={size}
-[?2004l[?2004h>               fill="none"
-[?2004l[?2004h>               stroke={selectedId ? '#ffcc00' : '#00ff66'}
-[?2004l[?2004h>               strokeWidth="2"
-[?2004l[?2004h>             />
-[?2004l[?2004h>           );
-[?2004l[?2004h>         })() : null}
-[?2004l[?2004h> 
-[?2004l[?2004h>         {/* Islands */}
-[?2004l[?2004h>         <g>
-[?2004l[?2004h>           {puzzle.islands.map((isl) => {
-[?2004l[?2004h>             const isSelected = selectedId === isl.id;
-[?2004l[?2004h>             const curCount = counts.get(isl.id) || 0;
-[?2004l[?2004h>             const satisfied = curCount === isl.value;
-[?2004l[?2004h> 
-[?2004l[?2004h>             return (
-[?2004l[?2004h>               <g
-[?2004l[?2004h>                 key={isl.id}
-[?2004l[?2004h>                 transform={`translate(${px(isl.x)}, ${px(isl.y)})`}
-[?2004l[?2004h>                 onClick={() => onIslandClick(isl.id)}
-[?2004l[?2004h>                 style={{ cursor: 'pointer' }}
-[?2004l[?2004h>               >
-[?2004l[?2004h>                 <circle
-[?2004l[?2004h>                   r={14}
-[?2004l[?2004h>                   fill="#000"
-[?2004l[?2004h>                   stroke={isSelected ? '#ffcc00' : satisfied ? '#00ff66' : '#00aa44'}
-[?2004l[?2004h>                   strokeWidth={2}
-[?2004l[?2004h>                 />
-[?2004l[?2004h>                 <text
-[?2004l[?2004h>                   x={0}
-[?2004l[?2004h>                   y={5}
-[?2004l[?2004h>                   textAnchor="middle"
-[?2004l[?2004h>                   fontSize="14"
-[?2004l[?2004h>                   fill="#00ff66"
-[?2004l[?2004h>                 >
-[?2004l[?2004h>                   {isl.value}
-[?2004l[?2004h>                 </text>
-[?2004l[?2004h>               </g>
-[?2004l[?2004h>             );
-[?2004l[?2004h>           })}
-[?2004l[?2004h>         </g>
-[?2004l[?2004h>       </svg>
-[?2004l[?2004h>     </>
-[?2004l[?2004h>   );
-[?2004l[?2004h> }
-[?2004l[?2004h> EOF
-[?2004l[?2004hroot@e3febcf25c5d:/app# npm run build
-[?2004l
-> hashi-puzzle@0.1.0 build
-> vite build
-
-[1G[0K[36mvite v5.4.21 [32mbuilding for production...[36m[39m
-[2K[1Gtransforming (1) [2mindex.html[22m[2K[1Gtransforming (3) [2msrc/main.jsx[22m[2K[1Gtransforming (5) [2msrc/App.jsx[22m[2K[1Gtransforming (7) [2mnode_modules/react/index.js[22m[2K[1Gtransforming (14) [2mnode_modules/scheduler/cjs/scheduler.production.min.js[22m[2K[1Gtransforming (17) [2mnode_modules/react-dom/index.js[22m[2K[1G[32m✓[39m 28 modules transformed.
-[2K[1Grendering chunks (1)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1G[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.40 kB[22m[1m[22m[2m │ gzip:  0.27 kB[22m
-[2mdist/[22m[2massets/[22m[35mindex-D17GWvCM.css  [39m[1m[2m  0.76 kB[22m[1m[22m[2m │ gzip:  0.41 kB[22m
-[2mdist/[22m[2massets/[22m[36mindex-BQ9_zc_f.js   [39m[1m[2m149.17 kB[22m[1m[22m[2m │ gzip: 48.58 kB[22m
-[32m✓ built in 7.22s[39m
-[1G[0K⠙[1G[0K[?2004hroot@e3febcf25c5d:/app# npm run dev -- --host 0.0.0.0 --port 3000
-[?2004l[1G[0K⠙[1G[0K
-> hashi-puzzle@0.1.0 dev
-> vite --host 0.0.0.0 --port 3000
-
-[1G[0K⠙[1G[0K
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[1;1H[0J
-  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m602[22m[2m[0m ms[22m
-
-  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m3000[22m/[39m
-[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
