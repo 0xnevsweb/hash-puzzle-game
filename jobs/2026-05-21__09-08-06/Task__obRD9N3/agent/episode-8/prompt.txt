@@ -1,0 +1,4 @@
+Previous response had parsing errors:
+ERROR: Invalid JSON: Expecting ',' delimiter: line 7 column 22 (char 11471) | Content preview: '{\n  "analysis": "Build still succeeds, but App.jsx does not include `bridgeHitAreas.push`; our perl '...
+
+Please fix these issues and provide a proper JSON response.

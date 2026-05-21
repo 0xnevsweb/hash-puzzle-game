@@ -1,0 +1,12 @@
+Error: http://localhost:3000 is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer.
+
+
+ RUN  v2.1.9 /tests
+
+ ✓ unit/hashiLogic.spec.ts (16 tests) 16ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  13:03:10
+   Duration  1.69s (transform 187ms, setup 0ms, collect 183ms, tests 16ms, environment 851ms, prepare 187ms)
+

@@ -1,0 +1,280 @@
+Current terminal state:
+New Terminal Output:
+
+root@644bcdbf5956:/app# sed -n '1,220p' /app/src/utils/hashiLogic.js
+const ERR_NON_ADJ = 'Cannot connect non-adjacent islands';
+const ERR_MAX2 = 'Max 2 bridges per pair';
+const ERR_EXCEED = 'Island would exceed its number';
+const ERR_CROSS = 'Bridges would cross';
+
+export const ERROR_TEXTS = [ERR_NON_ADJ, ERR_MAX2, ERR_EXCEED, ERR_CROSS];
+
+export function canonicalKey(from, to) {
+  const a = { x: from.x, y: from.y };
+  const b = { x: to.x, y: to.y };
+  const first = (a.x < b.x) || (a.x === b.x && a.y <= b.y) ? a : b;
+  const second = first === a ? b : a;
+  return `${first.x},${first.y},${second.x},${second.y}`;
+}
+
+export function parseKey(key) {
+  const [x1, y1, x2, y2] = key.split(',').map(Number);
+  return { x1, y1, x2, y2 };
+}
+
+export function isStraight(from, to) {
+  return from.x === to.x || from.y === to.y;
+}
+
+export function hasIslandBetween(islands, from, to) {
+  if (!isStraight(from, to)) return true;
+  if (from.x === to.x) {
+    const x = from.x;
+    const yMin = Math.min(from.y, to.y);
+    const yMax = Math.max(from.y, to.y);
+    return islands.some((isl) => isl.x === x && isl.y > yMin && isl.y < yMax);
+  }
+  const y = from.y;
+  const xMin = Math.min(from.x, to.x);
+  const xMax = Math.max(from.x, to.x);
+  return islands.some((isl) => isl.y === y && isl.x > xMin && isl.x < xMax);
+}
+
+export function computeCurrentCounts(islands, bridges) {
+  const counts = new Map();
+  for (const isl of islands) counts.set(isl.id, 0);
+
+  for (const [key, n] of bridges.entries()) {
+    if (!n) continue;
+    const { x1, y1, x2, y2 } = parseKey(key);
+    const a = islands.find((i) => i.x === x1 && i.y === y1);
+    const b = islands.find((i) => i.x === x2 && i.y === y2);
+    if (!a || !b) continue;
+    counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+    counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+  }
+  return counts;
+}
+
+function segmentsCross(segA, segB) {
+  // seg: {x1,y1,x2,y2} in grid units, axis-aligned, endpoints at islands.
+  const aVert = segA.x1 === segA.x2;
+  const bVert = segB.x1 === segB.x2;
+  if (aVert === bVert) return false; // parallel can't cross in interior in Hashi sense.
+
+  const v = aVert ? segA : segB;
+  const h = aVert ? segB : segA;
+
+  const vx = v.x1;
+  const vyMin = Math.min(v.y1, v.y2);
+  const vyMax = Math.max(v.y1, v.y2);
+
+  const hy = h.y1;
+  const hxMin = Math.min(h.x1, h.x2);
+  const hxMax = Math.max(h.x1, h.x2);
+
+  const ix = vx;
+  const iy = hy;
+
+  // intersection must be strictly inside both segments, not at endpoints.
+  const vInterior = iy > vyMin && iy < vyMax;
+  const hInterior = ix > hxMin && ix < hxMax;
+  return vInterior && hInterior;
+}
+
+export function bridgesWouldCross(bridges, from, to) {
+  const candidate = { x1: from.x, y1: from.y, x2: to.x, y2: to.y };
+  for (const [key, n] of bridges.entries()) {
+    if (!n) continue;
+    const seg = parseKey(key);
+    // sharing endpoints is fine; also same segment is fine.
+    const same = (seg.x1 === candidate.x1 && seg.y1 === candidate.y1 && seg.x2 === candidate.x2 && seg.y2 === candidate.y2) ||
+                 (seg.x1 === candidate.x2 && seg.y1 === candidate.y2 && seg.x2 === candidate.x1 && seg.y2 === candidate.y1);
+    if (same) continue;
+    const sharesEndpoint =
+      (seg.x1 === candidate.x1 && seg.y1 === candidate.y1) ||
+      (seg.x2 === candidate.x1 && seg.y2 === candidate.y1) ||
+      (seg.x1 === candidate.x2 && seg.y1 === candidate.y2) ||
+      (seg.x2 === candidate.x2 && seg.y2 === candidate.y2);
+    if (sharesEndpoint) continue;
+
+    if (segmentsCross(seg, candidate)) return true;
+  }
+  return false;
+}
+
+export function canAddBridge(islands, bridges, from, to, delta) {
+  if (!from || !to || from.id === to.id) return { valid: false, error: ERR_NON_ADJ };
+  if (!isStraight(from, to)) return { valid: false, error: ERR_NON_ADJ };
+  if (hasIslandBetween(islands, from, to)) return { valid: false, error: ERR_NON_ADJ };
+
+  const key = canonicalKey(from, to);
+  const existing = bridges.get(key) ?? 0;
+  const next = existing + delta;
+  if (next < 0) return { valid: true, error: null };
+  if (next > 2) return { valid: false, error: ERR_MAX2 };
+
+  const counts = computeCurrentCounts(islands, bridges);
+  const fromCount = (counts.get(from.id) ?? 0) + delta;
+  const toCount = (counts.get(to.id) ?? 0) + delta;
+  if (fromCount > from.value || toCount > to.value) return { valid: false, error: ERR_EXCEED };
+
+  // crossing only matters if we're adding (delta>0)
+  if (delta > 0 && bridgesWouldCross(bridges, from, to)) return { valid: false, error: ERR_CROSS };
+
+  return { valid: true, error: null };
+}
+
+export function checkConnectivity(islands, bridges) {
+  if (islands.length === 0) return true;
+
+  const posToId = new Map(islands.map((i) => [`${i.x},${i.y}`, i.id]));
+  const adj = new Map(islands.map((i) => [i.id, []]));
+
+  for (const [key, n] of bridges.entries()) {
+    if (!n) continue;
+    const { x1, y1, x2, y2 } = parseKey(key);
+    const aId = posToId.get(`${x1},${y1}`);
+    const bId = posToId.get(`${x2},${y2}`
+[... output limited to 10000 bytes; 3992 interior bytes omitted ...]
+idgesWouldCross(bridges, from, to) {
+>   const candidate = { x1: from.x, y1: from.y, x2: to.x, y2: to.y };
+>   for (const [key, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const seg = parseKey(key);
+>
+>     // same segment doesn't count as crossing
+>     const same =
+>       (seg.x1 === candidate.x1 && seg.y1 === candidate.y1 && seg.x2 === candidate.x2 && seg.y2 === candidate.y2) ||
+>       (seg.x1 === candidate.x2 && seg.y1 === candidate.y2 && seg.x2 === candidate.x1 && seg.y2 === candidate.y1);
+>     if (same) continue;
+>
+>     // sharing an endpoint is allowed
+>     const sharesEndpoint =
+>       (seg.x1 === candidate.x1 && seg.y1 === candidate.y1) ||
+>       (seg.x2 === candidate.x1 && seg.y2 === candidate.y1) ||
+>       (seg.x1 === candidate.x2 && seg.y1 === candidate.y2) ||
+>       (seg.x2 === candidate.x2 && seg.y2 === candidate.y2);
+>     if (sharesEndpoint) continue;
+>
+>     if (segmentsCross(seg, candidate)) return true;
+>   }
+>   return false;
+> }
+>
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   if (!from || !to || from.id === to.id) return { valid: false, error: ERR_NON_ADJ };
+>   if (!isStraight(from, to)) return { valid: false, error: ERR_NON_ADJ };
+>   if (hasIslandBetween(islands, from, to)) return { valid: false, error: ERR_NON_ADJ };
+>
+>   const key = canonicalKey(from, to);
+>   const existing = bridges.get(key) ?? 0;
+>   const next = existing + delta;
+>
+>   if (next > 2) return { valid: false, error: ERR_MAX2 };
+>   if (next < 0) return { valid: true, error: null };
+>
+>   const counts = computeCurrentCounts(islands, bridges);
+>   const fromCount = (counts.get(from.id) ?? 0) + delta;
+>   const toCount = (counts.get(to.id) ?? 0) + delta;
+>   if (fromCount > from.value || toCount > to.value) return { valid: false, error: ERR_EXCEED };
+>
+>   if (delta > 0 && bridgesWouldCross(bridges, from, to)) return { valid: false, error: ERR_CROSS };
+>
+>   return { valid: true, error: null };
+> }
+>
+> export function checkConnectivity(islands, bridges) {
+>   if (islands.length <= 1) return true;
+>
+>   const posToId = new Map(islands.map((i) => [`${i.x},${i.y}`, i.id]));
+>   const adj = new Map(islands.map((i) => [i.id, []]));
+>
+>   for (const [key, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const { x1, y1, x2, y2 } = parseKey(key);
+>     const aId = posToId.get(`${x1},${y1}`);
+>     const bId = posToId.get(`${x2},${y2}`);
+>     if (aId === undefined || bId === undefined) continue;
+>     adj.get(aId).push(bId);
+>     adj.get(bId).push(aId);
+>   }
+>
+>   const startId = islands[0].id;
+>   const seen = new Set([startId]);
+>   const stack = [startId];
+>   while (stack.length) {
+>     const cur = stack.pop();
+>     for (const nxt of adj.get(cur) || []) {
+>       if (!seen.has(nxt)) {
+>         seen.add(nxt);
+>         stack.push(nxt);
+>       }
+>     }
+>   }
+>   return seen.size === islands.length;
+> }
+>
+> export function isVictory(islands, bridges) {
+>   // Ensure no crossings
+>   const segs = [];
+>   for (const [key, n] of bridges.entries()) {
+>     if (!n) continue;
+>     segs.push(parseKey(key));
+>   }
+>   for (let i = 0; i < segs.length; i++) {
+>     for (let j = i + 1; j < segs.length; j++) {
+>       const a = segs[i];
+>       const b = segs[j];
+>       const sharesEndpoint =
+>         (a.x1 === b.x1 && a.y1 === b.y1) ||
+>         (a.x1 === b.x2 && a.y1 === b.y2) ||
+>         (a.x2 === b.x1 && a.y2 === b.y1) ||
+>         (a.x2 === b.x2 && a.y2 === b.y2);
+>       if (sharesEndpoint) continue;
+>       if (segmentsCross(a, b)) return false;
+>     }
+>   }
+>
+>   const counts = computeCurrentCounts(islands, bridges);
+>   for (const isl of islands) {
+>     if ((counts.get(isl.id) ?? 0) !== isl.value) return false;
+>   }
+>
+>   return checkConnectivity(islands, bridges);
+> }
+> EOF
+root@644bcdbf5956:/app# node -e "import('./src/utils/hashiLogic.js').then(m=>console.log('hashiLogic exports:', Object.keys(m)))"
+hashiLogic exports: [
+  'ERROR_TEXTS',
+  'bridgesWouldCross',
+  'canAddBridge',
+  'canonicalKey',
+  'checkConnectivity',
+  'computeCurrentCounts',
+  'hasIslandBetween',
+  'isStraight',
+  'isVictory',
+  'parseKey'
+]
+root@644bcdbf5956:/app# grep -R "Cannot connect non-adjacent islands\|Max 2 bridges per pair\|Island would exceed its number\|Bridges would cross" -n /app/src |
+ head
+/app/src/utils/hashiLogic.js:1:const ERR_NON_ADJ = 'Cannot connect non-adjacent islands';
+/app/src/utils/hashiLogic.js:2:const ERR_MAX2 = 'Max 2 bridges per pair';
+/app/src/utils/hashiLogic.js:3:const ERR_EXCEED = 'Island would exceed its number';
+/app/src/utils/hashiLogic.js:4:const ERR_CROSS = 'Bridges would cross';
+root@644bcdbf5956:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 28 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.27 kB
+dist/assets/index-pq-G6E_L.css    0.97 kB │ gzip:  0.48 kB
+dist/assets/index-8KBmPeEE.js   149.31 kB │ gzip: 48.54 kB
+✓ built in 4.84s
+root@644bcdbf5956:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

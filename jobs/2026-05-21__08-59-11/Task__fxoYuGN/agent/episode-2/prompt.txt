@@ -1,0 +1,17 @@
+New Terminal Output:
+
+root@f69c66ca1b04:/app# ls -la
+total 72
+drwxr-xr-x  1 root root  4096 May 20 19:14 .
+drwxr-xr-x  1 root root  4096 May 21 12:59 ..
+drwxr-xr-x 39 root root  4096 May 20 19:14 node_modules
+-rw-r--r--  1 root root 56042 May 20 19:14 package-lock.json
+-rw-rw-r--  1 root root   350 May 19 21:44 package.json
+root@f69c66ca1b04:/app# find . -maxdepth 2 -type f -print
+./node_modules/.package-lock.json
+./package-lock.json
+./package.json
+root@f69c66ca1b04:/app# ls -la public || true
+ls: cannot access 'public': No such file or directory
+root@f69c66ca1b04:/app# ls -la index.html vite.config.js vite.config.mjs 2>/dev/null || true
+root@f69c66ca1b04:/app#

@@ -16,9 +16,21 @@ WORKDIR /app
 
 # Pre-install the game scaffold's node_modules (Vite + React) so the agent
 # and solve.sh can run `npm run build` offline. Only the manifest is copied
-# so this layer caches across iterations.
+# first so this layer caches across iterations.
 COPY package.json /app/package.json
 RUN npm install --no-audit --no-fund
+
+# Drop the rest of the scaffold (source files, configs, docs, public assets)
+# into /app so the agent starts from a realistic project layout rather than
+# an empty directory.
+COPY index.html vite.config.js /app/
+COPY src/ /app/src/
+COPY public/ /app/public/
+COPY README.md CHANGELOG.md CONTRIBUTING.md LICENSE /app/
+COPY .gitignore .editorconfig .nvmrc .prettierrc.json .prettierignore /app/
+COPY jsconfig.json eslint.config.js /app/
+COPY .vscode/ /app/.vscode/
+COPY docs/ /app/docs/
 
 # Pre-stage verifier node_modules + the Playwright Chromium browser at a stable
 # location outside /tests (which gets populated at runtime). test.sh symlinks

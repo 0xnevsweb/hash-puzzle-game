@@ -1,0 +1,140 @@
+Error: http://localhost:3000 is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer.
+
+
+ RUN  v2.1.9 /tests
+
+ ❯ unit/hashiLogic.spec.ts (16 tests | 6 failed) 28ms
+   × canAddBridge > rejects when island value would be exceeded 11ms
+     → expected true to be false // Object.is equality
+   × getKey canonicalization (via canAddBridge) > horizontal and vertical bridges from the same island get distinct keys 1ms
+     → expected +0 to be 2 // Object.is equality
+   × isVictory > returns true for fully solved Easy puzzle 1ms
+     → expected false to be true // Object.is equality
+   × checkConnectivity > returns true when all islands are reachable 1ms
+     → expected false to be true // Object.is equality
+   × computeCurrentCounts > counts single bridges correctly 1ms
+     → expected +0 to be 1 // Object.is equality
+   × computeCurrentCounts > counts double bridges correctly 1ms
+     → expected +0 to be 2 // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  unit/hashiLogic.spec.ts > canAddBridge > rejects when island value would be exceeded
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ unit/hashiLogic.spec.ts:60:19
+     58|     const bridges = new Map([['2,2,6,2', 1], ['2,2,2,6', 1]]);
+     59|     const { valid, error } = canAddBridge(islands, bridges, islands[0]…
+     60|     expect(valid).toBe(false);
+       |                   ^
+     61|     expect(error).toMatch(/exceed/i);
+     62|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  unit/hashiLogic.spec.ts > getKey canonicalization (via canAddBridge) > horizontal and vertical bridges from the same island get distinct keys
+AssertionError: expected +0 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ unit/hashiLogic.spec.ts:101:27
+     99|     // Both bridges should coexist: A has 2 connections
+    100|     const counts = computeCurrentCounts(islands, bridges);
+    101|     expect(counts.get(0)).toBe(2);
+       |                           ^
+    102|   });
+    103| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  unit/hashiLogic.spec.ts > isVictory > returns true for fully solved Easy puzzle
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ unit/hashiLogic.spec.ts:111:56
+    109| 
+    110|   it('returns true for fully solved Easy puzzle', () => {
+    111|     expect(isVictory(makeEasy(), solvedEasyBridges())).toBe(true);
+       |                                                        ^
+    112|   });
+    113| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  unit/hashiLogic.spec.ts > checkConnectivity > returns true when all islands are reachable
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ unit/hashiLogic.spec.ts:140:64
+    138| 
+    139|   it('returns true when all islands are reachable', () => {
+    140|     expect(checkConnectivity(makeEasy(), solvedEasyBridges())).toBe(tr…
+       |                                                                ^
+    141|   });
+    142| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  unit/hashiLogic.spec.ts > computeCurrentCounts > counts single bridges correctly
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ unit/hashiLogic.spec.ts:149:27
+    147|     const bridges = new Map([['2,2,6,2', 1]]);
+    148|     const counts = computeCurrentCounts(islands, bridges);
+    149|     expect(counts.get(0)).toBe(1);
+       |                           ^
+    150|     expect(counts.get(1)).toBe(1);
+    151|     expect(counts.get(2)).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  unit/hashiLogic.spec.ts > computeCurrentCounts > counts double bridges correctly
+AssertionError: expected +0 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ unit/hashiLogic.spec.ts:159:27
+    157|     const bridges = new Map([['2,2,6,2', 2]]);
+    158|     const counts = computeCurrentCounts(islands, bridges);
+    159|     expect(counts.get(0)).toBe(2);
+       |                           ^
+    160|     expect(counts.get(1)).toBe(2);
+    161|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 10 passed (16)
+   Start at  12:46:01
+   Duration  1.29s (transform 210ms, setup 0ms, collect 267ms, tests 28ms, environment 519ms, prepare 171ms)
+

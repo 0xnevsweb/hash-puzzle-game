@@ -1,0 +1,118 @@
+{
+    "id": "74f584cb-5f97-4864-b375-cf906f101196",
+    "task_name": "Task",
+    "trial_name": "Task__6YNDXMe",
+    "trial_uri": "file:///home/chance-weston/Desktop/Sonrkel/Pending%20Tasks/hash-puzzle-game/jobs/2026-05-21__08-59-11/Task__6YNDXMe",
+    "task_id": {
+        "path": "Task"
+    },
+    "source": null,
+    "task_checksum": "12728bc054fae439b1a7d24eb39414a342b150584d59ac950c70aacf8c69938f",
+    "config": {
+        "task": {
+            "path": "Task",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "Task__6YNDXMe",
+        "trials_dir": "jobs/2026-05-21__08-59-11",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "openai/@openai/gpt-5.2",
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {},
+            "env": {}
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "suppress_override_warnings": false,
+            "mounts": null,
+            "env": {},
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "job_id": "540fbbf3-2275-46aa-974f-8023a872a6dc"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "@openai/gpt-5.2",
+            "provider": "openai"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 127539,
+        "n_cache_tokens": 115712,
+        "n_output_tokens": 10320,
+        "cost_usd": 0.18542685,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 10,
+            "api_request_times_msec": [
+                7336.314678192139,
+                6245.055675506592,
+                76429.48365211487,
+                6841.560840606689,
+                7498.485803604126,
+                7024.7321128845215,
+                6985.805511474609,
+                8378.315925598145,
+                5030.438661575317,
+                2526.956796646118
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-05-21T12:59:11.413786Z",
+    "finished_at": "2026-05-21T13:03:43.256375Z",
+    "environment_setup": {
+        "started_at": "2026-05-21T12:59:11.694027Z",
+        "finished_at": "2026-05-21T12:59:33.606020Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-05-21T12:59:33.606034Z",
+        "finished_at": "2026-05-21T12:59:46.212327Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-05-21T12:59:46.212390Z",
+        "finished_at": "2026-05-21T13:02:49.486161Z"
+    },
+    "verifier": {
+        "started_at": "2026-05-21T13:02:50.621183Z",
+        "finished_at": "2026-05-21T13:03:31.753419Z"
+    },
+    "step_results": null
+}

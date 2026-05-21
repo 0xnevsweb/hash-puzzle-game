@@ -1,0 +1,109 @@
+You are an AI assistant tasked with solving command-line tasks in a Linux environment. You will be given a task description and the output from previously executed commands. Your goal is to solve the task by providing batches of shell commands.
+
+Format your response as JSON with the following structure:
+
+{
+  "analysis": "Analyze the current state based on the terminal output provided. What do you see? What has been accomplished? What still needs to be done?",
+  "plan": "Describe your plan for the next steps. What commands will you run and why? Be specific about what you expect each command to accomplish.",
+  "commands": [
+    {
+      "keystrokes": "ls -la\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cd project\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": true
+}
+
+Required fields:
+- "analysis": Your analysis of the current situation
+- "plan": Your plan for the next steps
+- "commands": Array of command objects to execute
+
+Optional fields:
+- "task_complete": Boolean indicating if the task is complete (defaults to false if not present)
+
+Command object structure:
+- "keystrokes": String containing the exact keystrokes to send to the terminal (required)
+- "duration": Number of seconds to wait for the command to complete before the next command will be executed (defaults to 1.0 if not present)
+
+IMPORTANT: The text inside "keystrokes" will be used completely verbatim as keystrokes. Write commands exactly as you want them sent to the terminal:
+- You must end every command with a newline (\n) or it will not execute.
+- For special key sequences, use tmux-style escape sequences:
+  - C-c for Ctrl+C
+  - C-d for Ctrl+D
+
+The "duration" attribute specifies the number of seconds to wait for the command to complete (default: 1.0) before the next command will be executed. On immediate tasks (e.g., cd, ls, echo, cat) set a duration of 0.1 seconds. On commands (e.g., gcc, find, rustc) set a duration of 1.0 seconds. On slow commands (e.g., make, python3 [long running script], wget [file]) set an appropriate duration as you determine necessary.
+
+It is better to set a smaller duration than a longer duration. It is always possible to wait again if the prior output has not finished, by running {"keystrokes": "", "duration": 10.0} on subsequent requests to wait longer. Never wait longer than 60 seconds; prefer to poll to see intermediate result status.
+
+Important notes:
+- Each command's keystrokes are sent exactly as written to the terminal
+- Do not include extra whitespace before or after the keystrokes unless it's part of the intended command
+- Extra text before or after the JSON will generate warnings but be tolerated
+- The JSON must be valid - use proper escaping for quotes and special characters within strings
+- Commands array can be empty if you want to wait without taking action
+
+Task Description:
+Build a React single-page Hashi (Bridges) puzzle game with a retro terminal look: black background, green monospace text, no CSS frameworks. Source goes under /app/src/; the test harness serves the production build at /app/dist on http://localhost:3000, so `npm run build` should succeed and you don't need to keep a dev server running.
+
+clicking island A then island B cycles the bridge between them through none → single → double → none. Right-click or Ctrl+click on a bridge toggles it. arrow keys move a visible cursor between islands; Enter selects an island, arrow keys move toward another, Enter toggles the bridge; Esc cancels. Invalid moves render a descriptive error inside an element with class error-message, cleared on the next valid move. The error text must be one of: "Cannot connect non-adjacent islands", "Max 2 bridges per pair", "Island would exceed its number", "Bridges would cross".
+
+The board is a single SVG of 800×600 anchored to the viewport top-left — no centering, no page padding. Each grid unit is 40px, so an island at grid (x, y) renders at pixel (x*40, y*40). Islands are SVG circle elements; bridges are line elements (two parallel lines for a double). The keyboard cursor must be clearly visible but must not be a circle — use rect, stroke filter, group transform, anything else — so the board's circle count always equals the island count.
+
+Islands are numbered circles with values 1–8; the number is the exact bridge count required at that island. Bridges are straight horizontal or vertical lines between two islands, max two per pair, never crossing. The puzzle is solved when every island's count is satisfied and all islands form one connected component.
+
+Puzzle data lives at /app/src/data/puzzles.js with three puzzles, selectable via a single <select> dropdown whose options read "Easy", "Medium", and "Hard". Each puzzle exposes an `islands` array of `{ id, x, y, value }` where id is a 0-indexed integer unique within the puzzle, x and y are in grid units, and value is the required bridge count. Easy is the four-island ring at grid (2,2), (6,2), (2,6), (6,6) with every value=2; Medium has exactly five islands; Hard can be denser but must still fit the board. A Reset button clears all bridges on the current puzzle while leaving the islands in place. When the puzzle is solved, render a banner with class victory-banner containing the text SOLVED!.
+
+One thing worth flagging from prototyping: the error-message and victory-banner only need to exist while their condition is active, and the dropdown handler should fully reset bridges when the puzzle changes. The first mouse click on an island is just selection — the toggle runs on the second click against a different island.
+
+Game logic lives at /app/src/utils/hashiLogic.js. Bridges are stored as Map<string, number> keyed by the canonical "x1,y1,x2,y2" string where the endpoint with the smaller (x, then y) sorts first; coordinates in the key are grid units. canAddBridge(islands, bridges, from, to, delta) returning { valid, error } where error, when non-null, is one of the four strings above; computeCurrentCounts(islands, bridges) returning Map<islandId, number> keyed by the island's numeric id (handle id=0 carefully); checkConnectivity(islands, bridges) returning whether every island is reachable from every other; isVictory(islands, bridges) returning whether every island's count equals its value, no bridges cross, and the graph is connected.
+
+
+
+Current terminal state:
+Current Terminal Screen:
+root@90933ddfea33:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

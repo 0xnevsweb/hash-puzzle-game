@@ -1,0 +1,349 @@
+New Terminal Output:
+
+root@644bcdbf5956:/app# mkdir -p /app/src/data /app/src/utils
+root@644bcdbf5956:/app# cat > /app/index.html <<'EOF'
+> <!doctype html>
+> <html lang="en">
+>   <head>
+>     <meta charset="UTF-8" />
+>     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+>     <title>Hashi Puzzle</title>
+>   </head>
+>   <body>
+>     <div id="root"></div>
+>     <script type="module" src="/src/main.jsx"></script>
+>   </body>
+> </html>
+> EOF
+root@644bcdbf5956:/app# cat > /app/src/style.css <<'EOF'
+> :root{
+>   --bg:#000;
+>   --fg:#00ff66;
+>   --fg-dim:#00cc55;
+>   --err:#ff4d4d;
+> }
+> html,body{height:100%;}
+> body{
+>   margin:0;
+>   padding:0;
+>   background:var(--bg);
+>   color:var(--fg);
+>   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+>   overflow:hidden;
+> }
+> #root{height:100%;}
+>
+> .app{
+>   position:relative;
+>   width:100vw;
+>   height:100vh;
+> }
+>
+> .hud{
+>   position:absolute;
+>   top:0;
+>   left:0;
+>   padding:8px;
+>   background:rgba(0,0,0,0.65);
+>   border:1px solid var(--fg-dim);
+>   display:flex;
+>   gap:8px;
+>   align-items:center;
+>   z-index:2;
+> }
+> select, button{
+>   background:#000;
+>   color:var(--fg);
+>   border:1px solid var(--fg-dim);
+>   padding:4px 8px;
+>   font:inherit;
+> }
+> button{cursor:pointer;}
+>
+> svg.board{
+>   position:absolute;
+>   top:0;
+>   left:0;
+> }
+>
+> .error-message{
+>   position:absolute;
+>   left:0;
+>   top:44px;
+>   padding:8px;
+>   color:var(--err);
+>   background:rgba(0,0,0,0.65);
+>   border:1px solid var(--err);
+>   z-index:3;
+>   white-space:pre;
+> }
+>
+> .victory-banner{
+>   position:absolute;
+>   left:0;
+>   top:84px;
+>   padding:8px 12px;
+>   color:var(--fg);
+>   background:rgba(0,0,0,0.8);
+>   border:2px solid var(--fg);
+>   z-index:3;
+>   font-weight:700;
+>   letter-spacing:1px;
+> }
+> EOF
+root@644bcdbf5956:/app# cat > /app/src/data/puzzles.js <<'EOF'
+> export const PUZZLES = {
+>   Easy: {
+>     name: 'Easy',
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 2 },
+>       { id: 2, x: 2, y: 6, value: 2 },
+>       { id: 3, x: 6, y: 6, value: 2 },
+>     ],
+>   },
+>   Medium: {
+>     name: 'Medium',
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 3 },
+>       { id: 2, x: 10, y: 2, value: 2 },
+>       { id: 3, x: 6, y: 6, value: 3 },
+>       { id: 4, x: 6, y: 10, value: 3 },
+>     ],
+>   },
+>   Hard: {
+>     name: 'Hard',
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 3 },
+>       { id: 1, x: 6, y: 2, value: 4 },
+>       { id: 2, x: 10, y: 2, value: 3 },
+>       { id: 3, x: 2, y: 6, value: 4 },
+>       { id: 4, x: 6, y: 6, value: 6 },
+>       { id: 5, x: 10, y: 6, value: 4 },
+>       { id: 6, x: 2, y: 10, value: 3 },
+>       { id: 7, x: 6, y: 10, value: 4 },
+>       { id: 8, x: 10, y: 10, value: 3 },
+>     ],
+>   },
+> };
+>
+> export const PUZZLE_ORDER = ['Easy', 'Medium', 'Hard'];
+> EOF
+root@644bcdbf5956:/app# cat > /app/src/utils/hashiLogic.js <<'EOF'
+> const ERR_NON_ADJ = 'Cannot connect non-adjacent islands';
+> const ERR_MAX2 = 'Max 2 bridges per pair';
+> const ERR_EXCEED = 'Island would exceed its number';
+> const ERR_CROSS = 'Bridges would cross';
+>
+> export const ERROR_TEXTS = [ERR_NON_ADJ, ERR_MAX2, ERR_EXCEED, ERR_CROSS];
+>
+> export function canonicalKey(from, to) {
+>   const a = { x: from.x, y: from.y };
+>   const b = { x: to.x, y: to.y };
+>   const first = (a.x < b.x) || (a.x === b.x && a.y <= b.y) ? a : b;
+>   const second = first === a ? b : a;
+>   return `${first.x},${first.y},${second.x},${second.y}`;
+t(to.id) ?? 0) + delta;
+  if (fromCount > from.value || toCount > to.value) return { valid: false, error: ERR_EXCEED };
+
+  // crossing only matters if we're adding (delta>0)
+  if (delta > 0 && bridgesWouldCross(bridges, from, to)) return { valid: false, error: ERR_CROSS };
+
+  return { valid: true, error: null };
+}
+
+export function checkConnectivity(islands, bridges) {
+  if (islands.length === 0) return true;
+
+  const posToId = new Map(islands.map((i) => [`${i.x},${i.y}`, > }
+>
+> export function parseKey(key) {
+>   const [x1, y1, x2, y2] = key.split(',').map(Number);
+>   return { x1, y1, x2, y2 };
+> }
+>
+> export function isStraight(from, to) {
+>   return from.x === to.x || from.y === to.y;
+i.id]));
+  const adj = new Map(islands.map((i) => [i.id, []]));
+
+  for (const [key, n] of bridges.entries()) {
+    if (!n) continue;
+    const { x1, y1, x2, y2 } = parseKey(key);
+    const aId = posToId.get> }
+>
+> export function hasIslandBetween(islands, from, to) {
+>   if (!isStraight(from, to)) return true;
+>   if (from.x === to.x) {
+>     const x = from.x;
+>     const yMin = Math.min(from.y, to.y);
+>     const yMax = Math.max(from.y, to.y);
+>     return islands.some((isl) => isl.x === x && isl.y > yMin && isl.y < yMax);
+>   }
+>   const y = from.y;
+>   const xMin = Math.min(from.x, to.x);
+>   const xMax = Math.max(from.x, to.x);
+>   return islands.some((isl) => isl.y === y && isl
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+turn;
+>       }
+>
+>       if (key === 'Enter') {
+>         e.preventDefault();
+>         if (kbdFromId === null) {
+>           setKbdFromId(cursor.id);
+>           setSelectedId(cursor.id);
+>           setError(null);
+>           return;
+>         }
+>         if (kbdFromId === cursor.id) {
+>           setKbdFromId(cursor.id);
+>           setSelectedId(cursor.id);
+>           setError(null);
+>           return;
+>         }
+>         const from = getIslandById(islands, kbdFromId);
+>         const ok = cycleBridge(from, cursor);
+>         if (ok) {
+>           setKbdFromId(null);
+>           setSelectedId(null);
+>         }
+>         return;
+>       }
+>     }
+>
+>     el.addEventListener('keydown', onKeyDown);
+>     return () => el.removeEventListener('keydown', onKeyDown);
+>   }, [islands, cursorId, kbdFromId, bridges]);
+>
+>   const bridgeRender = [];
+>   for (const [key, n] of bridges.entries()) {
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     const from = islands.find((i) => i.x === x1 && i.y === y1);
+>     const to = islands.find((i) => i.x === x2 && i.y === y2);
+>     if (!from || !to) continue;
+>     const lines = bridgeLinesForPair(from, to, n);
+>     for (let idx = 0; idx < lines.length; idx++) {
+>       const ln = lines[idx];
+>       bridgeRender.push(
+>         <line
+>           key={`${key}-${idx}`}
+>           x1={ln.x1}
+>           y1={ln.y1}
+>           x2={ln.x2}
+>           y2={ln.y2}
+>           stroke="#00ff66"
+>           strokeWidth={4}
+>           strokeLinecap="round"
+>           opacity={0.9}
+>         />
+>       );
+>     }
+>   }
+>
+>   const cursorIsland = getIslandById(islands, cursorId) || islands[0];
+>   const cursorPx = cursorIsland ? islandAtPixel(cursorIsland) : { px: 0, py: 0 };
+>
+>   return (
+>     <div className="app" ref={rootRef}>
+>       <div className="hud">
+>         <label>
+>           Puzzle:{' '}
+>           <select
+>             value={puzzleName}
+>             onChange={(e) => setPuzzleName(e.target.value)}
+>           >
+>             {PUZZLE_ORDER.map((name) => (
+>               <option key={name} value={name}>{name}</option>
+>             ))}
+>           </select>
+>         </label>
+>         <button onClick={reset}>Reset</button>
+>       </div>
+>
+>       {error ? <div className="error-message">{error}</div> : null}
+>       {solved ? <div className="victory-banner">SOLVED!</div> : null}
+>
+>       <svg className="board" width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
+>         {/* bridges */}
+>         {bridgeRender}
+>
+>         {/* cursor: rect (NOT a circle) */}
+>         {cursorIsland ? (
+>           <rect
+>             x={cursorPx.px - 18}
+>             y={cursorPx.py - 18}
+>             width={36}
+>             height={36}
+>             fill="none"
+>             stroke={kbdFromId !== null ? "#ffffff" : "#00ff66"}
+>             strokeWidth={2}
+>             strokeDasharray={kbdFromId !== null ? "" : "4 3"}
+>             opacity={0.95}
+>           />
+>         ) : null}
+>
+>         {/* islands */}
+>         {islands.map((isl) => {
+>           const { px, py } = islandAtPixel(isl);
+>           const selected = selectedId === isl.id;
+>           const curCount = counts.get(isl.id) ?? 0;
+>           const satisfied = curCount === isl.value;
+>           return (
+>             <g key={isl.id}>
+>               <circle
+>                 cx={px}
+>                 cy={py}
+>                 r={16}
+>                 fill="#000"
+>                 stroke={selected ? "#ffffff" : satisfied ? "#00ff66" : "#00cc55"}
+>                 strokeWidth={selected ? 3 : 2}
+>                 onClick={(e) => onIslandClick(isl, e)}
+>                 onContextMenu={(e) => onIslandContextMenu(isl, e)}
+>                 style={{ cursor: 'pointer' }}
+>               />
+>               <text
+>                 x={px}
+>                 y={py + 6}
+>                 textAnchor="middle"
+>                 fontSize={16}
+>                 fill={selected ? "#ffffff" : "#00ff66"}
+>                 style={{ userSelect: 'none' }}
+>                 onClick={(e) => onIslandClick(isl, e)}
+>                 onContextMenu={(e) => onIslandContextMenu(isl, e)}
+>               >
+>                 {isl.value}
+>               </text>
+>             </g>
+>           );
+>         })}
+>       </svg>
+>     </div>
+>   );
+> }
+> EOF
+root@644bcdbf5956:/app# cat > /app/src/main.jsx <<'EOF'
+> import React from 'react';
+> import { createRoot } from 'react-dom/client';
+> import App from './App.jsx';
+> import './style.css';
+>
+> createRoot(document.getElementById('root')).render(
+>   <React.StrictMode>
+>     <App />
+>   </React.StrictMode>
+> );
+> EOF
+root@644bcdbf5956:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 28 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.27 kB
+dist/assets/index-pq-G6E_L.css    0.97 kB │ gzip:  0.48 kB
+dist/assets/index-DmzkCA5r.js   149.27 kB │ gzip: 48.52 kB
+✓ built in 2.84s
+root@644bcdbf5956:/app#

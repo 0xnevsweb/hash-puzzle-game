@@ -1,0 +1,319 @@
+New Terminal Output:
+
+root@4ed407c736f8:/app# sed -n '1,30p' src/utils/hashiLogic.js
+const ERROR_NON_ADJ = 'Cannot connect non-adjacent islands';
+const ERROR_MAX2 = 'Max 2 bridges per pair';
+const ERROR_EXCEED = 'Island would exceed its number';
+const ERROR_CROSS = 'Bridges would cross';
+
+export function canonicalBridgeKey(from, to) {
+  const a = { x: from.x, y: from.y };
+  const b = { x: to.x, y: to.y };
+  const first = a.x < b.x || (a.x === b.x && a.y <= b.y) ? a : b;
+  const second = first === a ? b : a;
+  return `${first.x},${first.y},${second.x},${second.y}`;
+}
+
+export function parseBridgeKey(key) {
+  const [x1, y1, x2, y2] = key.split(',').map(Number);
+  return { x1, y1, x2, y2 };
+}
+
+function isAxisAligned(from, to) {
+  return from.x === to.x || from.y === to.y;
+}
+
+function between(a, b, c) {
+  // c strictly between a and b
+  return (c > Math.min(a, b) && c < Math.max(a, b));
+}
+
+export function areAdjacent(islands, from, to) {
+  if (!isAxisAligned(from, to)) return false;
+  if (from.x === to.x) {
+root@4ed407c736f8:/app# cat > src/utils/hashiLogic.js <<'EOF'
+> const ERROR_NON_ADJ = 'Cannot connect non-adjacent islands';
+> const ERROR_MAX2 = 'Max 2 bridges per pair';
+> const ERROR_EXCEED = 'Island would exceed its number';
+> const ERROR_CROSS = 'Bridges would cross';
+>
+> export function canonicalBridgeKey(from, to) {
+>   const a = { x: from.x, y: from.y };
+>   const b = { x: to.x, y: to.y };
+>   const first = a.x < b.x || (a.x === b.x && a.y <= b.y) ? a : b;
+>   const second = first === a ? b : a;
+>   return `${first.x},${first.y},${second.x},${second.y}`;
+> }
+>
+> export function parseBridgeKey(key) {
+>   const [x1, y1, x2, y2] = key.split(',').map(Number);
+>   return { x1, y1, x2, y2 };
+> }
+>
+> function isAxisAligned(from, to) {
+>   return from.x === to.x || from.y === to.y;
+> }
+>
+> function between(a, b, c) {
+>   return c > Math.min(a, b) && c < Math.max(a, b);
+> }
+>
+> export function areAdjacent(islands, from, to) {
+>   if (!isAxisAligned(from, to)) return false;
+>   if (from.x === to.x) {
+>     const x = from.x;
+>     for (const isl of islands) {
+>       if (isl.id === from.id || isl.id === to.id) continue;
+>       if (isl.x === x && between(from.y, to.y, isl.y)) return false;
+>     }
+>     return true;
+>   }
+>
+>   const y = from.y;
+>   for (const isl of islands) {
+>     if (isl.id === from.id || isl.id === to.id) continue;
+>     if (isl.y === y && between(from.x, to.x, isl.x)) return false;
+>   }
+>   return true;
+> }
+>
+> function segmentCrosses(a1, a2, b1, b2) {
+>   const aVert = a1.x === a2.x;
+>   const bVert = b1.x === b2.x;
+>   if (aVert === bVert) return false;
+>
+>   const v1 = aVert ? a1 : b1;
+>   const v2 = aVert ? a2 : b2;
+>   const h1 = aVert ? b1 : a1;
+>   const h2 = aVert ? b2 : a2;
+>
+>   const ix = v1.x;
+>   const iy = h1.y;
+>
+>   const vYmin = Math.min(v1.y, v2.y);
+>   const vYmax = Math.max(v1.y, v2.y);
+>   const hXmin = Math.min(h1.x, h2.x);
+>   const hXmax = Math.max(h1.x, h2.x);
+>
+>   const onVInterior = iy > vYmin && iy < vYmax;
+>   const onHInterior = ix > hXmin && ix < hXmax;
+>   return onVInterior && onHInterior;
+> }
+>
+> export function bridgesWouldCross(bridges, from, to) {
+>   const a1 = { x: from.x, y: from.y };
+>   const a2 = { x: to.x, y: to.y };
+>
+>   for (const [key, count] of bridges.entries()) {
+>     if (!count) continue;
+>     const { x1, y1, x2, y2 } = parseBridgeKey(key);
+>     const b1 = { x: x1, y: y1 };
+>     const b2 = { x: x2, y: y2 };
+>
+>     const same =
+>       (a1.x === b1.x && a1.y === b1.y && a2.x === b2.x && a2.y === b2.y) ||
+>       (a1.x === b2.x && a1.y === b2.y && a2.x === b1.x && a2.y === b1.y);
+>     if (same) continue;
+>
+>     if (segmentCrosses(a1, a2, b1, b2)) return true;
+>   }
+>
+>   return false;
+> }
+>
+> export function computeCurrentCounts(islands, bridges) {
+>   const counts = new Map();
+>   for (const isl of islands) counts.set(isl.id, 0);
+>
+>   const byCoord = new Map(islands.map((i) => [`${i.x},${i.y}`, i]));
+>
+>   for (const [key, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const { x1, y1, x2, y2 } = parseBridgeKey(key);
+>     const a = byCoord.get(`${x1},${y1}`);
+>     const b = byCoord.get(`${x2},${y2}`);
+>     if (!a || !b) continue;
+>
+>     counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+>     counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+>   }
+>
+>   return counts;
+> }
+>
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   if (!from || !to) return { valid: false, error: ERROR_NON_ADJ };
+>   if (from.id === to.id) return { valid: false, error: ERROR_NON_ADJ };
+>   if (!areAdjacent(islands, from, to)) return { valid: false, error: ERROR_NON_ADJ };
+>
+>   const key = canonicalBridgeKey(from, to);
+>   const existing = bridges.get(key) ?? 0;
+>   const next = existing + delta;
+>
+>   if (next < 0) return { valid: true, error: null };
+>   if (next > 2) return { valid: false, error: ERROR_MAX2 };
+>
+>   if (existing === 0 && next > 0) {
+>     if (bridgesWouldCross(bridges, from, to)) return { valid: false, error:
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+={`0 0 ${WIDTH} ${HEIGHT}`}
+>       >
+>         <defs>
+>           <filter id="glow">
+>             <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
+>             <feMerge>
+>               <feMergeNode in="coloredBlur" />
+>               <feMergeNode in="SourceGraphic" />
+>             </feMerge>
+>           </filter>
+>         </defs>
+>
+>         {/* Bridges */}
+>         {segs.map((s) => {
+>           const stroke = 'rgba(0,255,102,0.85)';
+>           const strokeWidth = 4;
+>           const offset = 6;
+>
+>           if (s.count === 1) {
+>             return (
+>               <line
+>                 key={s.key}
+>                 x1={s.x1}
+>                 y1={s.y1}
+>                 x2={s.x2}
+>                 y2={s.y2}
+>                 stroke={stroke}
+>                 strokeWidth={strokeWidth}
+>                 filter="url(#glow)"
+>               />
+>             );
+>           }
+>
+>           // double: two parallel lines
+>           if (s.horizontal) {
+>             return (
+>               <g key={s.key}>
+>                 <line
+>                   x1={s.x1}
+>                   y1={s.y1 - offset}
+>                   x2={s.x2}
+>                   y2={s.y2 - offset}
+>                   stroke={stroke}
+>                   strokeWidth={strokeWidth}
+>                   filter="url(#glow)"
+>                 />
+>                 <line
+>                   x1={s.x1}
+>                   y1={s.y1 + offset}
+>                   x2={s.x2}
+>                   y2={s.y2 + offset}
+>                   stroke={stroke}
+>                   strokeWidth={strokeWidth}
+>                   filter="url(#glow)"
+>                 />
+>               </g>
+>             );
+>           }
+>
+>           return (
+>             <g key={s.key}>
+>               <line
+>                 x1={s.x1 - offset}
+>                 y1={s.y1}
+>                 x2={s.x2 - offset}
+>                 y2={s.y2}
+>                 stroke={stroke}
+>                 strokeWidth={strokeWidth}
+>                 filter="url(#glow)"
+>               />
+>               <line
+>                 x1={s.x1 + offset}
+>                 y1={s.y1}
+>                 x2={s.x2 + offset}
+>                 y2={s.y2}
+>                 stroke={stroke}
+>                 strokeWidth={strokeWidth}
+>                 filter="url(#glow)"
+>               />
+>             </g>
+>           );
+>         })}
+>
+>         {/* Cursor (must not be a circle) */}
+>         {cursorIsland ? (
+>           <rect
+>             x={cursorPx.cx - 18}
+>             y={cursorPx.cy - 18}
+>             width={36}
+>             height={36}
+>             fill="none"
+>             stroke={selectedId === cursorId ? 'rgba(255,255,0,0.95)' : 'rgba(0,255,102,0.9)'}
+>             strokeWidth={2}
+>             filter="url(#glow)"
+>           />
+>         ) : null}
+>
+>         {/* Islands */}
+>         {islands.map((isl) => {
+>           const { cx, cy } = islandPx(isl);
+>           const isSelected = selectedId === isl.id;
+>           const curCount = counts.get(isl.id) ?? 0;
+>           const ok = curCount === isl.value;
+>
+>           return (
+>             <g key={isl.id}>
+>               <circle
+>                 cx={cx}
+>                 cy={cy}
+>                 r={16}
+>                 fill="#000"
+>                 stroke={isSelected ? 'rgba(255,255,0,0.95)' : ok ? 'rgba(0,255,102,0.95)' : 'rgba(0,255,102,0.65)'}
+>                 strokeWidth={2}
+>                 filter="url(#glow)"
+>                 onClick={(e) => onIslandClick(isl, e)}
+>                 onContextMenu={(e) => onIslandContextMenu(isl, e)}
+>               />
+>               <text
+>                 x={cx}
+>                 y={cy + 5}
+>                 textAnchor="middle"
+>                 fontSize="16"
+>                 fill="rgba(0,255,102,0.95)"
+>                 style={{ userSelect: 'none', pointerEvents: 'none' }}
+>               >
+>                 {isl.value}
+>               </text>
+>             </g>
+>           );
+>         })}
+>       </svg>
+>     </div>
+>   );
+> }
+> EOF
+root@4ed407c736f8:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+[plugin:vite:esbuild] [plugin vite:esbuild] src/App.jsx: This assignment will throw because "bridges" is a constant
+152|        temp.set(key, (temp.get(key) ?? 0) + delta);
+153|        if (temp.get(key) === 0) temp.delete(key);
+154|        bridges = temp; // mutate closure variable snapshot intentionally
+   |        ^
+155|        cur += delta;
+156|      }
+
+✓ 33 modules transformed.
+dist/index.html                   0.39 kB │ gzip:  0.26 kB
+dist/assets/index-gBNZejWE.css    0.97 kB │ gzip:  0.46 kB
+dist/assets/index-gIJdJ-yc.js   151.47 kB │ gzip: 48.92 kB
+✓ built in 6.30s
+root@4ed407c736f8:/app# ls -la dist || true
+total 16
+drwxr-xr-x 3 root root 4096 May 21 13:10 .
+drwxr-xr-x 1 root root 4096 May 21 13:10 ..
+drwxr-xr-x 2 root root 4096 May 21 13:10 assets
+-rw-r--r-- 1 root root  390 May 21 13:10 index.html
+root@4ed407c736f8:/app#

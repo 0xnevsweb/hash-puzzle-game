@@ -1,0 +1,41 @@
+Current Terminal Screen:
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
+root@e3febcf25c5d:/app# ls -la src || true
+ls: cannot access 'src': No such file or directory
+root@e3febcf25c5d:/app# find src -maxdepth 3 -type f -print
+find: ‘src’: No such file or directory
+root@e3febcf25c5d:/app# npm install
+⠏ls -la
+⠙find . -maxdepth 2 -type f -print
+⠧cat index.html 2>/dev/null || echo "no index.html"
+⠸cd /app
+⠦npm install
+⠏ls -la
+⠙find . -maxdepth 2 -type f -print
+⠏cat index.html 2>/dev/null || echo "no index.html"
+⠸C-c
+⠏pwd
+⠹ls -la
+⠴ls -la index.html || true
+⠧mkdir -p src/data src/utils
+⠼C-c
+⠋C-c
+⠦
+⠏ps aux | egrep 'npm|vite' | egrep -v egrep || true
+⠴pkill -f "vite" || true
+⠹pkill -f "npm" || true
+⠇cd /app
+⠙mkdir -p src/data src/utils
+⠦

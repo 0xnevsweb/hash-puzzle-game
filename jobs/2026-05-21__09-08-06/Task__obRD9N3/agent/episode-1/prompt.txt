@@ -1,0 +1,41 @@
+New Terminal Output:
+root@90933ddfea33:/app# pwd
+/app
+root@90933ddfea33:/app# ls -la
+total 72
+drwxr-xr-x  1 root root  4096 May 20 19:14 .
+drwxr-xr-x  1 root root  4096 May 21 13:08 ..
+drwxr-xr-x 39 root root  4096 May 20 19:14 node_modules
+-rw-r--r--  1 root root 56042 May 20 19:14 package-lock.json
+-rw-rw-r--  1 root root   350 May 19 21:44 package.json
+root@90933ddfea33:/app# cat package.json
+{
+  "name": "hashi-puzzle",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
+root@90933ddfea33:/app# find src -maxdepth 3 -type f -print
+find: ‘src’: No such file or directory
+root@90933ddfea33:/app# find src -maxdepth 3 -type f -print -exec sed -n '1,200p' {} \;
+find: ‘src’: No such file or directory
+root@90933ddfea33:/app#
+
+
+
+
+
+

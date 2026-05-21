@@ -1,0 +1,44 @@
+Previous response had warnings:
+WARNINGS: - Command 1 should end with newline when followed by another command. Otherwise the two commands will be concatenated together on the same line.
+
+Current Terminal Screen:
+>   </body>
+> </html>
+> EOF
+root@6b0186ccf42a:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 32 modules transformed.
+dist/index.html                  0.46 kB │ gzip:  0.29 kB
+dist/assets/index-BlrB6qJS.js  150.64 kB │ gzip: 48.98 kB
+✓ built in 2.56s
+root@6b0186ccf42a:/app# ls -la /app/dist && sed -n '1,120p' /app/dist/index.html
+total 16
+drwxr-xr-x 3 root root 4096 May 21 13:10 .
+drwxr-xr-x 1 root root 4096 May 21 13:10 ..
+drwxr-xr-x 2 root root 4096 May 21 13:10 assets
+-rw-r--r-- 1 root root  457 May 21 13:10 index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hashi</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+        color: #00ff66;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-BlrB6qJS.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+root@6b0186ccf42a:/app#

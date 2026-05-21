@@ -1,0 +1,41 @@
+Current Terminal Screen:
+⠙find . -maxdepth 2 -type f -print
+⠧cat index.html 2>/dev/null || echo "no index.html"
+⠸cd /app
+⠦npm install
+⠏ls -la
+⠙find . -maxdepth 2 -type f -print
+⠏cat index.html 2>/dev/null || echo "no index.html"
+⠸C-c
+⠏pwd
+⠹ls -la
+⠴ls -la index.html || true
+⠧mkdir -p src/data src/utils
+⠼C-c
+⠋C-c
+⠦
+⠏ps aux | egrep 'npm|vite' | egrep -v egrep || true
+⠴pkill -f "vite" || true
+⠹pkill -f "npm" || true
+⠇cd /app
+⠙mkdir -p src/data src/utils
+⠇C-c
+⠴
+⠇ps -eo pid,ppid,cmd | egrep 'node|npm|vite' | egrep -v egrep || true
+⠼pkill -9 -f "vite" || true
+⠋pkill -9 -f "npm" || true
+⠦pkill -9 -f "node" || true
+⠸echo READY
+⠸C-c
+⠋reset
+npm error process terminated
+npm error signal SIGINT
+npm error A complete log of this run can be found in: /root/.npm/_logs/2026-05-21T12_59_53_040Z-debug-0.log
+root@e3febcf25c5d:/app# cd /app
+root@e3febcf25c5d:/app# npm install
+bash
+⠼cd /app
+⠇ps -eo pid,ppid,cmd | egrep 'node|npm|vite' | egrep -v egrep || true
+⠸mkdir -p src/data src/utils
+⠦echo CLEAN_PROMPT
+⠙

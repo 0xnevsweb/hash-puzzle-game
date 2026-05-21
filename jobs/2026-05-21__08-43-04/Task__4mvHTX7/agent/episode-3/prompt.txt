@@ -1,0 +1,362 @@
+New Terminal Output:
+
+root@72bd201bd497:/app# cd /app
+root@72bd201bd497:/app# mkdir -p src/data src/utils
+root@72bd201bd497:/app# cat > index.html <<'EOF'
+> <!doctype html>
+> <html lang="en">
+>   <head>
+>     <meta charset="UTF-8" />
+>     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+>     <title>Hashi Puzzle</title>
+>   </head>
+>   <body>
+>     <div id="root"></div>
+>     <script type="module" src="/src/main.jsx"></script>
+>   </body>
+> </html>
+> EOF
+root@72bd201bd497:/app# cat > vite.config.js <<'EOF'
+> import { defineConfig } from 'vite';
+> import react from '@vitejs/plugin-react';
+>
+> export default defineConfig({
+>   plugins: [react()],
+>   server: {
+>     port: 3000,
+>     strictPort: true,
+>     host: true
+>   }
+> });
+> EOF
+root@72bd201bd497:/app# cat > src/main.jsx <<'EOF'
+> import React from 'react';
+> import ReactDOM from 'react-dom/client';
+> import App from './App.jsx';
+> import './styles.css';
+>
+> ReactDOM.createRoot(document.getElementById('root')).render(
+>   <React.StrictMode>
+>     <App />
+>   </React.StrictMode>
+> );
+> EOF
+root@72bd201bd497:/app# cat > src/styles.css <<'EOF'
+> :root {
+>   color-scheme: dark;
+> }
+>
+> html, body {
+>   margin: 0;
+>   padding: 0;
+>   background: #000;
+>   color: #00ff66;
+>   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+> }
+>
+> #root {
+>   margin: 0;
+>   padding: 0;
+> }
+>
+> .app {
+>   position: relative;
+> }
+>
+> .ui-bar {
+>   position: absolute;
+>   left: 0;
+>   top: 0;
+>   z-index: 3;
+>   padding: 8px 10px;
+>   display: flex;
+>   gap: 10px;
+>   align-items: center;
+>   background: rgba(0,0,0,0.65);
+>   border-bottom: 1px solid rgba(0,255,102,0.35);
+> }
+>
+> select, button {
+>   background: #000;
+>   color: #00ff66;
+>   border: 1px solid rgba(0,255,102,0.6);
+>   padding: 6px 8px;
+>   font: inherit;
+> }
+>
+> button:hover, select:hover {
+>   border-color: #00ff66;
+> }
+>
+> .error-message {
+>   position: absolute;
+>   left: 0;
+>   top: 44px;
+>   z-index: 3;
+>   padding: 6px 10px;
+>   background: rgba(0,0,0,0.75);
+>   border: 1px solid rgba(0,255,102,0.6);
+>   max-width: 780px;
+> }
+>
+> .victory-banner {
+>   position: absolute;
+>   left: 0;
+>   top: 80px;
+>   z-index: 3;
+>   padding: 10px 14px;
+>   border: 2px solid #00ff66;
+>   background: rgba(0,0,0,0.85);
+>   font-weight: 700;
+>   letter-spacing: 2px;
+> }
+>
+> svg.board {
+>   position: absolute;
+>   left: 0;
+>   top: 0;
+>   width: 800px;
+>   height: 600px;
+>   display: block;
+> }
+> EOF
+root@72bd201bd497:/app# cat > src/data/puzzles.js <<'EOF'
+> // Grid units are 40px each. Island positions are in grid coordinates.
+> // id must be unique per puzzle.
+>
+> export const PUZZLES = [
+>   {
+>     id: 'easy',
+>     label: 'Easy',
+>     // Simple rectangle loop
+>     islands: [
+>       { id: 'A', x: 4, y: 3, value: 2 },
+>       { id: 'B', x: 12, y: 3, value: 2 },
+>       { id: 'C', x: 4, y: 10, value: 2 },
+>       { id: 'D', x: 12, y: 10, value: 2 }
+>     ]
+>   },
+>   {
+>     id: 'medium',
+>     label: 'Medium',
+>     // 3x3 layout with a center hub
+>     islands: [
+>       { id: 'A', x: 4, y: 3, value: 2 },
+>       { id: 'B', x: 10, y: 3, value: 3 },
+>       { id: 'C', x: 16, y: 3, value: 2 },
+>
+>       { id: 'D', x: 4, y: 8, value: 3 },
+>       { id: 'E', x: 10, y: 8, value: 4 },
+>       { id: 'F', x: 16, y: 8, value: 3 },
+>
+>       { id: 'G', x: 4, y: 13, value: 2 },
+>       { id: 'H', x: 10, y: 13, value: 3 },
+>       { id: 'I', x: 16, y: 13, value: 2 }
+>     ]
+>   },
+>   {
+>     id: 'hard',
+>     label: 'Hard',
+>     // Denser set intended to allow many interactions; still within 800x600.
+>     islands: [
+>       { id: 'A', x: 2, y: 2, value: 2 },
+>       { id: 'B', x: 7, y: 2, value: 4 },
+>       { id: 'C', x: 12, y: 2, value: 3 },
+>       { id: 'D', x: 17, y: 2, value: 2 },
+>
+>       { id: 'E', x: 2, y: 6, value: 3 },
+>       { id: 'F', x: 7, y: 6, value: 5 },
+>       { id: 'G', x: 12, y: 6, value: 5 },
+>       { id: 'H', x: 17, y: 6, value: 3 },
+>
+>       { id: 'I', x: 2, y: 10, value: 3 },
+>       { id: 'J', x: 7, y: 10, value: 6 },
+>       { id: 'K', x: 12, y: 10, value: 6 },
+>       { id: 'L', x: 17, y: 10, value: 3 },
+>
+>       { id: 'M', x: 2, y: 13, value: 2 },
+>       { id: 'N', x: 7, y: 13, value: 4 },
+>       { id: 'O', x: 12, y: 13, value: 4 },
+>       { id: 'P', x: 17, y: 13, value: 2 }
+>     ]
+>   }
+> ];
+> EOF
+root@72bd201bd497:/app# cat > src/utils/hashiLogic.js <<'EOF'
+> // Hashi (Bridges) logic utilities.
+> // Bridges are stored as Map<string, number> where key is "x1,y1,x2,y2" in grid units,
+> // canonicalized so the smaller endpoint (x then y) comes first.
+>
+> export const ERRORS = {
+>   NON_ADJ: 'Cannot connect non-adjacent islands',
+>   MAX_PAIR: 'Max 2 bridges per pair',
+>   EXCEED: 'Island would exceed its number',
+>   CROSS: 'Bridges would cross'
+> };
+>
+> export function canonicalKey(from, to) {
+>   const a = { x: from.x, y: from.y };
+>   const b = { x: to.x, y: to.y };
+>   const first = (a.x < b.x) || 
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+v className="victory-banner">SOLVED!</div> : null}
+>
+>       <svg
+>         ref={svgRef}
+>         className="board"
+>         width={W}
+>         height={H}
+>         viewBox={`0 0 ${W} ${H}`}
+>         onMouseDown={(e) => {
+>           // if clicking on empty SVG
+>           if (e.target === svgRef.current) onBackgroundClick();
+>         }}
+>       >
+>         {/* Bridges */}
+>         <g stroke="#00ff66" strokeLinecap="round">
+>           {bridgeSegments.map(({ key, from, to, num }) => {
+>             const x1 = px(from.x);
+>             const y1 = px(from.y);
+>             const x2 = px(to.x);
+>             const y2 = px(to.y);
+>             const isH = y1 === y2;
+>             const offset = 6;
+>
+>             const lines = [];
+>             const commonProps = {
+>               key: key,
+>               onContextMenu: (evt) => onBridgeContextMenu(from, to, evt),
+>               onClick: (evt) => onBridgeClick(from, to, evt),
+>               style: { cursor: 'pointer' }
+>             };
+>
+>             if (num === 1) {
+>               lines.push(
+>                 <line
+>                   {...commonProps}
+>                   key={`${key}-1`}
+>                   x1={x1}
+>                   y1={y1}
+>                   x2={x2}
+>                   y2={y2}
+>                   strokeWidth={4}
+>                 />
+>               );
+>             } else if (num === 2) {
+>               if (isH) {
+>                 lines.push(
+>                   <line
+>                     {...commonProps}
+>                     key={`${key}-a`}
+>                     x1={x1}
+>                     y1={y1 - offset}
+>                     x2={x2}
+>                     y2={y2 - offset}
+>                     strokeWidth={4}
+>                   />,
+>                   <line
+>                     {...commonProps}
+>                     key={`${key}-b`}
+>                     x1={x1}
+>                     y1={y1 + offset}
+>                     x2={x2}
+>                     y2={y2 + offset}
+>                     strokeWidth={4}
+>                   />
+>                 );
+>               } else {
+>                 lines.push(
+>                   <line
+>                     {...commonProps}
+>                     key={`${key}-a`}
+>                     x1={x1 - offset}
+>                     y1={y1}
+>                     x2={x2 - offset}
+>                     y2={y2}
+>                     strokeWidth={4}
+>                   />,
+>                   <line
+>                     {...commonProps}
+>                     key={`${key}-b`}
+>                     x1={x1 + offset}
+>                     y1={y1}
+>                     x2={x2 + offset}
+>                     y2={y2}
+>                     strokeWidth={4}
+>                   />
+>                 );
+>               }
+>             }
+>
+>             return <g key={key}>{lines}</g>;
+>           })}
+>         </g>
+>
+>         {/* Keyboard cursor (not a circle) */}
+>         {cursorIslandId && islandById.get(cursorIslandId) ? (() => {
+>           const c = islandById.get(cursorIslandId);
+>           const cx = px(c.x);
+>           const cy = px(c.y);
+>           const size = 34;
+>           return (
+>             <g>
+>               <rect
+>                 x={cx - size / 2}
+>                 y={cy - size / 2}
+>                 width={size}
+>                 height={size}
+>                 fill="none"
+>                 stroke="#00ff66"
+>                 strokeWidth={2}
+>                 strokeDasharray="6 4"
+>                 opacity={0.9}
+>               />
+>             </g>
+>           );
+>         })() : null}
+>
+>         {/* Islands */}
+>         <g>
+>           {islands.map((i) => {
+>             const cx = px(i.x);
+>             const cy = px(i.y);
+>             const isSelected = selectedIslandId === i.id;
+>             const curCount = counts.get(i.id) || 0;
+>             const satisfied = curCount === i.value;
+>             const over = curCount > i.value;
+>
+>             return (
+>               <g key={i.id} onClick={(evt) => onIslandClick(i, evt)} style={{ cursor: 'pointer' }}>
+>                 <circle
+>                   cx={cx}
+>                   cy={cy}
+>                   r={16}
+>                   fill="#000"
+>                   stroke={over ? '#ff3355' : (isSelected ? '#00ff66' : 'rgba(0,255,102,0.7)')}
+>                   strokeWidth={isSelected ? 3 : 2}
+>                 />
+>                 <text
+>                   x={cx}
+>                   y={cy + 5}
+>                   textAnchor="middle"
+>                   fontSize="16"
+>                   fill={satisfied ? '#00ff66' : 'rgba(0,255,102,0.9)'}
+>                 >
+>                   {i.value}
+>                 </text>
+>               </g>
+>             );
+>           })}
+>         </g>
+>       </svg>
+>     </div>
+>   );
+> }
+> EOF
+root@72bd201bd497:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming (10) node_modules/react/cjs/react-jsx-runtime.production.min.js

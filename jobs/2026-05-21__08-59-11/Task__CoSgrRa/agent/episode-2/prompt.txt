@@ -1,0 +1,359 @@
+New Terminal Output:
+
+root@4835e4e0af8a:/app# mkdir -p /app/src/data /app/src/utils
+root@4835e4e0af8a:/app# cat > /app/index.html <<'EOF'
+> <!doctype html>
+> <html lang="en">
+>   <head>
+>     <meta charset="UTF-8" />
+>     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+>     <title>Hashi</title>
+>   </head>
+>   <body>
+>     <div id="root"></div>
+>     <script type="module" src="/src/main.jsx"></script>
+>   </body>
+> </html>
+> EOF
+root@4835e4e0af8a:/app# cat > /app/vite.config.js <<'EOF'
+> import { defineConfig } from 'vite';
+> import react from '@vitejs/plugin-react';
+>
+> export default defineConfig({
+>   plugins: [react()],
+>   server: {
+>     port: 3000,
+>     strictPort: true,
+>     host: true
+>   }
+> });
+> EOF
+root@4835e4e0af8a:/app# cat > /app/src/main.jsx <<'EOF'
+> import React from 'react';
+> import ReactDOM from 'react-dom/client';
+> import App from './App.jsx';
+> import './index.css';
+>
+> ReactDOM.createRoot(document.getElementById('root')).render(
+>   <React.StrictMode>
+>     <App />
+>   </React.StrictMode>
+> );
+> EOF
+root@4835e4e0af8a:/app# cat > /app/src/index.css <<'EOF'
+> :root{
+>   --bg:#000;
+>   --fg:#00ff66;
+>   --fg-dim:#00aa44;
+>   --danger:#ff4466;
+> }
+>
+> html, body {
+>   margin: 0;
+>   padding: 0;
+>   width: 100%;
+>   height: 100%;
+>   background: var(--bg);
+>   color: var(--fg);
+>   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+> }
+>
+> #root {
+>   width: 100%;
+>   height: 100%;
+> }
+>
+> button, select {
+>   background: #000;
+>   color: var(--fg);
+>   border: 1px solid var(--fg);
+>   padding: 6px 10px;
+>   font: inherit;
+> }
+>
+> button:hover, select:hover { border-color: #7CFFAA; }
+>
+> .controls {
+>   position: fixed;
+>   left: 0;
+>   top: 0;
+>   padding: 8px;
+>   display: flex;
+>   gap: 8px;
+>   align-items: center;
+>   z-index: 10;
+>   background: rgba(0,0,0,0.6);
+> }
+>
+> .error-message {
+>   position: fixed;
+>   left: 0;
+>   top: 44px;
+>   padding: 8px;
+>   color: var(--danger);
+>   z-index: 10;
+>   background: rgba(0,0,0,0.6);
+> }
+>
+> .victory-banner {
+>   position: fixed;
+>   left: 0;
+>   top: 44px;
+>   padding: 8px;
+>   color: #000;
+>   background: var(--fg);
+>   z-index: 11;
+>   font-weight: 700;
+>   letter-spacing: 1px;
+> }
+> EOF
+root@4835e4e0af8a:/app# cat > /app/src/data/puzzles.js <<'EOF'
+> // Coordinates are in grid units. Render at (x*40, y*40).
+> // island: { id, x, y, value }
+>
+> export const puzzles = [
+>   {
+>     label: 'Easy',
+>     islands: [
+>       { id: 'A', x: 4, y: 3, value: 2 },
+>       { id: 'B', x: 10, y: 3, value: 2 },
+>       { id: 'C', x: 4, y: 9, value: 2 },
+>       { id: 'D', x: 10, y: 9, value: 2 },
+>     ],
+>   },
+>   {
+>     label: 'Medium',
+>     islands: [
+>       { id: 'A', x: 3, y: 2, value: 2 },
+>       { id: 'B', x: 9, y: 2, value: 3 },
+>       { id: 'C', x: 14, y: 2, value: 1 },
+>       { id: 'D', x: 3, y: 6, value: 3 },
+>       { id: 'E', x: 9, y: 6, value: 4 },
+>       { id: 'F', x: 14, y: 6, value: 3 },
+>       { id: 'G', x: 3, y: 11, value: 1 },
+>       { id: 'H', x: 9, y: 11, value: 3 },
+>       { id: 'I', x: 14, y: 11, value: 2 },
+>     ],
+>   },
+>   {
+>     label: 'Hard',
+>     islands: [
+>       { id: 'A', x: 2, y: 2, value: 3 },
+>       { id: 'B', x: 7, y: 2, value: 2 },
+>       { id: 'C', x: 12, y: 2, value: 3 },
+>       { id: 'D', x: 17, y: 2, value: 2 },
+>       { id: 'E', x: 2, y: 6, value: 2 },
+>       { id: 'F', x: 7, y: 6, value: 4 },
+>       { id: 'G', x: 12, y: 6, value: 4 },
+>       { id: 'H', x: 17, y: 6, value: 2 },
+>       { id: 'I', x: 2, y: 11, value: 3 },
+>       { id: 'J', x: 7, y: 11, value: 2 },
+>       { id: 'K', x: 12, y: 11, value: 2 },
+>       { id: 'L', x: 17, y: 11, value: 3 },
+>       { id: 'M', x: 2, y: 13, value: 1 },
+>       { id: 'N', x: 17, y: 13, value: 1 },
+>     ],
+>   },
+> ];
+> EOF
+root@4835e4e0af8a:/app# cat > /app/src/utils/hashiLogic.js <<'EOF'
+> const ERR_NON_ADJ = 'Cannot connect non-adjacent islands';
+> const ERR_MAX2 = 'Max 2 bridges per pair';
+> const ERR_EXCEED = 'Island would exceed its number';
+> const ERR_CROSS = 'Bridges would cross';
+>
+> export function canonicalBridgeKey(from, to) {
+>   const a = { x: from.x, y: from.y };
+>   const b = { x: to.x, y: to.y };
+>   if (a.x < b.x || (a.x === b.x && a.y <= b.y)) {
+>     return `${a.x},${a.y},${b.x},${b.y}`;
+>   }
+>   return `${b.x},${b.y},${a.x},${a.y}`;
+> }
+>
+> function isSamePoint(p, q) {
+>   return p.x === q.x && p.y === q.y;
+> }
+>
+> function getSegments(islands, bridges) {
+>   // return list of segments in grid units: { from:{x,y}, to:{x,y}, key }
+>   const segs = [];
+>   for (const [key, count] of bridges.entries()) {
+>     if (!count) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     segs.push({ from: { x: x1, y: y1 }, to: { x: x2, y: y2 }, key, count });
+>   }
+>   return segs;
+> }
+>
+> function between(v, a, b) {
+>   const lo = Math.min(a, b);
+>   const hi = Math.max(a, b);
+>   return v > lo && v < hi;
+> }
+>
+> function s
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+tMode('idle');
+>       }
+      textAnchor="middle"
+                fontSize="16"
+                fill={stroke}
+            >     }
+>
+>     window.addEventListener('keydown', onKeyDown);
+>     return () => window.removeEventListener('keydown', onKeyDown);
+>   }, [cursorIsland, islands, selectedIslandId, bridges]);
+>
+>   function reset() {
+>     setBridges(new Map());
+>     setSelectedIslandId(null);
+>     setMode('idle');
+>     setError(null);
+>   }
+>
+>   // Render bridges
+>   const bridgeLines = [];
+>   for (const [key, count] of bridges.entries()) {
+>     if (!count) continue;
+>     const { x1, y1, x2, y2 } = parseKey(key);
+>     const a = { x: px(x1), y: px(y1) };
+>     const b = { x: px(x2), y: px(y2) };
+>
+>     const isH = a.y === b.y;
+>     const off = 5;
+>     const stroke = '#00ff66';
+>     const width = 3;
+>
+>     if (count === 1) {
+>       bridgeLines.push(
+>         <line
+>           key={key}
+>           x1={a.x}
+>           y1={a.y}
+>           x2={b.x}
+>           y2={b.y}
+>           stroke={stroke}
+>           strokeWidth={width}
+>           shapeRendering="crispEdges"
+>         />
+>       );
+>     } else if (count === 2) {
+>       if (isH) {
+>         bridgeLines.push(
+>           <g key={key}>
+>             <line x1={a.x} y1={a.y - off} x2={b.x} y2={b.y - off} stroke={stroke} strokeWidth={width} shapeRendering="crispEdges" />
+>             <line x1={a.x} y1={a.y + off} x2={b.x} y2={b.y + off} stroke={stroke} strokeWidth={width} shapeRendering="crispEdges" />
+>           </g>
+>         );
+>       } else {
+>         bridgeLines.push(
+>           <g key={key}>
+>             <line x1={a.x - off} y1={a.y} x2={b.x - off} y2={b.y} stroke={stroke} strokeWidth={width} shapeRendering="crispEdges" />
+>             <line x1={a.x + off} y1={a.y} x2={b.x + off} y2={b.y} stroke={stroke} strokeWidth={width} shapeRendering="crispEdges" />
+>           </g>
+>         );
+>       }
+>     }
+>   }
+>
+>   // Cursor marker (non-circle)
+>   const cursorMarker = cursorIsland ? (
+>     <rect
+>       x={px(cursorIsland.x) - 18}
+>       y={px(cursorIsland.y) - 18}
+>       width={36}
+>       height={36}
+>       fill="none"
+>       stroke={mode === 'choosingTarget' || selectedIslandId ? '#7CFFAA' : '#00aa44'}
+>       strokeWidth={3}
+>       vectorEffect="non-scaling-stroke"
+>     />
+>   ) : null;
+>
+>   return (
+>     <>
+>       <div className="controls">
+>         <label>
+>           Puzzle:{' '}
+>           <select
+>             value={puzzleIndex}
+>             onChange={(e) => setPuzzleIndex(Number(e.target.value))}
+>           >
+>             {puzzles.map((p, idx) => (
+>               <option key={p.label} value={idx}>{p.label}</option>
+>             ))}
+>           </select>
+>         </label>
+>         <button onClick={reset}>Reset</button>
+>         <div style={{ color: '#00aa44' }}>
+>           Click: select island then another. Right-click/Ctrl+click on a bridge toggles it. Arrow keys + Enter.
+>         </div>
+>       </div>
+>
+>       {victory ? <div className="victory-banner">SOLVED!</div> : null}
+>       {!victory && error ? <div className="error-message">{error}</div> : null}
+>
+>       <svg
+>         ref={svgRef}
+>         width={W}
+>         height={H}
+>         style={{ position: 'fixed', left: 0, top: 0 }}
+>         onContextMenu={handleContextOrCtrlClickBridge}
+>         onMouseDown={(e) => {
+>           if (e.ctrlKey) handleContextOrCtrlClickBridge(e);
+>         }}
+>       >
+>         <rect x={0} y={0} width={W} height={H} fill="#000" />
+>
+>         {bridgeLines}
+>         {cursorMarker}
+>
+>         {islands.map((isl) => {
+>           const c = counts.get(isl.id) || 0;
+>           const satisfied = c === isl.value;
+>           const over = c > isl.value;
+>           const stroke = over ? '#ff4466' : (satisfied ? '#7CFFAA' : '#00ff66');
+>           const fill = '#000';
+>           const r = 16;
+>
+>           return (
+>             <g
+>               key={isl.id}
+>               transform={`translate(${px(isl.x)},${px(isl.y)})`}
+>               onMouseDown={(e) => {
+>                 e.preventDefault();
+>                 handleIslandClick(isl);
+>               }}
+>               style={{ cursor: 'pointer' }}
+>             >
+>               <circle cx={0} cy={0} r={r} fill={fill} stroke={stroke} strokeWidth={3} />
+>               <text
+>                 x={0}
+>                 y={5}
+>                 textAnchor="middle"
+>                 fontSize="16"
+>                 fill={stroke}
+>               >
+>                 {isl.value}
+>               </text>
+>             </g>
+>           );
+>         })}
+>       </svg>
+>     </>
+>   );
+> }
+> EOF
+root@4835e4e0af8a:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.39 kB │ gzip:  0.27 kB
+dist/assets/index-DJZ3O5GN.css    0.79 kB │ gzip:  0.42 kB
+dist/assets/index-BRK6CwCG.js   151.84 kB │ gzip: 49.23 kB
+✓ built in 5.13s
+root@4835e4e0af8a:/app#

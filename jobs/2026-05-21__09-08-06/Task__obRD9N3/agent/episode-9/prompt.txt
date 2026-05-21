@@ -1,0 +1,355 @@
+Current terminal state:
+New Terminal Output:
+
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.39 kB │ gzip:  0.26 kB
+dist/assets/index-CIxepvNE.css    1.05 kB │ gzip:  0.49 kB
+dist/assets/index-ClC7wlIc.js   150.32 kB │ gzip: 48.72 kB
+✓ built in 6.14s
+root@90933ddfea33:/app# cat > src/App.jsx <<'EOF'
+> import React, { useEffect, useMemo, useRef, useState } from 'react';
+> import { PUZZLES } from './data/puzzles.js';
+> import {
+>   canAddBridge,
+>   canonicalBridgeKey,
+>   computeCurrentCounts,
+>   isVictory
+> } from './utils/hashiLogic.js';
+>
+> const GRID = 40;
+> const W = 800;
+> const H = 600;
+>
+> function isCtrlLike(e) {
+>   return e.ctrlKey || e.metaKey;
+> }
+>
+> function findIslandAt(islands, x, y) {
+>   return islands.find((i) => i.x === x && i.y === y) || null;
+> }
+>
+> function nextIslandInDirection(islands, from, dir) {
+>   const candidates = islands.filter((i) => i.id !== from.id);
+>   if (dir === 'left') {
+>     const sameRow = candidates.filter((i) => i.y === from.y && i.x < from.x);
+>     sameRow.sort((a, b) => b.x - a.x);
+>     return sameRow[0] || null;
+>   }
+>   if (dir === 'right') {
+>     const sameRow = candidates.filter((i) => i.y === from.y && i.x > from.x);
+>     sameRow.sort((a, b) => a.x - b.x);
+>     return sameRow[0] || null;
+>   }
+>   if (dir === 'up') {
+>     const sameCol = candidates.filter((i) => i.x === from.x && i.y < from.y);
+>     sameCol.sort((a, b) => b.y - a.y);
+>     return sameCol[0] || null;
+>   }
+>   if (dir === 'down') {
+>     const sameCol = candidates.filter((i) => i.x === from.x && i.y > from.y);
+>     sameCol.sort((a, b) => a.y - b.y);
+idges.get(k) ?? 0;
+      const delta = cycleDelta(cu>     return sameCol[0] || null;
+>   }
+>   return null;
+> }
+>
+> function cycleDelta(current) {
+>   // none -> single -> double -> none
+>   if (current === 0) return +1;
+>   if (current === 1) return +1;
+>   return -2;
+> }
+rrent);
+      const ok = applyBridge(from, to, delta);
+      if (ok) {
+        setKbdFromId(null);
+        setSelectedId(null);
+      }
+    }
+  }
+
+  function reset() {
+    setBridges(new Map());
+    se>
+> export default function App() {
+>   const [difficulty, setDifficulty] = useState('Easy');
+>   const puzzle = PUZZLES[difficulty];
+>   const islands = puzzle.islands;
+>
+>   const [bridges, setBridges] = useState(() => new Map());
+>   const [selectedId, setSelectedId] = useState(null);
+>   const [cursorId, setCursorId] = useState(islands[0]?.id ?? null);
+>   const [kbdFromId, setKbdFromId] = useState(null);
+>   const [error, setError] = useState(null);
+>
+>   const svgRef = useRef(null);
+>
+>   useEffect(() => {
+>     // when puzzle changes: fully reset
+>     setBridges(new Map());
+>     setSelectedId(null);
+>     setError(null);
+>     setCursorId(PUZZLES[difficulty].islands[0]?.id ?? null);
+>     setKbdFromId(null);
+>   }, [difficulty]);
+>
+>   const counts = useMemo(() => computeCurrentCounts(islands, bridges), [islands, bridges]);
+>   const victory = useMemo(() => isVictory(islands, bridges), [islands, bridges]);
+>
+>   function applyBridge(from, to, delta) {
+>     const res = canAddBridge(islands, bridges, from, to, delta);
+>     if (!res.valid) {
+>       setError(res.error);
+>       return false;
+>     }
+>     setError(null);
+>
+>     const k = canonicalBridgeKey(from, to);
+>     const current = bridges.get(k) ?? 0;
+>     const next = current + delta;
+>
+>     const nb = new Map(bridges);
+>     if (next === 0) nb.delete(k);
+>     else nb.set(k, next);
+>     setBridges(nb);
+>     return true;
+>   }
+>
+>   function toggleCycle(from, to) {
+>     const k = canonicalBridgeKey(from, to);
+>     const current = bridges.get(k) ?? 0;
+>     const delta = cycleDelta(current);
+>     applyBridge(from, to, delta);
+>   }
+>
+>   function toggleRightClick(from, to) {
+>     const k = canonicalBridgeKey(from, to);
+>     const current = bridges.get(k) ?? 0;
+>     const delta = current > 0 ? -1 : +1;
+>     applyBridge(from, to, delta);
+>   }
+>
+>   function onIslandClick(isl, e) {
+>     e.preventDefault();
+>     svgRef.current?.focus();
+>
+>     setCursorId(isl.id);
+>
+>     if (selectedId == null) {
+>       setSelectedId(isl.id);
+>       return;
+>     }
+>     if (selectedId === isl.id) return;
+>
+>     const from = islands.find((i) => i.id === selectedId);
+>     const to = isl;
+>     toggleCycle(from, to);
+>     setSelectedId(null);
+>   }
+>
+>   function onIslandContextMenu(isl, e) {
+>     e.preventDefault();
+>     svgRef.current?.focus();
+>
+>     if (selectedId == null || selectedId === isl.id) {
+>       setSelectedId(isl.id);
+>       return;
+>     }
+>     const from = islands.find((i) => i.id === selectedId);
+>     toggleRightClick(from, isl);
+>     setSelectedId(null);
+>   }
+>
+>   function onIslandCtrlClick(isl, e) {
+>     if (!isCtrlLike(e)) return;
+>     e.preventDefault();
+>     svgRef.current?.focus();
+>
+>     if (selectedId == null || selectedId === isl.id) {
+>       setSelectedId(isl.id);
+>       return;
+>     }
+>     const from = 
+[... output limited to 10000 bytes; 1801 interior bytes omitted ...]
+ber);
+>     const ax = x1 * GRID;
+>     const ay = y1 * GRID;
+>     const bx = x2 * GRID;
+>     const by = y2 * GRID;
+>
+>     const from = findIslandAt(islands, x1, y1);
+>     const to = findIslandAt(islands, x2, y2);
+>
+>     // Transparent hit target so right-click / Ctrl+click on the bridge works.
+>     bridgeHitAreas.push(
+>       <line
+>         key={`hit-${k}`}
+>         x1={ax}
+>         y1={ay}
+>         x2={bx}
+>         y2={by}
+>         stroke="transparent"
+>         strokeWidth={18}
+>         strokeLinecap="round"
+>         onContextMenu={(e) => {
+>           e.preventDefault();
+>           svgRef.current?.focus();
+>           if (from && to) toggleRightClick(from, to);
+>         }}
+>         onClick={(e) => {
+>           if (!isCtrlLike(e)) return;
+>           e.preventDefault();
+>           svgRef.current?.focus();
+>           if (from && to) toggleRightClick(from, to);
+>         }}
+>       />
+>     );
+>
+>     const isH = ay === by;
+>     const offset = 6;
+>
+>     if (n === 1) {
+>       bridgeLines.push(
+>         <line
+>           key={`b-${k}-1`}
+>           x1={ax}
+>           y1={ay}
+>           x2={bx}
+>           y2={by}
+>           stroke="#00ff66"
+>           strokeWidth={4}
+>           strokeLinecap="round"
+>         />
+>       );
+>     } else if (n === 2) {
+>       const dx = isH ? 0 : offset;
+>       const dy = isH ? offset : 0;
+>       bridgeLines.push(
+>         <line
+>           key={`b-${k}-2a`}
+>           x1={ax - dx}
+>           y1={ay - dy}
+>           x2={bx - dx}
+>           y2={by - dy}
+>           stroke="#00ff66"
+>           strokeWidth={4}
+>           strokeLinecap="round"
+>         />
+>       );
+>       bridgeLines.push(
+>         <line
+>           key={`b-${k}-2b`}
+>           x1={ax + dx}
+>           y1={ay + dy}
+>           x2={bx + dx}
+>           y2={by + dy}
+>           stroke="#00ff66"
+>           strokeWidth={4}
+>           strokeLinecap="round"
+>         />
+>       );
+>     }
+>   }
+>
+>   const cursor = islands.find((i) => i.id === cursorId) || islands[0];
+>   const cursorPx = cursor ? { x: cursor.x * GRID, y: cursor.y * GRID } : { x: 0, y: 0 };
+>
+>   return (
+>     <div className="app">
+>       <div className="hud">
+>         <label>
+>           Puzzle
+>           <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+>             <option value="Easy">Easy</option>
+>             <option value="Medium">Medium</option>
+>             <option value="Hard">Hard</option>
+>           </select>
+>         </label>
+>         <button onClick={reset}>Reset</button>
+>       </div>
+>
+>       {error ? <div className="error-message">{error}</div> : null}
+>       {victory ? <div className="victory-banner">SOLVED!</div> : null}
+>
+>       <svg
+>         ref={svgRef}
+>         width={W}
+>         height={H}
+>         viewBox={`0 0 ${W} ${H}`}
+>         style={{ display: 'block', position: 'absolute', top: 0, left: 0, background: '#000' }}
+>         tabIndex={0}
+>         onKeyDown={handleKeyDown}
+>       >
+>         {cursor ? (
+>           <rect
+>             x={cursorPx.x - 18}
+>             y={cursorPx.y - 18}
+>             width={36}
+>             height={36}
+>             fill="none"
+>             stroke="#00ff66"
+>             strokeWidth={3}
+>             strokeDasharray="6 4"
+>           />
+>         ) : null}
+>
+>         <g>{bridgeLines}</g>
+>         <g>{bridgeHitAreas}</g>
+>
+>         <g>
+>           {islands.map((isl) => {
+>             const px = isl.x * GRID;
+>             const py = isl.y * GRID;
+>             const isSelected = selectedId === isl.id || kbdFromId === isl.id;
+>             const current = counts.get(isl.id) ?? 0;
+>             const satisfied = current === isl.value;
+>
+>             return (
+>               <g key={isl.id}>
+>                 <circle
+>                   cx={px}
+>                   cy={py}
+>                   r={16}
+>                   fill="#000"
+>                   stroke={isSelected ? '#00ff66' : 'rgba(0,255,102,0.7)'}
+>                   strokeWidth={isSelected ? 4 : 2}
+>                   onClick={(e) => {
+>                     onIslandCtrlClick(isl, e);
+>                     if (!isCtrlLike(e)) onIslandClick(isl, e);
+>                   }}
+>                   onContextMenu={(e) => onIslandContextMenu(isl, e)}
+>                 />
+>                 <text
+>                   x={px}
+>                   y={py + 6}
+>                   textAnchor="middle"
+>                   fontSize="16"
+>                   fill={satisfied ? '#00ff66' : 'rgba(0,255,102,0.9)'}
+>                 >
+>                   {isl.value}
+>                 </text>
+>               </g>
+>             );
+>           })}
+>         </g>
+>       </svg>
+>     </div>
+>   );
+> }
+> EOF
+root@90933ddfea33:/app# grep -n "bridgeHitAreas.push" -n src/App.jsx
+228:    bridgeHitAreas.push(
+root@90933ddfea33:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming (14) node_modules/react/jsx-runtime.js
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.
