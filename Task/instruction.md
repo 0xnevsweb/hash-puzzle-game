@@ -12,3 +12,5 @@ One thing worth flagging from prototyping: the error-message and victory-banner 
 
 Game logic lives at /app/src/utils/hashiLogic.js. Bridges are stored as Map<string, number> keyed by the canonical "x1,y1,x2,y2" string where the endpoint with the smaller (x, then y) sorts first; coordinates in the key are grid units. canAddBridge(islands, bridges, from, to, delta) returning { valid, error } where error, when non-null, is one of the four strings above; computeCurrentCounts(islands, bridges) returning Map<islandId, number> keyed by the island's numeric id (handle id=0 carefully); checkConnectivity(islands, bridges) returning whether every island is reachable from every other; isVictory(islands, bridges) returning whether every island's count equals its value, no bridges cross, and the graph is connected.
 
+canAddBridge should also guard the degenerate from === to case (valid: false; the error string there is unconstrained).
+
