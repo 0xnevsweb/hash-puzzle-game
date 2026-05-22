@@ -48,6 +48,15 @@ const handleBridgeRightClick = (e, key) => {
   onBridgeUpdate(newBridges, null);
 };
 
+const handleBridgeClick = (e, key) => {
+  if (!e.ctrlKey && !e.metaKey) return;
+  e.preventDefault();
+  if (!bridges.has(key)) return;
+  const newBridges = new Map(bridges);
+  newBridges.delete(key);
+  onBridgeUpdate(newBridges, null);
+};
+
   useEffect(() => {
     const findNearest = (from, direction) => {
       let candidates = [];
@@ -127,19 +136,20 @@ const handleBridgeRightClick = (e, key) => {
               stroke="#0f0" strokeWidth="4"
               style={{ cursor: 'pointer' }}
               onContextMenu={(e) => handleBridgeRightClick(e, key)}
+              onClick={(e) => handleBridgeClick(e, key)}
             />
           );
         } else if (count === 2) {
           if (isHorizontal) {
             return (
-              <g key={key} onContextMenu={(e) => handleBridgeRightClick(e, key)} style={{ cursor: 'pointer' }}>
+              <g key={key} onContextMenu={(e) => handleBridgeRightClick(e, key)} onClick={(e) => handleBridgeClick(e, key)} style={{ cursor: 'pointer' }}>
                 <line x1={x1px} y1={y1px - 4} x2={x2px} y2={y2px - 4} stroke="#0f0" strokeWidth="2" />
                 <line x1={x1px} y1={y1px + 4} x2={x2px} y2={y2px + 4} stroke="#0f0" strokeWidth="2" />
               </g>
             );
           } else {
             return (
-              <g key={key} onContextMenu={(e) => handleBridgeRightClick(e, key)} style={{ cursor: 'pointer' }}>
+              <g key={key} onContextMenu={(e) => handleBridgeRightClick(e, key)} onClick={(e) => handleBridgeClick(e, key)} style={{ cursor: 'pointer' }}>
                 <line x1={x1px - 4} y1={y1px} x2={x2px - 4} y2={y2px} stroke="#0f0" strokeWidth="2" />
                 <line x1={x1px + 4} y1={y1px} x2={x2px + 4} y2={y2px} stroke="#0f0" strokeWidth="2" />
               </g>
