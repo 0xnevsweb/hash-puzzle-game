@@ -43,7 +43,9 @@ test('victory banner appears', async ({ page }) => {
   await page.mouse.click(240, 240);
   await page.mouse.click(80, 240);
   await page.mouse.click(240, 240);
-  await expect(page.locator('.victory-banner')).toBeVisible();
+  const banner = page.locator('.victory-banner');
+  await expect(banner).toBeVisible();
+  await expect(banner).toContainText('SOLVED!');
 });
 
 test('reset clears bridges', async ({ page }) => {
@@ -125,5 +127,6 @@ test('error message clears on next valid move', async ({ page }) => {
   await page.mouse.click(80, 80);
   await page.mouse.click(240, 80);
   await expect(page.locator('.error-message')).toHaveCount(0);
+  await expect(page.locator('line')).toHaveCount(1);
 });
 
