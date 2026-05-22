@@ -15,10 +15,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Pre-install the game scaffold's node_modules (Vite + React) so the agent
-# and solve.sh can run `npm run build` offline. Only the manifest is copied
-# first so this layer caches across iterations.
-COPY package.json /app/package.json
-RUN npm install --no-audit --no-fund
+# and solve.sh can run `npm run build` offline. The manifest + lockfile are
+# copied first so this layer caches across iterations, and `npm ci` enforces
+# a reproducible install from the committed lockfile.
+COPY package.json package-lock.json /app/
+RUN npm ci --no-audit --no-fund
 
 # Drop the rest of the scaffold (source files, configs, docs, public assets)
 # into /app so the agent starts from a realistic project layout rather than

@@ -1,5 +1,0 @@
-Previous response had parsing errors:
-ERROR: Invalid JSON: Expecting ',' delimiter: line 19 column 22 (char 8350) | Content preview: '{\n  "analysis": "Build succeeds and dist/ is produced. However, the terminal output while writing sr'...
-WARNINGS: - Extra text detected after JSON object
-
-Please fix these issues and provide a proper JSON response.

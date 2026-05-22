@@ -3,7 +3,7 @@ version = "2.0"
 [metadata]
 author_name = "Chance Weston"
 author_email = "chanceweston97@gmail.com"
-difficulty = "hard"
+difficulty = "medium"
 category = "software-engineering"
 subcategories = ["tool_specific", "ui_building"]
 number_of_milestones = 0
