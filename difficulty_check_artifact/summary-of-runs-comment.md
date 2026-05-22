@@ -12,6 +12,14 @@
 ⚠️ Some tests are not passed by any agent run. It's not clear if this task is solvable or simply super hard.
 | Test Name | Successful Runs / Total Runs |
 |-------------|------------------------------|
+| e2e: right-click on bridge midpoint removes bridge | 0 / 6 |
+| e2e: ctrl+click on bridge midpoint removes bridge | 0 / 6 |
+| e2e: error message clears after subsequent valid move | 0 / 6 |
+| e2e: clicking island A then island B cycles bridge (none → single → double → none) | 1 / 6 |
+| e2e: invalid move displays correct error string | 1 / 6 |
+| e2e: victory banner shows when puzzle solved | 1 / 6 |
+| e2e: Reset button clears all bridges | 1 / 6 |
+| unit: canAddBridge rejects self-connection (from === to) | 4 / 6 |
 </details>
 
 ### Analysis on Agent Failures
