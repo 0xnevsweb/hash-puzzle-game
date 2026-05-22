@@ -1,0 +1,1230 @@
+[?2004hroot@41b49b35b47a:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@41b49b35b47a:/app# clear
+[?2004l[H[J[3J[?2004hroot@41b49b35b47a:/app# ls -la /app/
+[?2004ltotal 120
+drwxr-xr-x  7 root root  4096 May 22 00:23 .
+drwxr-xr-x 19 root root   265 May 22 00:25 ..
+-rw-r--r--  1 root root   188 May 22 00:21 .editorconfig
+-rw-r--r--  1 root root    82 May 22 00:21 .gitignore
+-rw-r--r--  1 root root     3 May 22 00:21 .nvmrc
+-rw-r--r--  1 root root    38 May 22 00:21 .prettierignore
+-rw-r--r--  1 root root   116 May 22 00:21 .prettierrc.json
+drwxr-xr-x  2 root root    50 May 22 00:21 .vscode
+-rw-r--r--  1 root root   249 May 22 00:21 CHANGELOG.md
+-rw-r--r--  1 root root   285 May 22 00:21 CONTRIBUTING.md
+-rw-r--r--  1 root root  1077 May 22 00:21 LICENSE
+-rw-r--r--  1 root root   566 May 22 00:21 README.md
+drwxr-xr-x  2 root root    51 May 22 00:21 docs
+-rw-r--r--  1 root root   348 May 22 00:21 eslint.config.js
+-rw-r--r--  1 root root   307 May 22 00:21 index.html
+-rw-r--r--  1 root root   245 May 22 00:21 jsconfig.json
+drwxr-xr-x 39 root root  4096 May 22 00:22 node_modules
+-rw-r--r--  1 root root 56093 May 22 00:22 package-lock.json
+-rw-r--r--  1 root root   350 May 22 00:21 package.json
+drwxr-xr-x  2 root root    43 May 22 00:21 public
+drwxr-xr-x  3 root root    67 May 22 00:21 src
+-rw-r--r--  1 root root   136 May 22 00:21 vite.config.js
+[?2004hroot@41b49b35b47a:/app# cat /app/package.json 2>/dev/null
+[?2004l{
+  "name": "hashi-puzzle",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
+[?2004hroot@41b49b35b47a:/app# find /app/src -type f
+[?2004l/app/src/App.jsx
+/app/src/data/puzzles.js
+/app/src/index.css
+/app/src/index.jsx
+[?2004hroot@41b49b35b47a:/app# cat /app/vite.config.js
+[?2004limport { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+});
+[?2004hroot@41b49b35b47a:/app# cat /app/index.html
+[?2004l<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hashi Puzzle Terminal</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
+</html>
+[?2004hroot@41b49b35b47a:/app# cat /app/src/main.jsx 2>/dev/null; cat /app/src/main.js 2>/dev/null
+[?2004l[?2004hroot@41b49b35b47a:/app# cat /app/src/index.jsx
+[?2004limport React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+[?2004hroot@41b49b35b47a:/app# cat /app/src/App.jsx
+[?2004limport React from 'react';
+
+function App() {
+  return <div>Hashi Puzzle – implement the game</div>;
+}
+
+export default App;
+[?2004hroot@41b49b35b47a:/app# cat /app/src/data/puzzles.js
+[?2004lexport const puzzles = [
+  {
+    id: 1,
+    name: "Easy",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 2 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 2, y: 6, value: 2 },
+      { id: 3, x: 6, y: 6, value: 2 }
+    ]
+  },
+  {
+    id: 2,
+    name: "Medium",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 3 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 10, y: 2, value: 3 },
+      { id: 3, x: 4, y: 6, value: 2 },
+      { id: 4, x: 8, y: 6, value: 2 }
+    ]
+  },
+  {
+    id: 3,
+    name: "Hard",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 4 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 10, y: 2, value: 4 },
+      { id: 3, x: 2, y: 6, value: 2 },
+      { id: 4, x: 6, y: 6, value: 4 },
+      { id: 5, x: 10, y: 6, value: 2 }
+    ]
+  }
+];
+[?2004hroot@41b49b35b47a:/app# cat /app/src/index.css
+[?2004lbody {
+  margin: 0;
+  font-family: monospace;
+  background-color: black;
+  color: #0f0;
+}
+[?2004hroot@41b49b35b47a:/app# mkdir -p /app/src/utils
+[?2004l[?2004hroot@41b49b35b47a:/app# cat > /app/vite.config.js << 'EOF'
+[?2004l[?2004h> import { defineConfig } from 'vite';
+[?2004l[?2004h> import react from '@vitejs/plugin-react';
+[?2004l[?2004h> 
+[?2004l[?2004h> export default defineConfig({
+[?2004l[?2004h>   plugins: [react()],
+[?2004l[?2004h>   build: {
+[?2004l[?2004h>     outDir: 'dist',
+[?2004l[?2004h>   },
+[?2004l[?2004h> });
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@41b49b35b47a:/app# cat > /app/src/data/puzzles.js << 'EOF'
+[?2004l[?2004h> export const puzzles = [
+[?2004l[?2004h>   {
+[?2004l[?2004h>     id: 1,
+[?2004l[?2004h>     name: "Easy",
+[?2004l[?2004h>     islands: [
+[?2004l[?2004h>       { id: 0, x: 2, y: 2, value: 2 },
+[?2004l[?2004h>       { id: 1, x: 6, y: 2, value: 2 },
+[?2004l[?2004h>       { id: 2, x: 2, y: 6, value: 2 },
+[?2004l[?2004h>       { id: 3, x: 6, y: 6, value: 2 }
+[?2004l[?2004h>     ]
+[?2004l[?2004h>   },
+[?2004l[?2004h>   {
+[?2004l[?2004h>     id: 2,
+[?2004l[?2004h>     name: "Medium",
+[?2004l[?2004h>     islands: [
+[?2004l[?2004h>       { id: 0, x: 2, y: 2, value: 3 },
+[?2004l[?2004h>       { id: 1, x: 6, y: 2, value: 3 },
+[?2004l[?2004h>       { id: 2, x: 2, y: 6, value: 2 },
+[?2004l[?2004h>       { id: 3, x: 6, y: 6, value: 3 },
+[?2004l[?2004h>       { id: 4, x: 6, y: 10, value: 1 }
+[?2004l[?2004h>     ]
+[?2004l[?2004h>   },
+[?2004l[?2004h>   {
+[?2004l[?2004h>     id: 3,
+[?2004l[?2004h>     name: "Hard",
+[?2004l[?2004h>     islands: [
+[?2004l[?2004h>       { id: 0, x: 2, y: 2, value: 3 },
+[?2004l[?2004h>       { id: 1, x: 6, y: 2, value: 4 },
+[?2004l[?2004h>       { id: 2, x: 10, y: 2, value: 2 },
+[?2004l[?2004h>       { id: 3, x: 2, y: 6, value: 3 },
+[?2004l[?2004h>       { id: 4, x: 6, y: 6, value: 4 },
+[?2004l[?2004h>       { id: 5, x: 10, y: 6, value: 2 }
+[?2004l[?2004h>     ]
+[?2004l[?2004h>   }
+[?2004l[?2004h> ];
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@41b49b35b47a:/app# cat > /app/src/utils/hashiLogic.js << 'EOF'
+[?2004l[?2004h> // Generate canonical bridge key: smaller coordinate pair first
+[?2004l[?2004h> export function bridgeKey(from, to) {
+[?2004l[?2004h>   const x1 = from.x, y1 = from.y, x2 = to.x, y2 = to.y;
+[?2004l[?2004h>   if (x1 < x2 || (x1 === x2 && y1 < y2)) {
+[?2004l[?2004h>     return `${x1},${y1},${x2},${y2}`;
+[?2004l[?2004h>   }
+[?2004l[?2004h>   return `${x2},${y2},${x1},${y1}`;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> // Parse a bridge key back into coordinates
+[?2004l[?2004h> export function parseKey(key) {
+[?2004l[?2004h>   const [x1, y1, x2, y2] = key.split(',').map(Number);
+[?2004l[?2004h>   return { x1, y1, x2, y2 };
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> // Check if two islands are aligned (same row or column) with no island between them
+[?2004l[?2004h> function areAdjacent(islands, from, to) {
+[?2004l[?2004h>   if (from.x !== to.x && from.y !== to.y) return false;
+[?2004l[?2004h>   if (from.x === to.x && from.y === to.y) return false;
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Check no island between them
+[?2004l[?2004h>   for (const island of islands) {
+[?2004l[?2004h>     if (island.id === from.id || island.id === to.id) continue;
+[?2004l[?2004h>     if (from.x === to.x && island.x === from.x) {
+[?2004l[?2004h>       const minY = Math.min(from.y, to.y);
+[?2004l[?2004h>       const maxY = Math.max(from.y, to.y);
+[?2004l[?2004h>       if (island.y > minY && island.y < maxY) return false;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if (from.y === to.y && island.y === from.y) {
+[?2004l[?2004h>       const minX = Math.min(from.x, to.x);
+[?2004l[?2004h>       const maxX = Math.max(from.x, to.x);
+[?2004l[?2004h>       if (island.x > minX && island.x < maxX) return false;
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }
+[?2004l[?2004h>   return true;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> // Check if adding a bridge between from and to would cross any existing bridge
+[?2004l[?2004h> function wouldCross(islands, bridges, from, to) {
+[?2004l[?2004h>   // The new bridge is between from and to
+[?2004l[?2004h>   const isHorizontal = from.y === to.y;
+[?2004l[?2004h> 
+[?2004l[?2004h>   for (const [key, count] of bridges) {
+[?2004l[?2004h>     if (count === 0) continue;
+[?2004l[?2004h>     const { x1, y1, x2, y2 } = parseKey(key);
+[?2004l[?2004h>     const existingHorizontal = y1 === y2;
+[?2004leck [?2004h> 
+[?2004la[?2004h>     // Only perpendicular bridges can cross
+[?2004l[?2004h>     if (isHorizontal === existingHorizontal) continue;
+[?2004l[?2004h> 
+[?2004l[?2004h>     if (isHorizontal) {
+[?2004l[?2004h>       // New bridge is horizontal (from.y constant), existing is vertical (x1 constant)
+[?2004l[?2004h>       const newMinX = Math.min(from.x, to.x);
+[?2004l[?2004h>       const newMaxX = Math.max(from.x, to.x);
+[?2004l[?2004h>       const newY = from.y;
+[?2004l[?2004h>       const existX = x1;
+[?2004l[?2004h>       const existMinY = Math.min(y1, y2);
+[?2004l[?2004h>       const existMaxY = Math.max(y1, y2);
+[?2004l[?2004h> 
+[?2004l[?2004h>       if (existX > newMinX && existX < newMaxX && newY > existMinY && newY < existMaxY) {
+[?2004l[?2004h>         return true;
+[?2004l[?2004h>       }
+[?2004l[?2004h>     } else {
+[?2004l[?2004h>       // New bridge is vertical (from.x constant), existing is horizontal (y1 constant)
+[?2004l[?2004h>       const newMinY = Math.min(from.y, to.y);
+[?2004l[?2004h>       const newMaxY = Math.max(from.y, to.y);
+[?2004l[?2004h>       const newX = from.x;
+[?2004l[?2004h>       const existY = y1;
+[?2004l[?2004h>       const existMinX = Math.min(x1, x2);
+[?2004l[?2004h>       const existMaxX = Math.max(x1, x2);
+[?2004l[?2004h> 
+[?2004l[?2004h>       if (newX > existMinX && newX < existMaxX && existY > newMinY && existY < newMaxY) {
+[?2004l[?2004h>         return true;
+[?2004l[?2004h>       }
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }
+[?2004l[?2004h>   return false;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> // Compute current bridge counts per island
+[?2004l[?2004h> export function computeCurrentCounts(islands, bridges) {
+[?2004l[?2004h>   const counts = new Map();
+[?2004l[?2004h>   for (const island of islands) {
+[?2004l[?2004h>     counts.set(island.id, 0);
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   for (const [key, count] of bridges) {
+[?2004l[?2004h>     if (count === 0) continue;
+[?2004l[?2004h>     const { x1, y1, x2, y2 } = parseKey(key);
+[?2004l[?2004h>     // Find islands at these positions
+[?2004l[?2004h>     const island1 = islands.find(i => i.x === x1 && i.y === y1);
+[?2004l[?2004h>     const island2 = islands.find(i => i.x === x2 && i.y === y2);
+[?2004l[?2004h>     if (island1) counts.set(island1.id, (counts.get(island1.id) || 0) + count);
+[?2004l[?2004h>     if (island2) counts.set(island2.id, (counts.get(island2.id) || 0) + count);
+[?2004l[?2004h>   }
+[?2004l[?2004h>   return counts;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> // Check if adding delta bridges would exceed island values
+[?2004l[?2004h> function wouldExceedValue(islands, bridges, from, to, delta) {
+[?2004l[?2004h>   const counts = computeCurrentCounts(islands, bridges);
+[?2004l[?2004h>   const fromCount = counts.get(from.id) || 0;
+[?2004l[?2004h>   const toCount = counts.get(to.id) || 0;
+[?2004l[?2004h> 
+[?2004l[?2004h>   if (fromCount + delta > from.value) return true;
+[?2004l[?2004h>   if (toCount + delta > to.value) return true;
+[?2004l[?2004h>   return false;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> // Main validation function
+[?2004l[?2004h> export function canAddBridge(islands, bridges, from, to, delta) {
+[?2004l[?2004h>   // Check adjacency
+[?2004l[?2004h>   if (!areAdjacent(islands, from, to)) {
+[?2004l[?2004h>     return { valid: false, error: "Cannot connect non-adjacent islands" };
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Check max bridges
+[?2004l[?2004h>   const key = bridgeKey(from, to);
+[?2004l[?2004h>   const current = bridges.get(key) || 0;
+[?2004l[?2004h>   if (current + delta > 2) {
+[?2004l[?2004h>     return { valid: false, error: "Max 2 bridges per pair" };
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Check island values won't be exceeded
+[?2004l[?2004h>   if (wouldExceedValue(islands, bridges, from, to, delta)) {
+[?2004l[?2004h>     return { valid: false, error: "Island would exceed its number" };
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Check crossing (only if adding, not removing)
+[?2004l[?2004h>   if (delta > 0 && current === 0 && wouldCross(islands, bridges, from, to)) {
+[?2004l[?2004h>     return { valid: false, error: "Bridges would cross" };
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   return { valid: true, error: null };
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> // Check if all islands are connected via bridges
+[?2004l[?2004h> export function checkConnectivity(islands, bridges) {
+[?2004l[?2004h>   if (islands.length === 0) return true;
+[?2004l[?2004h>   if (islands.length === 1) return true;
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Build adjacency list
+[?2004l[?2004h>   const adj = new Map();
+[?2004l[?2004h>   for (const island of islands) {
+[?2004l[?2004h>     adj.set(island.id, []);
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   for (const [key, count] of bridges) {
+[?2004l[?2004h>     if (count === 0) continue;
+[?2004l[?2004h>     const { x1, y1, x2, y2 } = parseKey(key);
+[?2004l[?2004h>     const island1 = islands.find(i => i.x === x1 && i.y === y1);
+[?2004l[?2004h>     const island2 = islands.find(i => i.x === x2 && i.y === y2);
+[?2004l[?2004h>     if (island1 && island2) {
+[?2004l[?2004h>       adj.get(island1.id).push(island2.id);
+[?2004l[?2004h>       adj.get(island2.id).push(island1.id);
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   // BFS from first island
+[?2004l[?2004h>   const visited = new Set();
+[?2004l[?2004h>   const queue = [islands[0].id];
+[?2004l[?2004h>   visited.add(islands[0].id);
+[?2004l[?2004h> 
+[?2004l[?2004h>   while (queue.length > 0) {
+[?2004l[?2004h>     const current = queue.shift();
+[?2004l[?2004h>     for (const neighbor of adj.get(current)) {
+[?2004l[?2004h>       if (!visited.has(neighbor)) {
+[?2004l[?2004h>         visited.add(neighbor);
+[?2004l[?2004h>         queue.push(neighbor);
+[?2004l[?2004h>       }
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   return visited.size === islands.length;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> // Check victory condition
+[?2004l[?2004h> export function isVictory(islands, bridges) {
+[?2004l[?2004h>   // Check all island counts match values
+[?2004l[?2004h>   const counts = computeCurrentCounts(islands, bridges);
+[?2004l[?2004h>   for (const island of islands) {
+[?2004l[?2004h>     if ((counts.get(island.id) || 0) !== island.value) return false;
+[?2004l[?2004h>   }
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Check connectivity
+[?2004l[?2004h>   if (!checkConnectivity(islands, bridges)) return false;
+[?2004l[?2004h> 
+[?2004l[?2004h>   return true;
+[?2004l[?2004h> }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@41b49b35b47a:/app# cat > /app/src/App.jsx << 'ENDOFFILE'
+[?2004l[?2004h> import React, { useState, useCallback, useEffect, useRef } from 'react';
+[?2004l[?2004h> import { puzzles } from './data/puzzles';
+[?2004l[?2004h> import { bridgeKey, parseKey, canAddBridge, computeCurrentCounts, isVictory } from './utils/hashiLogic';
+[?2004l[?2004h> 
+[?2004li[?2004h> const GRID_SIZE = 40;
+[?2004l[?2004h> const ISLAND_RADIUS = 16;
+[?2004l[?2004h> 
+[?2004l[?2004h> function App() {
+[?2004l[?2004h>   const [puzzleIndex, setPuzzleIndex] = useState(0);
+[?2004l[?2004h>   const [bridges, setBridges] = useState(new Map());
+[?2004l[?2004h>   const [selectedIsland, setSelectedIsland] = useState(null);
+[?2004l[?2004h>   const [cursorIndex, setCursorIndex] = useState(0);
+[?2004l[?2004h>   const [error, setError] = useState(null);
+[?2004l[?2004h>   const [victory, setVictory] = useState(false);
+[?2004l[?2004h>   const [keyboardMode, setKeyboardMode] = useState(false);
+[?2004l[?2004h>   const svgRef = useRef(null);
+[?2004l[?2004h> 
+[?2004l[?2004h>   const currentPuzzle = puzzles[puzzleIndex];
+[?2004l[?2004h>   const islands = currentPuzzle.islands;
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Reset when puzzle changes
+[?2004l[?2004h>   const handlePuzzleChange = useCallback((e) => {
+[?2004l[?2004h>     setPuzzleIndex(Number(e.target.value));
+[?2004l[?2004h>     setBridges(new Map());
+[?2004l[?2004h>     setSelectedIsland(null);
+[?2004l[?2004h>     setCursorIndex(0);
+[?2004l[?2004h>     setError(null);
+[?2004l[?2004h>     setVictory(false);
+[?2004l[?2004h>   }, []);
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Reset button
+[?2004l[?2004h>   const handleReset = useCallback(() => {
+[?2004l[?2004h>     setBridges(new Map());
+[?2004l[?2004h>     setSelectedIsland(null);
+[?2004l[?2004h>     setError(null);
+[?2004l[?2004h>     setVictory(false);
+[?2004l[?2004h>   }, []);
+[?2004l[?2004h> 
+[?2004l([?2004h>   // Toggle bridge between two islands (cycle: none -> single -> double -> none)
+[?2004l[?2004h>   const toggleBridge = useCallback((fromIsland, toIsland) => {
+[?2004l[?2004h>     const key = bridgeKey(fromIsland, toIsland);
+[?2004l[?2004h>     const current = bridges.get(key) || 0;
+[?2004l[?2004h> 
+[?2004l[?2004h>     if (current === 0) {
+[?2004l[?2004h>       // Try to add single
+[?2004l[?2004h>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+[?2004l[?2004h>       if (!result.valid) {
+[?2004l[?2004h>         setError(result.error);
+[?2004l[?2004h>         return;
+[?2004l[?2004h>       }
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>       const newBridges = new Map(bridges);
+[?2004l[?2004h>       newBridges.set(key, 1);
+[?2004l[?2004h>       setBridges(newBridges);
+[?2004l[?2004h>       // Check victory
+[?2004l[?2004h>       if (isVictory(islands, newBridges)) setVictory(true);
+[?2004l[?2004h>     } else if (current === 1) {
+[?2004l[?2004h>       // Try to add second bridge
+[?2004l[?2004h>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+[?2004l[?2004h>       if (!result.valid) {
+[?2004l[?2004h>         // If can't add, remove instead (cycle to none)
+[?2004l[?2004h>         setError(null);
+[?2004l[?2004h>         const newBridges = new Map(bridges);
+[?2004l[?2004h>         newBridges.delete(key);
+[?2004l[?2004h>         setBridges(newBridges);
+[?2004l[?2004h>         setVictory(false);
+[?2004l[?2004h>         return;
+[?2004l[?2004h>       }
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>       const newBridges = new Map(bridges);
+[?2004l[?2004h>       newBridges.set(key, 2);
+[?2004l[?2004h>       setBridges(newBridges);
+[?2004l[?2004h>       if (isVictory(islands, newBridges)) setVictory(true);
+[?2004l[?2004h>     } else {
+[?2004l[?2004h>       // current === 2, cycle to none
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>       const newBridges = new Map(bridges);
+[?2004l[?2004h>       newBridges.delete(key);
+[?2004l[?2004h>       setBridges(newBridges);
+[?2004l[?2004h>       setVictory(false);
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }, [bridges, islands]);
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Remove bridge entirely
+[?2004l[?2004h>   const removeBridge = useCallback((fromIsland, toIsland) => {
+[?2004l[?2004h>     const key = bridgeKey(fromIsland, toIsland);
+[?2004l[?2004h>     const current = bridges.get(key) || 0;
+[?2004l[?2004h>     if (current > 0) {
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>       const newBridges = new Map(bridges);
+[?2004l[?2004h>       newBridges.delete(key);
+[?2004l[?2004h>       setBridges(newBridges);
+[?2004l[?2004h>       setVictory(false);
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }, [bridges]);
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Handle island click
+[?2004l[?2004h>   const handleIslandClick = useCallback((island, e) => {
+[?2004l[?2004h>     // Right-click or Ctrl+click = remove
+[?2004l[?2004h>     if (e.button === 2 || e.ctrlKey) {
+[?2004l[?2004h>       if (selectedIsland !== null) {
+[?2004l[?2004h>         removeBridge(selectedIsland, island);
+[?2004l[?2004h>         setSelectedIsland(null);
+[?2004l[?2004h>       }
+[?2004l[?2004h>       return;
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     if (selectedIsland === null) {
+[?2004l[?2004h>       setSelectedIsland(island);
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>     } else if (selectedIsland.id === island.id) {
+[?2004l[?2004h>       // Clicking same island deselects
+[?2004l[?2004h>       setSelectedIsland(null);
+[?2004l[?2004h>     } else {
+[?2004l[?2004h>       toggleBridge(selectedIsland, island);
+[?2004l[?2004h>       setSelectedIsland(null);
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }, [selectedIsland, toggleBridge, removeBridge]);
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Handle right-click on SVG for bridge removal
+[?2004l[?2004h>   const handleContextMenu = useCallback((e) => {
+[?2004l[?2004h>     e.preventDefault();
+[?2004l[?2004h>   }, []);
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Keyboard navigation
+[?2004l[?2004h>   useEffect(() => {
+[?2004l[?2004h>     const handleKeyDown = (e) => {
+[?2004l[?2004h>       if (e.key === 'Escape') {
+[?2004l[?2004h>         setSelectedIsland(null);
+[?2004l[?2004h>         setKeyboardMode(true);
+[?2004l[?2004h>         return;
+[?2004l[?2004h>       }
+[?2004l[?2004h> 
+[?2004l[?2004h>       if (e.key === 'Enter') {
+[?2004l[?2004h>         setKeyboardMode(true);
+[?2004l[?2004h>         const currentIsland = islands[cursorIndex];
+[?2004l[?2004h>         if (selectedIsland === null) {
+[?2004l[?2004h>           setSelectedIsland(currentIsland);
+[?2004l[?2004h>           setError(null);
+[?2004l[?2004h>         } else if (selectedIsland.id === currentIsland.id) {
+[?2004l[?2004h>           setSelectedIsland(null);
+[?2004l[?2004h>         } else {
+[?2004l[?2004h>           toggleBridge(selectedIsland, currentIsland);
+[?2004l[?2004h>           setSelectedIsland(null);
+[?2004l[?2004h>         }
+[?2004l[?2004h>         return;
+[?2004l[?2004h>       }
+[?2004l[?2004h> 
+[?2004l[?2004h>       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+[?2004l[?2004h>         e.preventDefault();
+[?2004l[?2004h>         setKeyboardMode(true);
+[?2004l[?2004h>         const current = islands[cursorIndex];
+[?2004l[?2004h>         let bestIndex = cursorIndex;
+[?2004l[?2004h>         let bestDist = Infinity;
+[?2004l[?2004h> 
+[?2004l[?2004h>         for (let i = 0; i < islands.length; i++) {
+[?2004l[?2004h>           if (i === cursorIndex) continue;
+[?2004l[?2004h>           const target = islands[i];
+[?2004l[?2004h>           const dx = target.x - current.x;
+[?2004l[?2004h>           const dy = target.y - current.y;
+[?2004l[?2004h> 
+[?2004lz[?2004h>           let valid = false;
+[?2004l[?2004h>           if (e.key === 'ArrowRight' && dx > 0 && Math.abs(dy) <= Math.abs(dx)) valid = true;
+[?2004l[?2004h>           if (e.key === 'ArrowLeft' && dx < 0 && Math.abs(dy) <= Math.abs(dx)) valid = true;
+[?2004l[?2004h>           if (e.key === 'ArrowDown' && dy > 0 && Math.abs(dx) <= Math.abs(dy)) valid = true;
+[?2004l[?2004h>           if (e.key === 'ArrowUp' && dy < 0 && Math.abs(dx) <= Math.abs(dy)) valid = true;
+[?2004l[?2004h> 
+[?2004l [?2004h>           if (valid) {
+[?2004l[?2004h>             const dist = Math.abs(dx) + Math.abs(dy);
+[?2004l[?2004h>             if (dist < bestDist) {
+[?2004l[?2004h>               bestDist = dist;
+[?2004l[?2004h>               bestIndex = i;
+[?2004l[?2004h>             }
+[?2004l[?2004h>           }
+[?2004l[?2004h>         }
+[?2004l[?2004h>         setCursorIndex(bestIndex);
+[?2004l[?2004h>       }
+[?2004l[?2004h>     };
+[?2004l[?2004h> 
+[?2004l[?2004h>     window.addEventListener('keydown', handleKeyDown);
+[?2004l[?2004h>     return () => window.removeEventListener('keydown', handleKeyDown);
+[?2004l[?2004h>   }, [islands, cursorIndex, selectedIsland, toggleBridge]);
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Render bridges as SVG lines
+[?2004l[?2004h>   const renderBridges = () => {
+[?2004l[?2004h>     const lines = [];
+[?2004l[?2004h>     for (const [key, count] of bridges) {
+[?2004l[?2004h>       if (count === 0) continue;
+[?2004l[?2004h>       const { x1, y1, x2, y2 } = parseKey(key);
+[?2004l[?2004h>       const px1 = x1 * GRID_SIZE;
+[?2004l[?2004h>       const py1 = y1 * GRID_SIZE;
+[?2004l[?2004h>       const px2 = x2 * GRID_SIZE;
+[?2004l[?2004h>       const py2 = y2 * GRID_SIZE;
+[?2004l[?2004h> 
+[?2004l[?2004h>       if (count === 1) {
+[?2004l[?2004h>         lines.push(
+[?2004l[?2004h>           <line
+[?2004l[?2004h>             key={key}
+[?2004l[?2004h>             x1={px1} y1={py1} x2={px2} y2={py2}
+[?2004l[?2004h>             stroke="#0f0"
+[?2004l[?2004h>             strokeWidth="2"
+[?2004l[?2004h>           />
+[?2004l[?2004h>         );
+[?2004l[?2004h>       } else if (count === 2) {
+[?2004l[?2004h>         // Two parallel lines offset by 4px
+[?2004l[?2004h>         const isHorizontal = y1 === y2;
+[?2004l[?2004h>         const offset = 4;
+[?2004l[?2004h>         if (isHorizontal) {
+[?2004l[?2004h>           lines.push(
+[?2004l[?2004h>             <line
+[?2004l[?2004h>               key={key + '-a'}
+[?2004l[?2004h>               x1={px1} y1={py1 - offset} x2={px2} y2={py2 - offset}
+[?2004l[?2004h>               stroke="#0f0"
+[?2004l[?2004h>               strokeWidth="2"
+[?2004l[?2004h>             />
+[?2004l[?2004h>           );
+[?2004l[?2004h>           lines.push(
+[?2004l[?2004h>             <line
+[?2004l[?2004h>               key={key + '-b'}
+[?2004l[?2004h>               x1={px1} y1={py1 + offset} x2={px2} y2={py2 + offset}
+[?2004l[?2004h>               stroke="#0f0"
+[?2004l[?2004h>               strokeWidth="2"
+[?2004l[?2004h>             />
+[?2004l[?2004h>           );
+[?2004l[?2004h>         } else {
+[?2004l[?2004h>           lines.push(
+[?2004l[?2004h>             <line
+[?2004l[?2004h>               key={key + '-a'}
+[?2004l[?2004h>               x1={px1 - offset} y1={py1} x2={px2 - offset} y2={py2}
+[?2004l[?2004h>               stroke="#0f0"
+[?2004l[?2004h>               strokeWidth="2"
+[?2004l[?2004h>             />
+[?2004l[?2004h>           );
+[?2004l[?2004h>           lines.push(
+[?2004l[?2004h>             <line
+[?2004l[?2004h>               key={key + '-b'}
+[?2004l[?2004h>               x1={px1 + offset} y1={py1} x2={px2 + offset} y2={py2}
+[?2004l[?2004h>               stroke="#0f0"
+[?2004l[?2004h>               strokeWidth="2"
+[?2004l[?2004h>             />
+[?2004l[?2004h>           );
+[?2004l[?2004h>         }
+[?2004l[?2004h>       }
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return lines;
+[?2004l[?2004h>   };
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Render islands
+[?2004l[?2004h>   const renderIslands = () => {
+[?2004l[?2004h>     return islands.map((island) => {
+[?2004l[?2004h>       const px = island.x * GRID_SIZE;
+[?2004l[?2004h>       const py = island.y * GRID_SIZE;
+[?2004l[?2004h>       const isSelected = selectedIsland && selectedIsland.id === island.id;
+[?2004l[?2004h> 
+[?2004l[?2004h>       return (
+[?2004l[?2004h>         <g key={island.id}
+[?2004l[?2004h>           onClick={(e) => handleIslandClick(island, e)}
+[?2004l[?2004h>           onContextMenu={(e) => {
+[?2004l[?2004h>             e.preventDefault();
+[?2004l[?2004h>             if (selectedIsland !== null) {
+[?2004l[?2004h>               removeBridge(selectedIsland, island);
+[?2004l[?2004h>               setSelectedIsland(null);
+[?2004l[?2004h>             } else {
+[?2004l[?2004h>               // Right-click with no selection - select for removal on next click
+[?2004l[?2004h>             }
+[?2004l[?2004h>           }}
+[?2004l[?2004h>           style={{ cursor: 'pointer' }}
+[?2004l[?2004h>         >
+[?2004l[?2004h>           <circle
+[?2004l[?2004h>             cx={px} cy={py} r={ISLAND_RADIUS}
+[?2004l[?2004h>             fill="black"
+[?2004l[?2004h>             stroke={isSelected ? "#ff0" : "#0f0"}
+[?2004l[?2004h>             strokeWidth={isSelected ? 3 : 2}
+[?2004l[?2004h>           />
+[?2004l[?2004h>           <text
+[?2004l[?2004h>             x={px} y={py}
+[?2004l[?2004h>             textAnchor="middle"
+[?2004l[?2004h>             dominantBaseline="central"
+[?2004l[?2004h>             fill="#0f0"
+[?2004l[?2004h>             fontSize="14"
+[?2004l[?2004h>             fontFamily="monospace"
+[?2004l[?2004h>           >
+[?2004l[?2004h>             {island.value}
+[?2004l[?2004h>           </text>
+[?2004l[?2004h>         </g>
+[?2004l[?2004h>       );
+[?2004l[?2004h>     });
+[?2004l[?2004h>   };
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Render keyboard cursor (NOT a circle - use rect)
+[?2004l[?2004h>   const renderCursor = () => {
+[?2004l[?2004h>     if (!keyboardMode) return null;
+[?2004l[?2004h>     const island = islands[cursorIndex];
+[?2004l[?2004h>     if (!island) return null;
+[?2004l[?2004h>     const px = island.x * GRID_SIZE;
+[?2004l[?2004h>     const py = island.y * GRID_SIZE;
+[?2004l[?2004h>     const size = ISLAND_RADIUS + 6;
+[?2004l[?2004h> 
+[?2004l[?2004h>     return (
+[?2004l[?2004h>       <rect
+[?2004l[?2004h>         x={px - size} y={py - size}
+[?2004l[?2004h>         width={size * 2} height={size * 2}
+[?2004l[?2004h>         fill="none"
+[?2004l[?2004h>         stroke="#0ff"
+[?2004l[?2004h>         strokeWidth="2"
+[?2004l[?2004h>         strokeDasharray="4 2"
+[?2004l[?2004h>       />
+[?2004l[?2004h>     );
+[?2004l[?2004h>   };
+[?2004l[?2004h> 
+[?2004l[?2004h>   return (
+[?2004l[?2004h>     <div style={{ margin: 0, padding: 0 }}>
+[?2004l[?2004h>       <div style={{ padding: '8px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+[?2004l[?2004h>         <select value={puzzleIndex} onChange={handlePuzzleChange} style={{
+[?2004l[?2004h>           background: 'black', color: '#0f0', border: '1px solid #0f0',
+[?2004l[?2004h>           fontFamily: 'monospace', fontSize: '14px', padding: '4px'
+[?2004l[?2004h>         }}>
+[?2004l[?2004h>           {puzzles.map((p, i) => (
+[?2004l[?2004h>             <option key={p.id} value={i}>{p.name}</option>
+[?2004l[?2004h>           ))}
+[?2004l[?2004h>         </select>
+[?2004l[?2004h>         <button onClick={handleReset} style={{
+[?2004l[?2004h>           background: 'black', color: '#0f0', border: '1px solid #0f0',
+[?2004l[?2004h>           fontFamily: 'monospace', fontSize: '14px', padding: '4px 8px', cursor: 'pointer'
+[?2004l[?2004h>         }}>Reset</button>
+[?2004l[?2004h>         {error && <span className="error-message" style={{ color: '#f00', fontFamily: 'monospace' }}>{error}</span>}
+[?2004l[?2004h>         {victory && <span className="victory-banner" style={{ color: '#0f0', fontFamily: 'monospace', fontSize: '20px', fontWeight: 'bold' }}>SOLVED!</span>}
+[?2004l[?2004h>       </div>
+[?2004l[?2004h>       <svg
+[?2004l[?2004h>         ref={svgRef}
+[?2004l[?2004h>         width={800}
+[?2004l[?2004h>         height={600}
+[?2004l[?2004h>         style={{ display: 'block' }}
+[?2004l[?2004h>         onContextMenu={handleContextMenu}
+[?2004l[?2004h>       >
+[?2004l[?2004h>         {renderBridges()}
+[?2004l[?2004h>         {renderIslands()}
+[?2004l[?2004h>         {renderCursor()}
+[?2004l[?2004h>       </svg>
+[?2004l[?2004h>     </div>
+[?2004l[?2004h>   );
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> export default App;
+[?2004l[?2004h> ENDOFFILE
+[?2004l[?2004hroot@41b49b35b47a:/app# cat > /app/src/index.css << 'EOF'
+[?2004l[?2004h> * {
+[?2004l[?2004h>   margin: 0;
+[?2004l[?2004h>   padding: 0;
+[?2004l[?2004h>   box-sizing: border-box;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> html, body {
+[?2004l[?2004h>   background-color: #000;
+[?2004l[?2004h>   color: #0f0;
+[?2004l[?2004h>   font-family: 'Courier New', Courier, monospace;
+[?2004l[?2004h>   overflow: hidden;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> #root {
+[?2004l[?2004h>   position: absolute;
+[?2004l[?2004h>   top: 0;
+[?2004l[?2004h>   left: 0;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> select option {
+[?2004l[?2004h>   background: #000;
+[?2004l[?2004h>   color: #0f0;
+[?2004l[?2004h> }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@41b49b35b47a:/app# cd /app && npm run build 2>&1
+[?2004l
+> hashi-puzzle@0.1.0 build
+> vite build
+
+[1G[0K[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+[2K[1Gtransforming (1) [2mindex.html[22m[2K[1Gtransforming (13) [2msrc/utils/hashiLogic.js[22m[2K[1Gtransforming (20) [2mnode_modules/scheduler/cjs/scheduler.production.min.js[22m[2K[1Gtransforming (24) [2mnode_modules/react-dom/client.js[22m[2K[1G[32m✓[39m 33 modules transformed.
+[2K[1Grendering chunks (1)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1G[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.40 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[2massets/[22m[35mindex-Gr6heut8.css  [39m[1m[2m  0.22 kB[22m[1m[22m[2m │ gzip:  0.18 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-DWT9LK91.js   [39m[1m[2m149.19 kB[22m[1m[22m[2m │ gzip: 48.19 kB[22m
+[32m✓ built in 982ms[39m
+[1G[0K⠙[1G[0K[?2004hroot@41b49b35b47a:/app# cat > /app/src/App.jsx << 'ENDOFFILE'
+[?2004ly(false);
+  }, []);
+
+  const handleReset = useCallback(() => {
+    setBridges(new Map());
+    setSelectedIsland(null);
+    setError(null);
+    setVictory(false);
+  }, []);
+
+  // Toggle bridge: none -> single -> double -> none
+  const toggleBridge = useCallback((fromIsland, toIsland) => {
+    const key = bridgeKey(fromIsland, toIsland);
+    const current = bridges.get(key) || 0;
+
+    if (current === 0) {
+      const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+      if (!result.valid) {
+        setError(result.error);
+        return;
+      }
+      setError(null);
+      const newBridges = new Map(bridges);
+      newBridges.set(key, 1);
+      setBridges(newBridges);
+      if (isVictory(islands, newBridges)) setVictory(true);
+      else setVictory(false);
+    } else if (current === 1) {
+      const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+      if (!result.valid) {
+        setError(result.error);
+        return;
+      }
+      setError(null);
+      const newBridges = new Map(bridges);
+      newBridges.set(key, 2);
+      setBridges(newBridges);
+      if (isVictory(islands, newBridges)) setVictory(true);
+      else setVictory(false);
+    } else {
+      // current === 2, cycle to none
+      setError(null);
+      const newBridges = new Map(bridges);
+      newBridges.delete(key);
+      setBridges(newBridges);
+      setVictory(false);
+    }
+  }, [bridges, islands]);
+
+  // Remove bridge entirely
+  const removeBridgeByKey = useCallback((key) => {
+    const current = bridges.get(key) || 0;
+    if (current > 0) {
+      setError(null);
+      const newBridges = new Map(bridges);
+      newBridges.delete(key);
+      setBridges(newBridges);
+      setVictory(false);
+    }
+  }, [bridges]);
+
+  // Handle island click
+  const handleIslandClick = useCallback((island, e) => {
+    if (e.button === 2 || e.ctrlKey) {
+      // Right-click or ctrl+click on island with selection: remove bridge
+      if (selectedIsland !== null && selectedIsland.id !== island.id) {
+        const key = bridgeKey(select[?2004h> import React, { useState, useCallback, useEffect, useRef } from 'react';
+[?2004l[?2004h> import { puzzles } from './data/puzzles';
+[?2004l[?2004h> import { bridgeKey, parseKey, canAddBridge, computeCurrentCounts, isVictory } from './utils/hashiLogic';
+[?2004l[?2004h> 
+[?2004l[?2004h> const GRID_SIZE = 40;
+[?2004l[?2004h> const ISLAND_RADIUS = 16;
+[?2004l[?2004h> 
+[?2004l[?2004h> function App() {
+[?2004l[?2004h>   const [puzzleIndex, setPuzzleIndex] = useState(0);
+[?2004l[?2004h>   const [bridges, setBridges] = useState(new Map());
+[?2004l[?2004h>   const [selectedIsland, setSelectedIsland] = useState(null);
+[?2004l[?2004h>   const [cursorIndex, setCursorIndex] = useState(0);
+[?2004l[?2004h>   const [error, setError] = useState(null);
+[?2004l[?2004h>   const [victory, setVictory] = useState(false);
+[?2004l[?2004h>   const [keyboardMode, setKeyboardMode] = useState(false);
+[?2004l[?2004h>   const svgRef = useRef(null);
+[?2004l[?2004h> 
+[?2004l[?2004h>   const currentPuzzle = puzzles[puzzleIndex];
+[?2004l[?2004h>   const islands = currentPuzzle.islands;
+[?2004l[?2004h> 
+[?2004l[?2004h>   const handlePuzzleChange = useCallback((e) => {
+[?2004l[?2004h>     setPuzzleIndex(Number(e.target.value));
+[?2004l[?2004h>     setBridges(new Map());
+[?2004l[?2004h>     setSelectedIsland(null);
+[?2004l[?2004h>     setCursorIndex(0);
+[?2004l[?2004h>     setError(null);
+[?2004l[?2004h>     setVictory(false);
+[?2004l[?2004h>   }, []);
+[?2004l[?2004h> 
+[?2004ll[?2004h>   const handleReset = useCallback(() => {
+[?2004l[?2004h>     setBridges(new Map());
+[?2004l[?2004h>     setSelectedIsland(null);
+[?2004l[?2004h>     setError(null);
+[?2004l[?2004h>     setVictory(false);
+[?2004l[?2004h>   }, []);
+[?2004l[?2004h> 
+[?2004li[?2004h>   // Toggle bridge: none -> single -> double -> none
+[?2004l [?2004h>   const toggleBridge = useCallback((fromIsland, toIsland) => {
+[?2004l[?2004h>     const key = bridgeKey(fromIsland, toIsland);
+[?2004l[?2004h>     const current = bridges.get(key) || 0;
+[?2004l[?2004h> 
+[?2004l[?2004h>     if (current === 0) {
+[?2004l[?2004h>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+[?2004l[?2004h>       if (!result.valid) {
+[?2004l[?2004h>         setError(result.error);
+[?2004l[?2004h>         return;
+[?2004l[?2004h>       }
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>       const newBridges = new Map(bridges);
+[?2004l[?2004h>       newBridges.set(key, 1);
+[?2004l[?2004h>       setBridges(newBridges);
+[?2004l[?2004h>       if (isVictory(islands, newBridges)) setVictory(true);
+[?2004l[?2004h>       else setVictory(false);
+[?2004l[?2004h>     } else if (current === 1) {
+[?2004l[?2004h>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+[?2004l const { x[?2004h>       if (!result.valid) {
+[?2004l[?2004h>         setError(result.error);
+[?2004l[?2004h>         return;
+[?2004l[?2004h>       }
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>       const newBridges = new Map(bridges);
+[?2004l[?2004h>       newBridges.set(key, 2);
+[?2004l[?2004h>       setBridges(newBridges);
+[?2004l[?2004h>       if (isVictory(islands, newBridges)) setVictory(true);
+[?2004l[?2004h>       else setVictory(false);
+[?2004l[?2004h>     } else {
+[?2004l[?2004h>       // current === 2, cycle to none
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>       const newBridges = new Map(bridges);
+[?2004l[?2004h>       newBridges.delete(key);
+[?2004l[?2004h>       setBridges(newBridges);
+[?2004l[?2004h>       setVictory(false);
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }, [bridges, islands]);
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Remove bridge entirely
+[?2004l[?2004h>   const removeBridgeByKey = useCallback((key) => {
+[?2004l[?2004h>     const current = bridges.get(key) || 0;
+[?2004l[?2004h>     if (current > 0) {
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>       const newBridges = new Map(bridges);
+[?2004l[?2004h>       newBridges.delete(key);
+[?2004l[?2004h>       setBridges(newBridges);
+[?2004l[?2004h>       setVictory(false);
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }, [bridges]);
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Handle island click
+[?2004l[?2004h>   const handleIslandClick = useCallback((island, e) => {
+[?2004l[?2004h>     if (e.button === 2 || e.ctrlKey) {
+[?2004l[?2004h>       // Right-click or ctrl+click on island with selection: remove bridge
+[?2004l[?2004h>       if (selectedIsland !== null && selectedIsland.id !== island.id) {
+[?2004l[?2004h>         const key = bridgeKey(selectedIsland, island);
+[?2004l[?2004h>         removeBridgeByKey(key);
+[?2004l[?2004h>         setSelectedIsland(null);
+[?2004l[?2004h>       }
+[?2004l[?2004h>       return;
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     if (selectedIsland === null) {
+[?2004l[?2004h>       setSelectedIsland(island);
+[?2004l[?2004h>       setError(null);
+[?2004l[?2004h>     } else if (selectedIsland.id === island.id) {
+[?2004l[?2004h>       setSelectedIsland(null);
+[?2004l[?2004h>     } else {
+[?2004l[?2004h>       toggleBridge(selectedIsland, island);
+[?2004l[?2004h>       setSelectedIsland(null);
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }, [selectedIsland, toggleBridge, removeBridgeByKey]);
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Handle right-click/ctrl+click on bridge lines
+[?2004l[?2004h>   const handleBridgeClick = useCallback((key, e) => {
+[?2004l[?2004h>     if (e.button === 2 || e.ctrlKey) {
+[?2004l[?2004h>       e.stopPropagation();
+[?2004l[?2004h>       removeBridgeByKey(key);
+[?2004l[?2004h>     }
+[?2004l[?2004h>   }, [removeBridgeByKey]);
+[?2004l[?2004h> 
+[?2004l[?2004h>   const handleBridgeContextMenu = useCallback((key, e) => {
+[?2004l[?2004h>     e.preventDefault();
+[?2004l[?2004h>     e.stopPropagation();
+[?2004l[?2004h>     removeBridgeByKey(key);
+[?2004l[?2004h>   }, [removeBridgeByKey]);
+[?2004l[?2004h> 
+[?2004l[?2004h>   const handleContextMenu = useCallback((e) => {
+[?2004l[?2004h>     e.preventDefault();
+[?2004l[?2004h>   }, []);
+[?2004l[?2004h> 
+[?2004l [?2004h>   // Keyboard navigation
+[?2004l[?2004h>   useEffect(() => {
+[?2004l[?2004h>     const handleKeyDown = (e) => {
+[?2004l[?2004h>       if (e.key === 'Escape') {
+[?2004l[?2004h>         setSelectedIsland(null);
+[?2004l[?2004h>         setKeyboardMode(true);
+[?2004l[?2004h>         return;
+[?2004l[?2004h>       }
+[?2004l[?2004h> 
+[?2004l
+[?2004h>       if (e.key === 'Enter') {
+[?2004l[?2004h>         setKeyboardMode(true);
+[?2004l[?2004h>         const currentIsland = islands[cursorIndex];
+[?2004l[?2004h>         if (selectedIsland === null) {
+[?2004l[?2004h>           setSelectedIsland(currentIsland);
+[?2004l[?2004h>           setError(null);
+[?2004l[?2004h>         } else if (selectedIsland.id === currentIsland.id) {
+[?2004l[?2004h>           setSelectedIsland(null);
+[?2004l[?2004h>         } else {
+[?2004l[?2004h>           toggleBridge(selectedIsland, currentIsland);
+[?2004l[?2004h>           setSelectedIsland(null);
+[?2004l[?2004h>         }
+[?2004l[?2004h>         return;
+[?2004l[?2004h>       }
+[?2004l[?2004h> 
+[?2004l[?2004h>       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+[?2004l[?2004h>         e.preventDefault();
+[?2004l[?2004h>         setKeyboardMode(true);
+[?2004l[?2004h>         const current = islands[cursorIndex];
+[?2004l[?2004h>         let bestIndex = cursorIndex;
+[?2004l[?2004h>         let bestDist = Infinity;
+[?2004l[?2004h> 
+[?2004l [?2004h>         for (let i = 0; i < islands.length; i++) {
+[?2004l[?2004h>           if (i === cursorIndex) continue;
+[?2004l[?2004h>           const target = islands[i];
+[?2004l[?2004h>           const dx = target.x - current.x;
+[?2004l[?2004h>           const dy = target.y - current.y;
+[?2004l[?2004h> 
+[?2004l{[?2004h>           let valid = false;
+[?2004l[?2004h>           if (e.key === 'ArrowRight' && dx > 0) valid = true;
+[?2004l[?2004h>           if (e.key === 'ArrowLeft' && dx < 0) valid = true;
+[?2004l[?2004h>           if (e.key === 'ArrowDown' && dy > 0) valid = true;
+[?2004l[?2004h>           if (e.key === 'ArrowUp' && dy < 0) valid = true;
+[?2004l[?2004h> 
+[?2004l[?2004h>           if (valid) {
+[?2004l[?2004h>             const dist = Math.abs(dx) + Math.abs(dy);
+[?2004l[?2004h>             if (dist < bestDist) {
+[?2004l[?2004h>               bestDist = dist;
+[?2004l[?2004h>               bestIndex = i;
+[?2004l[?2004h>             }
+[?2004l[?2004h>           }
+[?2004l[?2004h>         }
+[?2004l[?2004h>         setCursorIndex(bestIndex);
+[?2004l[?2004h>       }
+[?2004l[?2004h>     };
+[?2004l[?2004h> 
+[?2004l[?2004h>     window.addEventListener('keydown', handleKeyDown);
+[?2004l[?2004h>     return () => window.removeEventListener('keydown', handleKeyDown);
+[?2004l[?2004h>   }, [islands, cursorIndex, selectedIsland, toggleBridge]);
+[?2004l[?2004h> 
+[?2004l [?2004h>   // Render bridges
+[?2004l[?2004h>   const renderBridges = () => {
+[?2004l[?2004h>     const lines = [];
+[?2004l[?2004h>     for (const [key, count] of bridges) {
+[?2004l[?2004h>       if (count === 0) continue;
+[?2004l[?2004h>       const { x1, y1, x2, y2 } = parseKey(key);
+[?2004l[?2004h>       const px1 = x1 * GRID_SIZE;
+[?2004l[?2004h>       const py1 = y1 * GRID_SIZE;
+[?2004l[?2004h>       const px2 = x2 * GRID_SIZE;
+[?2004l[?2004h>       const py2 = y2 * GRID_SIZE;
+[?2004l[?2004h> 
+[?2004l[?2004h>       if (count === 1) {
+[?2004l[?2004h>         lines.push(
+[?2004l[?2004h>           <line
+[?2004l[?2004h>             key={key}
+[?2004l[?2004h>             x1={px1} y1={py1} x2={px2} y2={py2}
+[?2004l[?2004h>             stroke="#0f0"
+[?2004l[?2004h>             strokeWidth="3"
+[?2004l[?2004h>             onClick={(e) => handleBridgeClick(key, e)}
+[?2004l[?2004h>             onContextMenu={(e) => handleBridgeContextMenu(key, e)}
+[?2004l[?2004h>             style={{ cursor: 'pointer' }}
+[?2004l[?2004h>           />
+[?2004l[?2004h>         );
+[?2004l[?2004h>       } else if (count === 2) {
+[?2004l[?2004h>         const isHorizontal = y1 === y2;
+[?2004l[?2004h>         const offset = 4;
+[?2004l[?2004h>         if (isHorizontal) {
+[?2004l[?2004h>           lines.push(
+[?2004l[?2004h>             <line
+[?2004l[?2004h>               key={key + '-a'}
+[?2004l[?2004h>               x1={px1} y1={py1 - offset} x2={px2} y2={py2 - offset}
+[?2004l[?2004h>               stroke="#0f0"
+[?2004l[?2004h>               strokeWidth="3"
+[?2004l[?2004h>               onClick={(e) => handleBridgeClick(key, e)}
+[?2004l[?2004h>               onContextMenu={(e) => handleBridgeContextMenu(key, e)}
+[?2004l[?2004h>               style={{ cursor: 'pointer' }}
+[?2004l[?2004h>             />
+[?2004l[?2004h>           );
+[?2004l[?2004h>           lines.push(
+[?2004l[?2004h>             <line
+[?2004l [?2004h>               key={key + '-b'}
+[?2004lh[?2004h>               x1={px1} y1={py1 + offset} x2={px2} y2={py2 + offset}
+[?2004l[?2004h>               stroke="#0f0"
+[?2004l[?2004h>               strokeWidth="3"
+[?2004l[?2004h>               onClick={(e) => handleBridgeClick(key, e)}
+[?2004l[?2004h>               onContextMenu={(e) => handleBridgeContextMenu(key, e)}
+[?2004l[?2004h>               style={{ cursor: 'pointer' }}
+[?2004l[?2004h>             />
+[?2004l[?2004h>           );
+[?2004l[?2004h>         } else {
+[?2004l[?2004h>           lines.push(
+[?2004l[?2004h>             <line
+[?2004l[?2004h>               key={key + '-a'}
+[?2004l[?2004h>               x1={px1 - offset} y1={py1} x2={px2 - offset} y2={py2}
+[?2004l[?2004h>               stroke="#0f0"
+[?2004l[?2004h>               strokeWidth="3"
+[?2004l[?2004h>               onClick={(e) => handleBridgeClick(key, e)}
+[?2004l[?2004h>               onContextMenu={(e) => handleBridgeContextMenu(key, e)}
+[?2004l[?2004h>               style={{ cursor: 'pointer' }}
+[?2004l[?2004h>             />
+[?2004l[?2004h>           );
+[?2004l[?2004h>           lines.push(
+[?2004l[?2004h>             <line
+[?2004l[?2004h>               key={key + '-b'}
+[?2004l[?2004h>               x1={px1 + offset} y1={py1} x2={px2 + offset} y2={py2}
+[?2004l[?2004h>               stroke="#0f0"
+[?2004l[?2004h>               strokeWidth="3"
+[?2004l[?2004h>               onClick={(e) => handleBridgeClick(key, e)}
+[?2004l[?2004h>               onContextMenu={(e) => handleBridgeContextMenu(key, e)}
+[?2004l[?2004h>               style={{ cursor: 'pointer' }}
+[?2004l[?2004h>             />
+[?2004l[?2004h>           );
+[?2004l[?2004h>         }
+[?2004l[?2004h>       }
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return lines;
+[?2004l[?2004h>   };
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Render islands
+[?2004l[?2004h>   const renderIslands = () => {
+[?2004l[?2004h>     return islands.map((island) => {
+[?2004l[?2004h>       const px = island.x * GRID_SIZE;
+[?2004l[?2004h>       const py = island.y * GRID_SIZE;
+[?2004l[?2004h>       const isSelected = selectedIsland && selectedIsland.id === island.id;
+[?2004l[?2004h> 
+[?2004l[?2004h>       return (
+[?2004l[?2004h>         <g key={island.id}
+[?2004l[?2004h>           onClick={(e) => handleIslandClick(island, e)}
+[?2004l[?2004h>           onContextMenu={(e) => {
+[?2004l[?2004h>             e.preventDefault();
+[?2004l[?2004h>             e.stopPropagation();
+[?2004l[?2004h>             if (selectedIsland !== null && selectedIsland.id !== island.id) {
+[?2004l[?2004h>               const key = bridgeKey(selectedIsland, island);
+[?2004l[?2004h>               removeBridgeByKey(key);
+[?2004l[?2004h>               setSelectedIsland(null);
+[?2004l[?2004h>             }
+[?2004l[?2004h>           }}
+[?2004l[?2004h>           style={{ cursor: 'pointer' }}
+[?2004l[?2004h>         >
+[?2004l[?2004h>           <circle
+[?2004l[?2004h>             cx={px} cy={py} r={ISLAND_RADIUS}
+[?2004l[?2004h>             fill="black"
+[?2004l[?2004h>             stroke={isSelected ? "#ff0" : "#0f0"}
+[?2004l[?2004h>             strokeWidth={isSelected ? 3 : 2}
+[?2004l[?2004h>           />
+[?2004l[?2004h>           <text
+[?2004l[?2004h>             x={px} y={py}
+[?2004l[?2004h>             textAnchor="middle"
+[?2004l[?2004h>             dominantBaseline="central"
+[?2004l[?2004h>             fill="#0f0"
+[?2004l[?2004h>             fontSize="14"
+[?2004l[?2004h>             fontFamily="monospace"
+[?2004l[?2004h>             style={{ pointerEvents: 'none' }}
+[?2004l[?2004h>           >
+[?2004l[?2004h>             {island.value}
+[?2004l[?2004h>           </text>
+[?2004l[?2004h>         </g>
+[?2004l[?2004h>       );
+[?2004l[?2004h>     });
+[?2004l[?2004h>   };
+[?2004l[?2004h> 
+[?2004l[?2004h>   // Render keyboard cursor (rect, NOT circle)
+[?2004l[?2004h>   const renderCursor = () => {
+[?2004l[?2004h>     if (!keyboardMode) return null;
+[?2004l[?2004h>     const island = islands[cursorIndex];
+[?2004l[?2004h>     if (!island) return null;
+[?2004l[?2004h>     const px = island.x * GRID_SIZE;
+[?2004l[?2004h>     const py = island.y * GRID_SIZE;
+[?2004l[?2004h>     const size = ISLAND_RADIUS + 6;
+[?2004l[?2004h> 
+[?2004l[?2004h>     return (
+[?2004l[?2004h>       <rect
+[?2004l[?2004h>         x={px - size} y={py - size}
+[?2004l[?2004h>         width={size * 2} height={size * 2}
+[?2004l[?2004h>         fill="none"
+[?2004l[?2004h>         stroke="#0ff"
+[?2004l[?2004h>         strokeWidth="2"
+[?2004l[?2004h>         strokeDasharray="4 2"
+[?2004l[?2004h>         style={{ pointerEvents: 'none' }}
+[?2004l[?2004h>       />
+[?2004l[?2004h>     );
+[?2004l[?2004h>   };
+[?2004l[?2004h> 
+[?2004l[?2004h>   return (
+[?2004l[?2004h>     <div style={{ margin: 0, padding: 0 }}>
+[?2004l[?2004h>       <div style={{ padding: '8px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+[?2004l[?2004h>         <select value={puzzleIndex} onChange={handlePuzzleChange} style={{
+[?2004l[?2004h>           background: 'black', color: '#0f0', border: '1px solid #0f0',
+[?2004l[?2004h>           fontFamily: 'monospace', fontSize: '14px', padding: '4px'
+[?2004l[?2004h>         }}>
+[?2004l[?2004h>           {puzzles.map((p, i) => (
+[?2004l[?2004h>             <option key={p.id} value={i}>{p.name}</option>
+[?2004l[?2004h>           ))}
+[?2004l[?2004h>         </select>
+[?2004l[?2004h>         <button onClick={handleReset} style={{
+[?2004l[?2004h>           background: 'black', color: '#0f0', border: '1px solid #0f0',
+[?2004l[?2004h>           fontFamily: 'monospace', fontSize: '14px', padding: '4px 8px', cursor: 'pointer'
+[?2004l[?2004h>         }}>Reset</button>
+[?2004l[?2004h>         {error && <span className="error-message" style={{ color: '#f00', fontFamily: 'monospace' }}>{error}</span>}
+[?2004l[?2004h>         {victory && <span className="victory-banner" style={{ color: '#0f0', fontFamily: 'monospace', fontSize: '20px', fontWeight: 'bold' }}>SOLVED!</span>}
+[?2004l[?2004h>       </div>
+[?2004l[?2004h>       <svg
+[?2004l[?2004h>         ref={svgRef}
+[?2004l[?2004h>         width={800}
+[?2004l[?2004h>         height={600}
+[?2004l[?2004h>         style={{ display: 'block' }}
+[?2004l[?2004h>         onContextMenu={handleContextMenu}
+[?2004l[?2004h>       >
+[?2004l[?2004h>         {renderBridges()}
+[?2004l[?2004h>         {renderIslands()}
+[?2004l[?2004h>         {renderCursor()}
+[?2004l[?2004h>       </svg>
+[?2004l[?2004h>     </div>
+[?2004l[?2004h>   );
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> export default App;
+[?2004l[?2004h> ENDOFFILE
+[?2004l[?2004hroot@41b49b35b47a:/app# npm run build 2>&1
+[?2004l
+> hashi-puzzle@0.1.0 build
+> vite build
+
+[1G[0K[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+[2K[1Gtransforming (1) [2mindex.html[22m[2K[1Gtransforming (14) [2mnode_modules/react/jsx-runtime.js[22m[2K[1Gtransforming (20) [2mnode_modules/scheduler/cjs/scheduler.production.min.js[22m[2K[1Gtransforming (24) [2mnode_modules/react-dom/client.js[22m[2K[1G[32m✓[39m 33 modules transformed.
+[2K[1Grendering chunks (1)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1G[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.40 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[2massets/[22m[35mindex-Gr6heut8.css  [39m[1m[2m  0.22 kB[22m[1m[22m[2m │ gzip:  0.18 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-Cx7QBE_k.js   [39m[1m[2m149.71 kB[22m[1m[22m[2m │ gzip: 48.28 kB[22m
+[32m✓ built in 916ms[39m
+[1G[0K⠙[1G[0K[?2004hroot@41b49b35b47a:/app# head -5 /app/src/App.jsx
+[?2004limport React, { useState, useCallback, useEffect, useRef } from 'react';
+import { puzzles } from './data/puzzles';
+import { bridgeKey, parseKey, canAddBridge, computeCurrentCounts, isVictory } from './utils/hashiLogic';
+
+const GRID_SIZE = 40;
+[?2004hroot@41b49b35b47a:/app# wc -l /app/src/App.jsx
+[?2004l364 /app/src/App.jsx
+[?2004hroot@41b49b35b47a:/app# tail -5 /app/src/App.jsx
+[?2004l    </div>
+  );
+}
+
+export default App;
+[?2004hroot@41b49b35b47a:/app# ls /app/dist/
+[?2004lassets	favicon.svg  index.html  robots.txt
+[?2004hroot@41b49b35b47a:/app# cat /app/dist/index.html
+[?2004l<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hashi Puzzle Terminal</title>
+    <script type="module" crossorigin src="/assets/index-Cx7QBE_k.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Gr6heut8.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+[?2004hroot@41b49b35b47a:/app# 

@@ -1,0 +1,214 @@
+New Terminal Output:
+
+root@19bf34d6591d:/app# node -c src/utils/hashiLogic.js
+root@19bf34d6591d:/app# sed -n '1,220p' src/utils/hashiLogic.js
+export const ERR_NON_ADJACENT = 'Cannot connect non-adjacent islands';
+export const ERR_MAX_PER_PAIR = 'Max 2 bridges per pair';
+export const ERR_EXCEED = 'Island would exceed its number';
+export const ERR_CROSS = 'Bridges would cross';
+
+function isAligned(a, b) {
+  return a.x === b.x || a.y === b.y;
+}
+
+export function canonicalBridgeKey(from, to) {
+  const a = { x: from.x, y: from.y };
+  const b = { x: to.x, y: to.y };
+  const first = a.x < b.x || (a.x === b.x && a.y <= b.y) ? a : b;
+  const second = first === a ? b : a;
+  return `${first.x},${first.y},${second.x},${second.y}`;
+}
+
+function parseKey(key) {
+  const [x1, y1, x2, y2] = key.split(',').map(Number);
+  return { x1, y1, x2, y2 };
+}
+
+function between(v, a, b) {
+  return v > Math.min(a, b) && v < Math.max(a, b);
+}
+
+function hasBlockingIsland(islands, a, b) {
+  if (!isAligned(a, b)) return true;
+  if (a.x === b.x) {
+    const x = a.x;
+    return islands.some((p) => p.id !== a.id && p.id !== b.id && p.x === x && between(p.y, a.y, b.y));
+  }
+  const y = a.y;
+  return islands.some((p) => p.id !== a.id && p.id !== b.id && p.y === y && between(p.x, a.x, b.x));
+}
+
+export function areAdjacent(islands, a, b) {
+  if (!a || !b) return false;
+  if (a.id === b.id) return false;
+  if (!isAligned(a, b)) return false;
+  return !hasBlockingIsland(islands, a, b);
+}
+
+function segmentCrosses(segA, segB) {
+  // Only consider crossing of perpendicular interior points (not sharing endpoints).
+  const a = segA;
+  const b = segB;
+
+  const aVert = a.x1 === a.x2;
+  const bVert = b.x1 === b.x2;
+  if (aVert === bVert) return false;
+
+  const v = aVert ? a : b;
+  const h = aVert ? b : a;
+
+  const ix = v.x1;
+  const iy = h.y1;
+
+  const vMinY = Math.min(v.y1, v.y2);
+  const vMaxY = Math.max(v.y1, v.y2);
+  const hMinX = Math.min(h.x1, h.x2);
+  const hMaxX = Math.max(h.x1, h.x2);
+
+  // intersection must be strictly inside both segments (not at endpoints)
+  const vInterior = iy > vMinY && iy < vMaxY;
+  const hInterior = ix > hMinX && ix < hMaxX;
+  if (!vInterior || !hInterior) return false;
+
+  // exclude if intersection equals any endpoint (extra safety)
+  const endpoints = [
+    `${a.x1},${a.y1}`,
+    `${a.x2},${a.y2}`,
+    `${b.x1},${b.y1}`,
+    `${b.x2},${b.y2}`
+  ];
+  if (endpoints.includes(`${ix},${iy}`)) return false;
+
+  return true;
+}
+
+export function bridgesWouldCross(bridges, from, to) {
+  const key = canonicalBridgeKey(from, to);
+  const { x1, y1, x2, y2 } = parseKey(key);
+  const newSeg = { x1, y1, x2, y2 };
+
+  for (const [k, count] of bridges.entries()) {
+    if (!count) continue;
+    if (k === key) continue;
+    const seg = parseKey(k);
+
+    // sharing endpoints never counts as crossing
+    const sharesEndpoint =
+      (seg.x1 === x1 && seg.y1 === y1) ||
+      (seg.x2 === x1 && seg.y2 === y1) ||
+      (seg.x1 === x2 && seg.y1 === y2) ||
+      (seg.x2 === x2 && seg.y2 === y2) ||
+      (seg.x1 === x1 && seg.y1 === y1) ||
+      (seg.x2 === x2 && seg.y2 === y2);
+
+    if (sharesEndpoint) continue;
+    if (segmentCrosses(newSeg, seg)) return true;
+  }
+  return false;
+}
+
+export function computeCurrentCounts(islands, bridges) {
+  const counts = new Map();
+  for (const isl of islands) counts.set(isl.id, 0);
+
+  for (const [key, n] of bridges.entries()) {
+    if (!n) continue;
+    const { x1, y1, x2, y2 } = parseKey(key);
+    const a = islands.find((p) => p.x === x1 && p.y === y1);
+    const b = islands.find((p) => p.x === x2 && p.y === y2);
+    if (!a || !b) continue;
+    counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+    counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+  }
+
+  return counts;
+}
+
+export function canAddBridge(islands, bridges, from, to, delta) {
+  if (!areAdjacent(islands, from, to)) {
+    return { valid: false, error: ERR_NON_ADJACENT };
+  }
+
+  const key = canonicalBridgeKey(from, to);
+  const current = bridges.get(key) ?? 0;
+  const next = current + delta;
+
+  if (next < 0) return { valid: true, error: null };
+  if (next > 2) return { valid: false, error: ERR_MAX_PER_PAIR };
+
+  if (next > 0 && bridgesWouldCross(bridges, from, to)) {
+    return { valid: false, error: ERR_CROSS };
+  }
+
+  const counts = computeCurrentCounts(islands, bridges);
+  const fromCount = (counts.get(from.id) ?? 0) + delta;
+  const toCount = (counts.get(to.id) ?? 0) + delta;
+
+  if (fromCount > from.value || toCount > to.value) {
+    return { valid: false, error: ERR_EXCEED };
+  }
+
+  return { valid: true, error: null };
+}
+
+export function checkConnectivity(islands, bridges) {
+  if (!islands.length) return true;
+
+  const adj = new Map();
+  for (const isl of islands) adj.set(isl.id, []);
+
+  for (const [key, n] of bridges.entries()) {
+    if (!n) continue;
+    const { x1, y1, x2, y2 } = parseKey(key);
+    const a = islands.find((p) => p.x === x1 && p.y === y1);
+    const b = islands.find((p) => p.x === x2 && p.y === y2);
+    if (!a || !b) continue;
+    adj.get(a.id).push(b.id);
+    adj.get(b.id).push(a.id);
+  }
+
+  const start = islands[0].id;
+  const seen = new Set([start]);
+  const stack = [start];
+  while (stack.length) {
+    const cur = stack.pop();
+    for (const nb of adj.get(cur) || []) {
+      if (!seen.has(nb)) {
+        seen.add(nb);
+        stack.push(nb);
+      }
+    }
+  }
+
+  return seen.size === islands.length;
+}
+
+export function isVictory(islands, bridges) {
+  // Ensure no crossings (defensive)
+  const keys = [...bridges.entries()].filter(([, n]) => n > 0).map(([k]) => k);
+  for (let i = 0; i < keys.length; i++) {
+    const a = parseKey(keys[i]);
+    for (let j = i + 1; j < keys.length; j++) {
+      const b = parseKey(keys[j]);
+      if (segmentCrosses(a, b)) return false;
+    }
+  }
+
+  const counts = computeCurrentCounts(islands, bridges);
+  for (const isl of islands) {
+    if ((counts.get(isl.id) ?? 0) !== isl.value) return false;
+  }
+
+  return checkConnectivity(islands, bridges);
+}
+root@19bf34d6591d:/app# sed -n '220,520p' src/utils/hashiLogic.js
+root@19bf34d6591d:/app# grep -n "^a>\|^C>\|^[a-zA-Z]> \|^i$" -n src/utils/hashiLogic.js || true
+root@19bf34d6591d:/app# grep -n "export function" -n src/utils/hashiLogic.js
+10:export function canonicalBridgeKey(from, to) {
+37:export function areAdjacent(islands, a, b) {
+81:export function bridgesWouldCross(bridges, from, to) {
+106:export function computeCurrentCounts(islands, bridges) {
+123:export function canAddBridge(islands, bridges, from, to, delta) {
+150:export function checkConnectivity(islands, bridges) {
+182:export function isVictory(islands, bridges) {
+root@19bf34d6591d:/app#

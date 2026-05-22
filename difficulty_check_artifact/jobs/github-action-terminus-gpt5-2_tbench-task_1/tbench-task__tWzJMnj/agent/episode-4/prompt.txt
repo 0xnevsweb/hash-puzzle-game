@@ -1,0 +1,136 @@
+New Terminal Output:
+
+root@87e9000a9ae9:/app# nl -ba /app/src/utils/hashiLogic.js | sed -n '1,120p'
+     1  export const ERROR_NON_ADJACENT = "Cannot connect non-adjacent islands";
+     2  export const ERROR_MAX_PAIR = "Max 2 bridges per pair";
+     3  export const ERROR_EXCEED = "Island would exceed its number";
+     4  export const ERROR_CROSS = "Bridges would cross";
+     5
+     6  export function canonicalKey(a, b) {
+     7    // a,b are {x,y} in grid units
+     8    const p1 = { x: a.x, y: a.y };
+     9    const p2 = { x: b.x, y: b.y };
+    10    const swap = p1.x > p2.x || (p1.x === p2.x && p1.y > p2.y);
+    11    const s = swap ? [p2, p1] : [p1, p2];
+    12    return `${s[0].x},${s[0].y},${s[1].x},${s[1].y}`;
+    13  }
+    14
+    15  export function parseKey(key) {
+    16    const [x1, y1, x2, y2] = key.split(',').map(Number);
+    17    return { x1, y1, x2, y2 };
+    18  }
+    19
+    20  function isHorizontal(seg) {
+    21    return seg.y1 === seg.y2;
+    22  }
+    23
+    24  function isVertical(seg) {
+    25    return seg.x1 === seg.x2;
+    26  }
+    27
+    28  function normSeg(seg) {
+    29    // return with (x1,y1) <= (x2,y2) along axis
+    30    if (isHorizontal(seg)) {
+    31      const swap = seg.x1 > seg.x2;
+    32      return swap
+    33        ? { x1: seg.x2, y1: seg.y2, x2: seg.x1, y2: seg.y1 }
+    34        : seg;
+    35    }
+    36    if (isVertical(seg)) {
+    37      const swap = seg.y1 > seg.y2;
+    38      return swap
+    39        ? { x1: seg.x2, y1: seg.y2, x2: seg.x1, y2: seg.y1 }
+    40        : seg;
+    41    }
+    42    return seg;
+    43  }
+    44
+    45  export function computeCurrentCounts(islands, bridges) {
+    46    const counts = new Map();
+    47    for (const isl of islands) counts.set(isl.id, 0);
+    48
+    49    for (const [key, n] of bridges.entries()) {
+    50      if (!n) continue;
+    51      const { x1, y1, x2, y2 } = parseKey(key);
+    52      const a = islands.find((i) => i.x === x1 && i.y === y1);
+    53      const b = islands.find((i) => i.x === x2 && i.y === y2);
+    54      if (!a || !b) continue;
+    55      counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+    56      counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+    57    }
+    58    return counts;
+    59  }
+    60
+    61  function between(v, a, b) {
+    62    const lo = Math.min(a, b);
+    63    const hi = Math.max(a, b);
+    64    return v > lo && v < hi;
+    65  }
+    66
+    67  export function bridgesCross(existingKey, newKey) {
+    68    if (existingKey === newKey) return false;
+    69    const e = normSeg(parseKey(existingKey));
+    70    const n = normSeg(parseKey(newKey));
+    71
+    72    // Only orthogonal crossings matter; colinear overlaps are prevented by adjacency.
+    73    const eH = isHorizontal(e);
+    74    const eV = isVertical(e);
+    75    const nH = isHorizontal(n);
+    76    const nV = isVertical(n);
+    77    if (!((eH && nV) || (eV && nH))) return false;
+    78
+    79    const h = eH ? e : n;
+    80    const v = eV ? e : n;
+    81
+    82    // Proper crossing at an interior point (not at endpoints)
+    83    const cx = v.x1;
+    84    const cy = h.y1;
+    85
+    86    const hX1 = Math.min(h.x1, h.x2);
+    87    const hX2 = Math.max(h.x1, h.x2);
+    88    const vY1 = Math.min(v.y1, v.y2);
+    89    const vY2 = Math.max(v.y1, v.y2);
+    90
+    91    const intersects = cx >= hX1 && cx <= hX2 && cy >= vY1 && cy <= vY2;
+    92    if (!intersects) return false;
+    93
+    94    // exclude touching at endpoints
+    95    const hEndpoint = (cx === h.x1 && cy === h.y1) || (cx === h.x2 && cy === h.y2);
+    96    const vEndpoint = (cx === v.x1 && cy === v.y1) || (cx === v.x2 && cy === v.y2);
+    97    if (hEndpoint || vEndpoint) return false;
+    98
+    99    // also ensure it's strictly inside both segments
+   100    if (!between(cx, h.x1, h.x2)) return false;
+   101    if (!between(cy, v.y1, v.y2)) return false;
+   102
+   103    return true;
+   104  }
+   105
+   106  export function canAddBridge(islands, bridges, from, to, delta) {
+   107    if (!from || !to) return { valid: false, error: ERROR_NON_ADJACENT };
+   108    if (from.id === to.id) return { valid: false, error: ERROR_NON_ADJACENT };
+   109
+   110    const sameRow = from.y === to.y;
+   111    const sameCol = from.x === to.x;
+   112    if (!sameRow && !sameCol) return { valid: false, error: ERROR_NON_ADJACENT };
+   113
+   114    // must be adjacent with no island between
+   115    if (sameRow) {
+   116      const blocked = islands.some((i) => i.id !== from.id && i.id !== to.id && i.y === from.y && between(i.x, from.x, to.x));
+   117      if (blocked) return { valid: false, error: ERROR_NON_ADJACENT };
+   118    } else {
+   119      const blocked = islands.some((i) => i.id !== from.id && i.id !== to.id && i.x === from.x && between(i.y, from.y, to.y));
+   120      if (blocked) return { valid: false, error: ERROR_NON_ADJACENT };
+root@87e9000a9ae9:/app# node -c /app/src/utils/hashiLogic.js 2>/dev/null || true
+root@87e9000a9ae9:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-D36fXC7D.css    0.07 kB │ gzip:  0.08 kB
+dist/assets/index-BS9PDzzt.js   149.87 kB │ gzip: 48.68 kB
+✓ built in 879ms
+root@87e9000a9ae9:/app#

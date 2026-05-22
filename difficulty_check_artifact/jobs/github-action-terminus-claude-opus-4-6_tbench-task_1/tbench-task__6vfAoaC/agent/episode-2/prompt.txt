@@ -1,0 +1,28 @@
+New Terminal Output:
+
+root@f8d41e55f58e:/app# find /app/src -type f && echo '---' && cat /app/vite.config.js && echo '---' && cat /app/index.html
+/app/src/App.jsx
+/app/src/data/puzzles.js
+/app/src/index.css
+/app/src/index.jsx
+---
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+});
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hashi Puzzle Terminal</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
+</html>
+root@f8d41e55f58e:/app#

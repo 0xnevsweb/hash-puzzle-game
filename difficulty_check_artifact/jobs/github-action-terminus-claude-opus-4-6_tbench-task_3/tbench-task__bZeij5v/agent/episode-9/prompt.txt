@@ -1,0 +1,57 @@
+Current terminal state:
+New Terminal Output:
+
+root@9b533a5833b1:/app# ls -la /app/dist/ && echo '---' && cat /app/src/data/puzzles.js
+total 16
+drwxr-xr-x 3 root root   75 May 22 00:30 .
+drwxr-xr-x 8 root root 4096 May 22 00:30 ..
+drwxr-xr-x 2 root root   57 May 22 00:30 assets
+-rw-r--r-- 1 root root  216 May 22 00:30 favicon.svg
+-rw-r--r-- 1 root root  404 May 22 00:30 index.html
+-rw-r--r-- 1 root root   23 May 22 00:30 robots.txt
+---
+export const puzzles = [
+  {
+    id: 1,
+    name: "Easy",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 2 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 2, y: 6, value: 2 },
+      { id: 3, x: 6, y: 6, value: 2 }
+    ]
+  },
+  {
+    id: 2,
+    name: "Medium",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 2 },
+      { id: 1, x: 6, y: 2, value: 3 },
+      { id: 2, x: 10, y: 2, value: 1 },
+      { id: 3, x: 2, y: 6, value: 2 },
+      { id: 4, x: 6, y: 6, value: 2 }
+    ]
+  },
+  {
+    id: 3,
+    name: "Hard",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 3 },
+      { id: 1, x: 6, y: 2, value: 4 },
+      { id: 2, x: 10, y: 2, value: 2 },
+      { id: 3, x: 2, y: 6, value: 2 },
+      { id: 4, x: 6, y: 6, value: 4 },
+      { id: 5, x: 10, y: 6, value: 3 }
+    ]
+  }
+];
+root@9b533a5833b1:/app# cat /app/src/utils/hashiLogic.js | head -5
+// Canonical bridge key: smaller endpoint first (by x, then y)
+export function bridgeKey(island1, island2) {
+  const x1 = island1.x, y1 = island1.y;
+  const x2 = island2.x, y2 = island2.y;
+  if (x1 < x2 || (x1 === x2 && y1 < y2)) {
+root@9b533a5833b1:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

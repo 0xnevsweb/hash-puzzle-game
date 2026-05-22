@@ -1,0 +1,337 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+
+New Terminal Output:
+
+root@843be2ffebf5:/app# cat > /app/src/App.jsx << 'ENDOFFILE'
+nt === 1) {
+      // Try to add second
+      const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+      if (!result.valid) {
+        // If can't add second, cycle to none
+        setError(null);
+        const newBridges = new Map(bridges);
+        newBridges.delete(key);
+        setBridges(newBridges);
+        return;
+      }
+      setError(null);
+      const newBridges = new Map(bridges);
+      newBridges.set(key, 2);
+      setBridges(newBridges);
+    } else {
+      // currentCount === 2, cycle to none
+      setError(null);
+      const newBridges = new Map(bridges);
+      newBridges.delete(key);
+      setBridges(newBridges);
+    }
+  }, [bridges, islands]);
+
+  const removeBridge = useCallback((fromIsland, toIsland) => {
+    const key = bridgeKey(fromIsland, toIsland);
+    const currentCount = bridges.get(key) || 0;
+    if (currentCount > 0) {
+      setError(null);
+      const newBridges = new Map(bridges);
+      newBridges.delete(key);
+      setBridges(newBridges);
+    }
+  }, [bridges]);
+
+ > import React, { useState, useEffect, useCallback, useRef } from 'react';
+> import { puzzles } from './data/puzzles';
+> import { bridgeKey, canAddBridge, computeCurrentCounts, isVictory } from './utils/hashiLogic';
+>
+> const GRID_SIZE = 40;
+> const ISLAND_RADIUS = 16;
+>
+> function App() {
+>   const [puzzleIndex, setPuzzleIndex] = useState(0);
+>   const [bridges, setBridges] = useState(new Map());
+      >   const [selectedIsland, setSelectedIsland] = useState(null);
+>   const [cursorIndex, setCursorIndex] = useState(0);
+>   const [error, setError] = useState(null);
+>   const [victory, setVictory] = useState(false);
+>   const [keyboardMode, setKeyboardMode] = useState(false);
+>   const svgRef = useRef(null);
+>
+>   const currentPuzzle = puzzles[puzzleIndex];
+>   const islands = currentPuzzle.islands;
+>
+>   // Reset when puzzle changes
+>   const resetGame = useCallback(() => {
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setCursorIndex(0);
+>     setError(null);
+>     setVictory(false);
+>   }, []);
+>
+>   useEffect(() => {
+>     resetGame();
+>   }, [puzzleIndex, resetGame]);
+>
+>   // Check victory after bridge changes
+>   useEffect(() => {
+>     if (bridges.size > 0 && isVictory(islands, bridges)) {
+>       setVictory(true);
+>     } else {
+>       setVictory(false);
+>     }
+>   }, [bridges, islands]);
+>
+>   const handlePuzzleChange = (e) => {
+>     setPuzzleIndex(Number(e.target.value));
+>   };
+>
+>   const handleReset = () => {
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setError(null);
+>     setVictory(false);
+>   };
+>
+
+>   const toggleBridge = useCallback((fromIsland, toIsland) => {
+>     const key = bridgeKey(fromIsland, toIsland);
+>     const currentCount = bridges.get(key) || 0;
+>
+>     if (currentCount === 0) {
+>       // Try to add single
+>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+>       if (!result.valid) {
+>         setError(result.error);
+>         return;
+>       }
+>       setError(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.set(key, 1);
+>       setBridges(newBridges);
+>     } else if (currentCount === 1) {
+>       // Try to add second
+>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+>       if (!result.valid) {
+>         // If can't add second, cycle to none
+st px1 = >         setError(null);
+>         const newBridges = new Map(bridges);
+>         newBridges.delete(key);
+>         setBridges(newBridges);
+>         return;
+>       }
+>       setError(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.set(key, 2);
+>       setBridges(newBridges);
+>     } else {
+>       // currentCount === 2, cycle to none
+>       setError(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.delete(key);
+>       setBridges(newBridges);
+>     }
+>   }, [bridges, islands]);
+>
+>   const removeBridge = useCallback((fromIsland, toIsland) => {
+>     const key = bridgeKey(fromIsland, toIsland);
+>     const currentCount = bridges.get(key) || 0;
+>     if (currentCount > 0) {
+>       setError(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.delete(key);
+>       setBridges(newBridges);
+>     }
+>   }, [bridges]);
+>
+2>   const handleIslandClick = useCallback((island, e) => {
+>     if (e.button === 2 || e.ctrlKey) {
+>       // Right-click or Ctrl+click: remove bridge if selected
+>       if (selectedIsland !== null) {
+>         removeBridge(selectedIsland, island);
+>         setSelectedIsland(null);
+>       }
+>       return;
+>     }
+>
+>     if (selectedIsland === null) {
+>       setSelectedIsland(island);
+>       setError(null);
+>     } else {
+>       if (selectedIsland.id === island.id) {
+>         setSelectedIsland(null);
+>         return;
+>       }
+>       toggleBridge(selectedIsland, island);
+>       setSelectedIsland(null);
+>     }
+>   }, [selectedIs
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+        const isHorizontal = y1 === y2;
+>         const offset = 4;
+>         if (isHorizontal) {
+>           lines.push(
+>             <line
+>               key={key + '-a'}
+>               x1={px1} y1={py1 - offset}
+>               x2={px2} y2={py2 - offset}
+>               stroke="#0f0"
+>               strokeWidth="2"
+>             />
+>           );
+>           lines.push(
+>             <line
+>               key={key + '-b'}
+>               x1={px1} y1={py1 + offset}
+>               x2={px2} y2={py2 + offset}
+>               stroke="#0f0"
+>               strokeWidth="2"
+>             />
+>           );
+>         } else {
+>           lines.push(
+>             <line
+>               key={key + '-a'}
+>               x1={px1 - offset} y1={py1}
+>               x2={px2 - offset} y2={py2}
+>               stroke="#0f0"
+>               strokeWidth="2"
+>             />
+>           );
+>           lines.push(
+>             <line
+>               key={key + '-b'}
+>               x1={px1 + offset} y1={py1}
+>               x2={px2 + offset} y2={py2}
+>               stroke="#0f0"
+>               strokeWidth="2"
+>             />
+>           );
+>         }
+>       }
+>     }
+>     return lines;
+>   };
+>
+>   // Render islands as circles
+>   const renderIslands = () => {
+>     return islands.map((island) => {
+>       const px = island.x * GRID_SIZE;
+>       const py = island.y * GRID_SIZE;
+>       const isSelected = selectedIsland && selectedIsland.id === island.id;
+>
+>       return (
+>         <g key={island.id} onClick={(e) => handleIslandClick(island, e)}
+>            onContextMenu={(e) => {
+>              e.preventDefault();
+>              if (selectedIsland !== null) {
+>                removeBridge(selectedIsland, island);
+>                setSelectedIsland(null);
+>              }
+>            }}
+>            style={{ cursor: 'pointer' }}>
+>           <circle
+>             cx={px}
+>             cy={py}
+>             r={ISLAND_RADIUS}
+>             fill="black"
+>             stroke={isSelected ? '#ff0' : '#0f0'}
+>             strokeWidth={isSelected ? 3 : 2}
+>           />
+>           <text
+>             x={px}
+>             y={py}
+>             textAnchor="middle"
+>             dominantBaseline="central"
+>             fill="#0f0"
+>             fontSize="14"
+>             fontFamily="monospace"
+>           >
+>             {island.value}
+>           </text>
+>         </g>
+>       );
+>     });
+>   };
+>
+>   // Render keyboard cursor (NOT a circle - use rect)
+>   const renderCursor = () => {
+>     if (!keyboardMode) return null;
+>     const island = islands[cursorIndex];
+>     if (!island) return null;
+>     const px = island.x * GRID_SIZE;
+>     const py = island.y * GRID_SIZE;
+>     const size = ISLAND_RADIUS + 6;
+>
+>     return (
+>       <rect
+>         x={px - size}
+>         y={py - size}
+>         width={size * 2}
+>         height={size * 2}
+>         fill="none"
+>         stroke="#0ff"
+>         strokeWidth="2"
+>         strokeDasharray="4 2"
+>       />
+>     );
+>   };
+>
+>   return (
+>     <div onContextMenu={handleContextMenu} style={{ margin: 0, padding: 0 }}>
+>       <div style={{ padding: '8px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+>         <select value={puzzleIndex} onChange={handlePuzzleChange}
+>           style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace', padding: '4px' }}>
+>           {puzzles.map((p, i) => (
+>             <option key={p.id} value={i}>{p.name}</option>
+>           ))}
+>         </select>
+>         <button onClick={handleReset}
+>           style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace', padding: '4px 8px', cursor: 'pointer' }}>
+>           Reset
+>         </button>
+>         {error && <span className="error-message" style={{ color: '#f00', fontFamily: 'monospace' }}>{error}</span>}
+>         {victory && <span className="victory-banner" style={{ color: '#0f0', fontFamily: 'monospace', fontSize: '20px', fontWeight: 'bold' }}>SOLVED!</span>}
+>       </div>
+>       <svg ref={svgRef} width="800" height="600" style={{ display: 'block' }}>
+>         {renderBridges()}
+>         {renderIslands()}
+>         {renderCursor()}
+>       </svg>
+>     </div>
+>   );
+> }
+>
+> export default App;
+> ENDOFFILE
+root@843be2ffebf5:/app# cat > /app/src/index.css << 'EOF'
+> * {
+>   margin: 0;
+>   padding: 0;
+>   box-sizing: border-box;
+> }
+>
+> html, body, #root {
+>   margin: 0;
+>   padding: 0;
+>   background-color: black;
+>   color: #0f0;
+>   font-family: monospace;
+>   overflow: hidden;
+> }
+>
+> svg {
+>   display: block;
+> }
+> EOF
+root@843be2ffebf5:/app# cd /app && npm run build 2>&1
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-D_2KznGW.css    0.17 kB │ gzip:  0.14 kB
+dist/assets/index-w6f6yBPz.js   149.95 kB │ gzip: 48.41 kB
+✓ built in 927ms
+root@843be2ffebf5:/app#

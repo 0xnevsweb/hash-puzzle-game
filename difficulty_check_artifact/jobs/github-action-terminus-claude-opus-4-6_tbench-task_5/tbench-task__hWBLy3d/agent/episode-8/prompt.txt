@@ -1,0 +1,45 @@
+New Terminal Output:
+
+root@843be2ffebf5:/app# ls /app/dist/
+assets  favicon.svg  index.html  robots.txt
+root@843be2ffebf5:/app# cat /app/dist/index.html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hashi Puzzle Terminal</title>
+    <script type="module" crossorigin src="/assets/index-BX_d_hph.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D_2KznGW.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+root@843be2ffebf5:/app# wc -l /app/src/App.jsx /app/src/utils/hashiLogic.js /app/src/data/puzzles.js
+  381 /app/src/App.jsx
+  222 /app/src/utils/hashiLogic.js
+   35 /app/src/data/puzzles.js
+  638 total
+root@843be2ffebf5:/app# tail -20 /app/src/App.jsx
+            <option key={p.id} value={i}>{p.name}</option>
+          ))}
+        </select>
+        <button onClick={handleReset}
+          style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace', padding: '4px 8px', cursor: 'pointer' }}>
+          Reset
+        </button>
+        {error && <span className="error-message" style={{ color: '#f00', fontFamily: 'monospace' }}>{error}</span>}
+        {victory && <span className="victory-banner" style={{ color: '#0f0', fontFamily: 'monospace', fontSize: '20px', fontWeight: 'bold' }}>SOLVED!</span>}
+      </div>
+      <svg ref={svgRef} width="800" height="600" style={{ display: 'block' }}>
+        {renderBridges()}
+        {renderIslands()}
+        {renderCursor()}
+      </svg>
+    </div>
+  );
+}
+
+export default App;
+root@843be2ffebf5:/app#
