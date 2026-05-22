@@ -66,3 +66,26 @@ test('puzzle change resets board', async ({ page }) => {
   expect(await page.locator('line').count()).toBe(0);
 });
 
+test('keyboard navigation toggles bridge', async ({ page }) => {
+  await page.goto('http://localhost:3000');
+  await page.selectOption('select', 'Easy');
+  await page.click('button:has-text("Reset")');
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('Enter');
+  expect(await page.locator('line').count()).toBeGreaterThan(0);
+  expect(await page.locator('circle').count()).toBe(4);
+});
+
+test('right-click removes a bridge', async ({ page }) => {
+  await page.goto('http://localhost:3000');
+  await page.selectOption('select', 'Easy');
+  await page.click('button:has-text("Reset")');
+  await page.mouse.click(80, 80);
+  await page.mouse.click(240, 80);
+  expect(await page.locator('line').count()).toBe(1);
+  await page.mouse.click(160, 80, { button: 'right' });
+  expect(await page.locator('line').count()).toBe(0);
+});
+

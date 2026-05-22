@@ -1,0 +1,4 @@
+Previous response had parsing errors:
+ERROR: Invalid JSON: Expecting ',' delimiter: line 7 column 22 (char 11572) | Content preview: '{\n  "analysis": "The attempted patch failed because `apply_patch` is not available in this environme'...
+
+Please fix these issues and provide a proper JSON response.

@@ -1,0 +1,6 @@
+{
+  "analysis": "I've carefully reviewed all the requirements and my implementation:\n\n1. **Toggle logic**: none→single→double→none cycle. If a transition fails validation, error is shown and state doesn't change.\n2. **Puzzles are solvable**:\n   - Easy: 4 islands (2,2)(6,2)(2,6)(6,6) all value=2. Solution: 1 bridge per edge of the square.\n   - Medium: 5 islands. Solution: 0-1:2, 0-3:1, 1-2:1, 1-4:1, 3-4:1 → counts 3,4,1,2,2 ✓\n   - Hard: 6 islands. Solution: 0-1:1, 0-3:1, 1-2:1, 1-4:2, 2-5:1, 3-4:1, 4-5:1 → counts 2,4,2,2,4,2 ✓\n3. **SVG**: 800×600 at top-left, 40px grid, circles for islands, rect for cursor\n4. **Line count**: equals visible bridge count (1 per single, 2 per double), no hidden lines\n5. **Error/Victory**: proper classes and exact error strings\n6. **Right-click/Ctrl+click**: removes bridges entirely\n7. **Keyboard**: Arrow keys move cursor, Enter selects/toggles, Escape cancels\n8. **Build**: succeeds to /app/dist\n\nAll requirements are met.",
+  "plan": "Task is complete.",
+  "commands": [],
+  "task_complete": true
+}

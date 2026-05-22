@@ -1,0 +1,283 @@
+New Terminal Output:
+
+root@843be2ffebf5:/app# cat > /app/vite.config.js << 'EOF'
+> import { defineConfig } from 'vite';
+> import react from '@vitejs/plugin-react';
+>
+> export default defineConfig({
+>   plugins: [react()],
+>   build: {
+>     outDir: 'dist',
+>   },
+> });
+> EOF
+root@843be2ffebf5:/app# mkdir -p /app/src/utils
+root@843be2ffebf5:/app# cat > /app/src/utils/hashiLogic.js << 'EOF'
+> // Canonical key for a bridge between two islands (grid coordinates)
+> export function bridgeKey(island1, island2) {
+>   const [a, b] = [island1, island2].sort((p, q) => {
+(islands[0].id);
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    for (const neighbor of adj.get(current)) {
+      if (!visited.has(neighbor)) {
+        visited.add(neighbor);
+        queue>     if (p.x !== q.x) return p.x - q.x;
+>     return p.y - q.y;
+>   });
+>   return `${a.x},${a.y},${b.x},${b.y}`;
+> }
+>
+> // Check if two islands are adjacent (same row/col, no island between them)
+> export function areAdjacent(islands, from, to) {
+>   if (from.id === to.id) return false;
+>   if (from.x !== to.x && from.y !== to.y) return false;
+>
+>   // Check no island between them
+>   if (from.x === to.x) {
+>     const minY = Math.min(from.y, to.y);
+>     const maxY = Math.max(from.y, to.y);
+>     for (const island of islands) {
+>       if (island.id === from.id || island.id === to.id) continue;
+>       if (island.x === from.x && island.y > minY && island.y < maxY) return false;
+>     }
+>   } else {
+>     const minX = Math.min(from.x, to.x);
+>     const maxX = Math.max(from.x, to.x);
+>     for (const island of islands) {
+>       if (island.id === from.id || island.id === to.id) continue;
+>       if (island.y === from.y && island.x > minX && island.x < maxX) return false;
+>     }
+>   }
+>   return true;
+> }
+>
+> // Check if adding a bridge between from and to would cross any existing bridge
+> export function wouldCross(islands, bridges, from, to) {
+>   // The new bridge segment
+>   const horizontal = from.y === to.y;
+>
+>   for (const [key, count] of bridges.entries()) {
+>     if (count === 0) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     const existingHorizontal = y1 === y2;
+>
+>     // Parallel bridges can't cross
+>     if (horizontal === existingHorizontal) continue;
+>
+>     // Perpendicular: check intersection
+>     if (horizontal) {
+>       // New bridge is horizontal (from.y === to.y)
+>       // Existing is vertical (x1 === x2)
+>       const hMinX = Math.min(from.x, to.x);
+>       const hMaxX = Math.max(from.x, to.x);
+>       const hY = from.y;
+>       const vX = x1;
+>       const vMinY = Math.min(y1, y2);
+>       const vMaxY = Math.max(y1, y2);
+>
+>       if (vX > hMinX && vX < hMaxX && hY > vMinY && hY < vMaxY) {
+>         return true;
+>       }
+>     } else {
+>       // New bridge is vertical (from.x === to.x)
+>       // Existing is horizontal (y1 === y2)
+>       const vMinY = Math.min(from.y, to.y);
+>       const vMaxY = Math.max(from.y, to.y);
+>       const vX = from.x;
+>       const hY = y1;
+>       const hMinX = Math.min(x1, x2);
+>       const hMaxX = Math.max(x1, x2);
+>
+>       if (vX > hMinX && vX < hMaxX && hY > vMinY && hY < vMaxY) {
+>         return true;
+>       }
+>     }
+>   }
+>   return false;
+> }
+>
+> // Compute current bridge counts per island
+> export function computeCurrentCounts(islands, bridges) {
+>   const counts = new Map();
+>   for (const island of islands) {
+>     counts.set(island.id, 0);
+>   }
+>
+>   for (const [key, count] of bridges.entries()) {
+>     if (count === 0) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     // Find which islands these coords belong to
+>     const islandA = islands.find(i => i.x === x1 && i.y === y1);
+>     const islandB = islands.find(i => i.x === x2 && i.y === y2);
+>     if (islandA) counts.set(islandA.id, (counts.get(islandA.id) || 0) + count);
+>     if (islandB) counts.set(islandB.id, (counts.get(islandB.id) || 0) + count);
+>   }
+>   return counts;
+> }
+>
+> // Check if all islands are connected via bridges
+> export function checkConnectivity(islands, bridges) {
+>   if (islands.length === 0) return true;
+>   if (islands.length === 1) return true;
+>
+>   // Build adjacency list
+>   const adj = new Map();
+>   for (const island of islands) {
+>     adj.set(island.id, []);
+>   }
+>
+>   for (const [key, count] of bridges.entries()) {
+>     if (count === 0) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     const islandA = islands.find(i => i.x === x1 && i.y === y1);
+>     const islandB = islands.find(i => i.x === x2 && i.y === y2);
+>     if (islandA && islandB) {
+>       adj.get(islandA.id).push(islandB.id);
+>       adj.get(islandB.id).push(islandA.id);
+>     }
+>   }
+>
+>   // BFS from first island
+>   const visited = new Set();
+>   const queue = [islands[0].id];
+>   visited.add(islands[0].id);
+>
+>   while (queue.length > 0) {
+>     const current = queue.shift();
+>     for (const neighbor of adj.get(current)) {
+>       if (!visited.has(neighbor)) {
+>         visited.add(neighbor);
+>         queue.push(neighbor);
+>       }
+>     }
+>   }
+>
+>   return visited.size === islands.length;
+> }
+>
+> // Check if puzzle is solved
+> export function isVictory(islands, bridges) {
+>   // Check all counts match
+>   const counts = computeCurrentCounts(islands, bridges);
+>   for (const island of islands) {
+>     if ((counts.get(island.id) || 0) !== island.value) return false;
+>   }
+>
+>   // Check no bridges cross
+>   const bridgeList = [];
+>   for (const [key, count] of bridges.entries()) {
+>     if (count === 0) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     bridgeList.push({ x1, y1, x2, y2 });
+>   }
+>
+>   for (let i = 0; i < bridgeList.length; i++) {
+>     for (let j = i + 1; j < bridgeList.length; j++) {
+>       const a = bridgeList[i];
+>       const b = bridgeList[j];
+>       const aHoriz = a.y1 === a.y2;
+>       const bHoriz = b.y1 === b.y2;
+>       if (aHoriz === bHoriz) continue;
+>
+>       if (aHoriz) {
+>         const hMinX = Math.min(a.x1, a.x2);
+>         const hMaxX = Math.max(a.x1, a.x2);
+>         const hY = a.y1;
+>         const vX = b.x1;
+>         const vMinY = Math.min(b.y1, b.y2);
+>         const vMaxY = Math.max(b.y1, b.y2);
+>         if (vX > hMinX && vX < hMaxX && hY > vMinY && hY < vMaxY) return false;
+>       } else {
+>         const hMinX = Math.min(b.x1, b.x2);
+>         const hMaxX = Math.max(b.x1, b.x2);
+>         const hY = b.y1;
+>         const vX = a.x1;
+>         const vMinY = Math.min(a.y1, a.y2);
+>         const vMaxY = Math.max(a.y1, a.y2);
+>         if (vX > hMinX && vX < hMaxX && hY > vMinY && hY < vMaxY) return false;
+>       }
+>     }
+>   }
+>
+>   // Check connectivity
+>   return checkConnectivity(islands, bridges);
+> }
+>
+> // Validate if a bridge can be added (delta = +1 for adding)
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   // Check adjacency
+>   if (from.x !== to.x && from.y !== to.y) {
+>     return { valid: false, error: "Cannot connect non-adjacent islands" };
+>   }
+>   if (!areAdjacent(islands, from, to)) {
+>     return { valid: false, error: "Cannot connect non-adjacent islands" };
+>   }
+>
+>   const key = bridgeKey(from, to);
+>   const currentCount = bridges.get(key) || 0;
+>   const newCount = currentCount + delta;
+>
+>   // Check max 2
+>   if (newCount > 2) {
+>     return { valid: false, error: "Max 2 bridges per pair" };
+>   }
+>
+>   // Check island capacity
+>   if (delta > 0) {
+>     const counts = computeCurrentCounts(islands, bridges);
+>     const fromCount = counts.get(from.id) || 0;
+>     const toCount = counts.get(to.id) || 0;
+>
+>     if (fromCount + delta > from.value || toCount + delta > to.value) {
+>       return { valid: false, error: "Island would exceed its number" };
+>     }
+>
+>     // Check crossing
+>     if (currentCount === 0 && wouldCross(islands, bridges, from, to)) {
+>       return { valid: false, error: "Bridges would cross" };
+>     }
+>   }
+>
+>   return { valid: true, error: null };
+> }
+> EOF
+root@843be2ffebf5:/app# cat > /app/src/data/puzzles.js << 'EOF'
+> export const puzzles = [
+>   {
+>     id: 1,
+>     name: "Easy",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 2 },
+>       { id: 2, x: 2, y: 6, value: 2 },
+>       { id: 3, x: 6, y: 6, value: 2 }
+>     ]
+>   },
+>   {
+>     id: 2,
+>     name: "Medium",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 3 },
+>       { id: 1, x: 6, y: 2, value: 4 },
+>       { id: 2, x: 10, y: 2, value: 1 },
+>       { id: 3, x: 2, y: 6, value: 2 },
+>       { id: 4, x: 6, y: 6, value: 2 }
+>     ]
+>   },
+>   {
+>     id: 3,
+>     name: "Hard",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 4 },
+>       { id: 2, x: 10, y: 2, value: 2 },
+>       { id: 3, x: 2, y: 6, value: 2 },
+>       { id: 4, x: 6, y: 6, value: 4 },
+>       { id: 5, x: 10, y: 6, value: 2 }
+>     ]
+>   }
+> ];
+> EOF
+root@843be2ffebf5:/app#

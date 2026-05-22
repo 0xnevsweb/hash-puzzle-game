@@ -1,0 +1,312 @@
+New Terminal Output:
+
+root@f5160cef3cb3:/app# sed -n '1,260p' src/utils/hashiLogic.js
+const ERR_NON_ADJ = 'Cannot connect non-adjacent islands';
+const ERR_MAX_PAIR = 'Max 2 bridges per pair';
+const ERR_EXCEED = 'Island would exceed its number';
+const ERR_CROSS = 'Bridges would cross';
+
+export function canonicalKey(from, to) {
+  const a = { x: from.x, y: from.y };
+  const b = { x: to.x, y: to.y };
+  const first = a.x < b.x || (a.x === b.x && a.y <= b.y) ? a : b;
+  const second = first === a ? b : a;
+  return `${first.x},${first.y},${second.x},${second.y}`;
+}
+
+export function parseKey(key) {
+  const [x1, y1, x2, y2] = key.split(',').map((n) => Number(n));
+  return { x1, y1, x2, y2 };
+}
+
+export function isAxisAligned(a, b) {
+  return a.x === b.x || a.y === b.y;
+}
+
+export function segmentFromIslands(a, b) {
+  const horiz = a.y === b.y;
+  if (horiz) {
+    const x1 = Math.min(a.x, b.x);
+    const x2 = Math.max(a.x, b.x);
+    return { orient: 'h', x1, x2, y: a.y };
+  }
+  const y1 = Math.min(a.y, b.y);
+  const y2 = Math.max(a.y, b.y);
+  return { orient: 'v', y1, y2, x: a.x };
+}
+
+export function areAdjacent(islands, a, b) {
+  if (!isAxisAligned(a, b)) return false;
+  const seg = segmentFromIslands(a, b);
+  if (seg.orient === 'h') {
+    const minX = seg.x1;
+    const maxX = seg.x2;
+    return !islands.some((i) => i.y === seg.y && i.x > minX && i.x < maxX);
+  }
+  const minY = seg.y1;
+  const maxY = seg.y2;
+  return !islands.some((i) => i.x === seg.x && i.y > minY && i.y < maxY);
+}
+
+export function segmentsCross(segA, segB) {
+  if (segA.orient === segB.orient) return false;
+  const h = segA.orient === 'h' ? segA : segB;
+  const v = segA.orient === 'v' ? segA : segB;
+
+  const withinX = v.x > h.x1 && v.x < h.x2;
+  const withinY = h.y > v.y1 && h.y < v.y2;
+  return withinX && withinY;
+}
+
+export function computeCurrentCounts(islands, bridges) {
+  const counts = new Map();
+  for (const isl of islands) counts.set(isl.id, 0);
+
+  for (const [key, n] of bridges.entries()) {
+    if (!n) continue;
+    const { x1, y1, x2, y2 } = parseKey(key);
+    const a = islands.find((i) => i.x === x1 && i.y === y1);
+    const b = islands.find((i) => i.x === x2 && i.y === y2);
+    if (!a || !b) continue;
+    counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+    counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+  }
+  return counts;
+}
+
+export function wouldCrossExisting(islands, bridges, from, to) {
+  const segNew = segmentFromIslands(from, to);
+
+  for (const [key, n] of bridges.entries()) {
+    if (!n) continue;
+    const { x1, y1, x2, y2 } = parseKey(key);
+
+    // sharing endpoints is allowed and not considered crossing
+    const sharesEndpoint =
+      (from.x === x1 && from.y === y1) ||
+      (from.x === x2 && from.y === y2) ||
+      (to.x === x1 && to.y === y1) ||
+      (to.x === x2 && to.y === y2);
+    if (sharesEndpoint) continue;
+
+    const a = islands.find((i) => i.x === x1 && i.y === y1);
+    const b = islands.find((i) => i.x === x2 && i.y === y2);
+    if (!a || !b) continue;
+
+    const segOld = segmentFromIslands(a, b);
+    if (segmentsCross(segNew, segOld)) return true;
+  }
+  return false;
+}
+
+export function canAddBridge(islands, bridges, from, to, delta) {
+  if (!from || !to) return { valid: false, error: ERR_NON_ADJ };
+  if (from.id === to.id) return { valid: false, error: ERR_NON_ADJ };
+  if (!isAxisAligned(from, to) || !areAdjacent(islands, from, to)) {
+    return { valid: false, error: ERR_NON_ADJ };
+  }
+
+  const key = canonicalKey(from, to);
+  const current = bridges.get(key) ?? 0;
+  const next = current + delta;
+
+  if (next < 0) return { valid: true, error: null };
+  if (next > 2) return { valid: false, error: ERR_MAX_PAIR };
+
+  const counts = computeCurrentCounts(islands, bridges);
+  const fromCount = (counts.get(from.id) ?? 0) + delta;
+  const toCount = (counts.get(to.id) ?? 0) + delta;
+  if (fromCount > from.value || toCount > to.value) {
+    return { valid: false, error: ERR_EXCEED };
+  }
+
+  if (delta > 0 && wouldCrossExisting(islands, bridges, from, to)) {
+    return { valid: false, error: ERR_CROSS };
+  }
+
+  return { valid: true, error: null };
+}
+
+export function checkConnectivity(islands, bridges) {
+  if (islands.length === 0) return true;
+
+  const byCoord = new Map(islands.map((i) => [`${i.x},${i.y}`, i]));
+  const adj = new Map(islands.map((i) => [i.id, []]));
+
+  for (const [key, n] of bridges.entries()) {
+    if (!n) continue;
+    const { x1, y1, x2, y2 } = parseKey(key);
+    const a = byCoord.get(`${x1},${y1}`);
+    const b = byCoord.get(`${x2},${y2}`);
+    if (!a || !b) continue;
+    adj.get(a.id).push(b.id);
+    adj.get(b.id).push(a.id);
+  }
+
+  const seen = new Set();
+  const stack = [islands[0].id];
+  while (stack.length) {
+    const cur = stack.pop();
+    if (seen.has(cur)) continue;
+    seen.add(cur);
+    for (const nxt of adj.get(cur) ?? []) {
+      if (!seen.has(nxt)) stack.push(nxt);
+    }
+  }
+
+  return seen.size === islands.length;
+}
+
+export function isVictory(islands, bridges) {
+  const counts = computeCurrentCoun
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+ > h.x1 && v.x < h.x2;
+>   const withinY = h.y > v.y1 && h.y < v.y2;
+>   return withinX && withinY;
+> }
+>
+> export function computeCurrentCounts(islands, bridges) {
+>   const counts = new Map();
+>   for (const isl of islands) counts.set(isl.id, 0);
+>
+>   for (const [key, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const { x1, y1, x2, y2 } = parseKey(key);
+>     const a = islands.find((i) => i.x === x1 && i.y === y1);
+>     const b = islands.find((i) => i.x === x2 && i.y === y2);
+>     if (!a || !b) continue;
+>     counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+>     counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+>   }
+>
+>   return counts;
+> }
+>
+> export function wouldCrossExisting(islands, bridges, from, to) {
+>   const segNew = segmentFromIslands(from, to);
+>
+>   for (const [key, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const { x1, y1, x2, y2 } = parseKey(key);
+>
+>     // if share endpoints, not crossing
+>     const sharesEndpoint =
+>       (from.x === x1 && from.y === y1) ||
+>       (from.x === x2 && from.y === y2) ||
+>       (to.x === x1 && to.y === y1) ||
+>       (to.x === x2 && to.y === y2);
+>     if (sharesEndpoint) continue;
+>
+>     const a = islands.find((i) => i.x === x1 && i.y === y1);
+>     const b = islands.find((i) => i.x === x2 && i.y === y2);
+>     if (!a || !b) continue;
+>
+>     const segOld = segmentFromIslands(a, b);
+>     if (segmentsCross(segNew, segOld)) return true;
+>   }
+>   return false;
+> }
+>
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   if (!from || !to) return { valid: false, error: ERR_NON_ADJ };
+>   if (from.id === to.id) return { valid: false, error: ERR_NON_ADJ };
+>
+>   if (!isAxisAligned(from, to) || !areAdjacent(islands, from, to)) {
+>     return { valid: false, error: ERR_NON_ADJ };
+>   }
+>
+>   const key = canonicalKey(from, to);
+>   const current = bridges.get(key) ?? 0;
+>   const next = current + delta;
+>
+>   if (next > 2) return { valid: false, error: ERR_MAX_PAIR };
+>
+>   const counts = computeCurrentCounts(islands, bridges);
+>   const fromCount = (counts.get(from.id) ?? 0) + delta;
+>   const toCount = (counts.get(to.id) ?? 0) + delta;
+>
+>   if (fromCount > from.value || toCount > to.value) {
+>     return { valid: false, error: ERR_EXCEED };
+>   }
+>
+>   if (delta > 0 && wouldCrossExisting(islands, bridges, from, to)) {
+>     return { valid: false, error: ERR_CROSS };
+>   }
+>
+>   return { valid: true, error: null };
+> }
+>
+> export function checkConnectivity(islands, bridges) {
+>   if (islands.length <= 1) return true;
+>
+>   const byCoord = new Map(islands.map((i) => [`${i.x},${i.y}`, i]));
+>   const adj = new Map(islands.map((i) => [i.id, []]));
+>
+>   for (const [key, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const { x1, y1, x2, y2 } = parseKey(key);
+>     const a = byCoord.get(`${x1},${y1}`);
+>     const b = byCoord.get(`${x2},${y2}`);
+>     if (!a || !b) continue;
+>     adj.get(a.id).push(b.id);
+>     adj.get(b.id).push(a.id);
+>   }
+>
+>   const seen = new Set();
+>   const stack = [islands[0].id];
+>   while (stack.length) {
+>     const cur = stack.pop();
+>     if (seen.has(cur)) continue;
+>     seen.add(cur);
+>     for (const nxt of adj.get(cur) ?? []) {
+>       if (!seen.has(nxt)) stack.push(nxt);
+>     }
+>   }
+>
+>   return seen.size === islands.length;
+> }
+>
+> export function isVictory(islands, bridges) {
+>   const counts = computeCurrentCounts(islands, bridges);
+>   for (const isl of islands) {
+>     if ((counts.get(isl.id) ?? 0) !== isl.value) return false;
+>   }
+>
+>   // Ensure no crossings (defensive)
+>   const keys = [...bridges.keys()].filter((k) => (bridges.get(k) ?? 0) > 0);
+>   for (let i = 0; i < keys.length; i++) {
+>     const { x1: ax1, y1: ay1, x2: ax2, y2: ay2 } = parseKey(keys[i]);
+>     const a1 = islands.find((isl) => isl.x === ax1 && isl.y === ay1);
+>     const a2 = islands.find((isl) => isl.x === ax2 && isl.y === ay2);
+>     if (!a1 || !a2) continue;
+>     const segA = segmentFromIslands(a1, a2);
+>
+>     for (let j = i + 1; j < keys.length; j++) {
+>       const { x1: bx1, y1: by1, x2: bx2, y2: by2 } = parseKey(keys[j]);
+>       const b1 = islands.find((isl) => isl.x === bx1 && isl.y === by1);
+>       const b2 = islands.find((isl) => isl.x === bx2 && isl.y === by2);
+>       if (!b1 || !b2) continue;
+>
+>       const shareEndpoint = a1.id === b1.id || a1.id === b2.id || a2.id === b1.id || a2.id === b2.id;
+>       if (shareEndpoint) continue;
+>
+>       const segB = segmentFromIslands(b1, b2);
+>       if (segmentsCross(segA, segB)) return false;
+>     }
+>   }
+>
+>   return checkConnectivity(islands, bridges);
+> }
+> EOF
+root@f5160cef3cb3:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.27 kB
+dist/assets/index-BR-CNxlW.css    0.85 kB │ gzip:  0.44 kB
+dist/assets/index-BWcor2so.js   150.79 kB │ gzip: 48.95 kB
+✓ built in 863ms
+root@f5160cef3cb3:/app#

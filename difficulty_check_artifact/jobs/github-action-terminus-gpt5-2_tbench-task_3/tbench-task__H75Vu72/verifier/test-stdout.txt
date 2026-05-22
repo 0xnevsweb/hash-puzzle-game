@@ -1,0 +1,45 @@
+[WebServer] [43m[1m WARN [22m[49m Checking for updates failed (use `--debug` to see full error)
+
+Running 8 tests using 1 worker
+
+  ✓  1 [chromium] › e2e/example.spec.ts:3:1 › initial render (165ms)
+  ✓  2 [chromium] › e2e/example.spec.ts:9:1 › mouse adds and removes bridge (157ms)
+  ✓  3 [chromium] › e2e/example.spec.ts:25:1 › invalid move shows error (134ms)
+  ✓  4 [chromium] › e2e/example.spec.ts:33:1 › victory banner appears (149ms)
+  ✓  5 [chromium] › e2e/example.spec.ts:48:1 › reset clears bridges (182ms)
+  ✘  6 [chromium] › e2e/example.spec.ts:59:1 › puzzle change resets board (121ms)
+  ✓  7 [chromium] › e2e/example.spec.ts:69:1 › keyboard navigation toggles bridge (193ms)
+  ✓  8 [chromium] › e2e/example.spec.ts:81:1 › right-click removes a bridge (146ms)
+
+
+  1) [chromium] › e2e/example.spec.ts:59:1 › puzzle change resets board ────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m0[39m
+    Received: [31m1[39m
+
+      64 |   await page.selectOption('select', 'Medium');
+      65 |   expect(await page.locator('circle').count()).toBe(5);
+    > 66 |   expect(await page.locator('line').count()).toBe(0);
+         |                                              ^
+      67 | });
+      68 |
+      69 | test('keyboard navigation toggles bridge', async ({ page }) => {
+        at /tests/e2e/example.spec.ts:66:46
+
+    Error Context: test-results/example-puzzle-change-resets-board-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/example.spec.ts:59:1 › puzzle change resets board ─────────────────────────────
+  7 passed (4.1s)
+
+ RUN  v2.1.9 /tests
+
+ ✓ unit/hashiLogic.spec.ts (16 tests) 8ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  00:27:21
+   Duration  606ms (transform 69ms, setup 0ms, collect 60ms, tests 8ms, environment 317ms, prepare 67ms)
+

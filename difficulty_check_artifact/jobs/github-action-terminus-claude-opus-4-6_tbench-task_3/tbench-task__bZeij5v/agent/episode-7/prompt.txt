@@ -1,0 +1,25 @@
+New Terminal Output:
+
+root@9b533a5833b1:/app# ls /app/dist/
+assets  favicon.svg  index.html  robots.txt
+root@9b533a5833b1:/app# cat /app/dist/index.html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hashi Puzzle Terminal</title>
+    <script type="module" crossorigin src="/assets/index-DnYFQIxZ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DhLrHbUD.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+root@9b533a5833b1:/app# find /app/src -type f | sort
+/app/src/App.jsx
+/app/src/data/puzzles.js
+/app/src/index.css
+/app/src/index.jsx
+/app/src/utils/hashiLogic.js
+root@9b533a5833b1:/app#

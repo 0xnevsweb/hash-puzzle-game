@@ -1,0 +1,30 @@
+{
+    "id": "5c54159a-4d73-4b89-b477-85fe240c7cca",
+    "started_at": "2026-05-22T00:14:56.992314",
+    "finished_at": "2026-05-22T00:19:19.886462",
+    "n_total_trials": 1,
+    "stats": {
+        "n_trials": 1,
+        "n_errors": 0,
+        "evals": {
+            "oracle__adhoc": {
+                "n_trials": 1,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 1.0
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "tbench-task__eCUg7Co"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        }
+    }
+}

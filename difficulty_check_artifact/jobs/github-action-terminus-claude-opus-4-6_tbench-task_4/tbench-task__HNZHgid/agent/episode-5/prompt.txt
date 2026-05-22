@@ -1,0 +1,11 @@
+New Terminal Output:
+
+root@cbe01dbaecac:/app# head -5 /app/src/utils/hashiLogic.js
+// Canonical bridge key: smaller coordinate pair first
+export function bridgeKey(from, to) {
+  const x1 = from.x, y1 = from.y, x2 = to.x, y2 = to.y;
+  if (x1 < x2 || (x1 === x2 && y1 < y2)) {
+    return `${x1},${y1},${x2},${y2}`;
+root@cbe01dbaecac:/app# wc -l /app/src/utils/hashiLogic.js
+210 /app/src/utils/hashiLogic.js
+root@cbe01dbaecac:/app#

@@ -1,0 +1,41 @@
+Current Terminal Screen:
+>             <option key={p.id} value={i}>{p.name}</option>
+>           ))}
+>         </select>
+>         <button onClick={handleReset}
+>           style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace', padding: '4px 8px', cursor: 'pointer' }}>
+>           Reset
+>         </button>
+>         {error && <span className="error-message" style={{ color: '#f00', fontFamily: 'monospace' }}>{error}</span>}
+>         {victory && <span className="victory-banner" style={{ color: '#0f0', fontFamily: 'monospace', fontSize: '20px', fontWeight: 'bold' }}>SOLVED!</span>}
+>       </div>
+>       <svg ref={svgRef} width="800" height="600" style={{ display: 'block' }}>
+>         {renderBridges()}
+>         {renderIslands()}
+>         {renderCursor()}
+>       </svg>
+>     </div>
+>   );
+> }
+>
+> export default App;
+> '''
+>
+> with open('/app/src/App.jsx', 'w') as f:
+>     f.write(content)
+> print('Written successfully')
+> PYEOF
+root@843be2ffebf5:/app# python3 /tmp/fix_app.py
+Written successfully
+root@843be2ffebf5:/app# cd /app && npm run build 2>&1
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-D_2KznGW.css    0.17 kB │ gzip:  0.14 kB
+dist/assets/index-KPUsrg2a.js   150.56 kB │ gzip: 48.49 kB
+✓ built in 962ms
+root@843be2ffebf5:/app#
