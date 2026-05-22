@@ -1,0 +1,41 @@
+Current Terminal Screen:
+>               >
+>                 {isl.value}
+>               </text>
+>
+>               {/* optional current count indicator */}
+>               <text
+>                 x={px}
+>                 y={py + 28}
+>                 textAnchor="middle"
+>                 fontSize={10}
+>                 fill="#0f0"
+>                 style={{ userSelect: 'none', pointerEvents: 'none', opacity: 0.7 }}
+>               >
+>                 {counts.get(isl.id) ?? 0}/{isl.value}
+>               </text>
+>             </g>
+>           );
+>         })}
+>       </svg>
+>
+>       {/* prevent default context menu selection issues */}
+>       <div style={{ padding: 8, opacity: 0.7 }}>
+>         Mouse: click island A then B to cycle bridge. Right-click or Ctrl+click removes. Keyboard: arrows move cursor, Enter selects/toggles, Esc cancels.
+>       </div>
+>     </div>
+>   );
+> }
+> EOF
+root@668653bc8018:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-D36fXC7D.css    0.07 kB │ gzip:  0.08 kB
+dist/assets/index-aq8vQA6R.js   149.93 kB │ gzip: 48.59 kB
+✓ built in 1.06s
+root@668653bc8018:/app#

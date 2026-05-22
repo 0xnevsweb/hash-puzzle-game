@@ -1,0 +1,312 @@
+New Terminal Output:
+
+root@9e5c6026fed6:/app# cat > src/utils/hashiLogic.js <<'EOF'
+> // Hashi (Bridges) game logic
+>
+> function keyFromCoords(a, b) {
+>   const p1 = { x: a.x, y: a.y };
+>   const p2 = { x: b.x, y: b.y };
+>   const first = p1.x < p2.x || (p1.x === p2.x && p1.y <= p2.y) ? p1 : p2;
+>   const second = first === p1 ? p2 : p1;
+>   return `${first.x},${first.y},${second.x},${second.y}`;
+> }
+>
+> function buildOccupancy(islands) {
+>   const byXY = new Map();
+>   const byId = new Map();
+>   for (const isl of islands) {
+>     byXY.set(`${isl.x},${isl.y}`, isl);
+>     byId.set(isl.id, isl);
+>   }
+>   return { byXY, byId };
+> }
+>
+> function isOrthogonal(a, b) {
+>   return a.x === b.x || a.y === b.y;
+> }
+>
+> // Adjacent means: same row/col and no other island between them.
+> function areAdjacent(islands, a, b) {
+>   if (!isOrthogonal(a, b)) return false;
+>   if (a.x === b.x) {
+>     const x = a.x;
+>     const y1 = Math.min(a.y, b.y);
+>     const y2 = Math.max(a.y, b.y);
+>     for (const isl of islands) {
+>       if (isl.x === x && isl.y > y1 && isl.y < y2) return false;
+>     }
+>     return true;
+>   }
+>   const y = a.y;
+>   const x1 = Math.min(a.x, b.x);
+>   const x2 = Math.max(a.x, b.x);
+>   for (const isl of islands) {
+>     if (isl.y === y && isl.x > x1 && isl.x < x2) return false;
+>   }
+>   return true;
+> }
+>
+> function segmentIntersectsStrict(a1, a2, b1, b2) {
+>   // Only considering axis-aligned segments.
+>   const aVert = a1.x === a2.x;
+>   const bVert = b1.x === b2.x;
+>   if (aVert === bVert) return false;
+>
+>   const vert = aVert ? { p1: a1, p2: a2 } : { p1: b1, p2: b2 };
+>   const horz = aVert ? { p1: b1, p2: b2 } : { p1: a1, p2: a2 };
+>
+>   const vx = vert.p1.x;
+>   const vy1 = Math.min(vert.p1.y, vert.p2.y);
+>   const vy2 = Math.max(vert.p1.y, vert.p2.y);
+>
+>   const hy = horz.p1.y;
+>   const hx1 = Math.min(horz.p1.x, horz.p2.x);
+>   const hx2 = Math.max(horz.p1.x, horz.p2.x);
+>
+>   // Strict interior crossing only (not touching endpoints)
+>   return vx > hx1 && vx < hx2 && hy > vy1 && hy < vy2;
+> }
+>
+> function bridgesWouldCross(bridges, from, to) {
+>   const a1 = { x: from.x, y: from.y };
+>   const a2 = { x: to.x, y: to.y };
+>
+>   for (const [k, count] of bridges.entries()) {
+>     if (!count) continue;
+>     const [x1, y1, x2, y2] = k.split(',').map(Number);
+>     const b1 = { x: x1, y: y1 };
+>     const b2 = { x: x2, y: y2 };
+>
+>     const sharesEndpoint =
+>       (a1.x === b1.x && a1.y === b1.y) ||
+>       (a1.x === b2.x && a1.y === b2.y) ||
+>       (a2.x === b1.x && a2.y === b1.y) ||
+>       (a2.x === b2.x && a2.y === b2.y);
+>     if (sharesEndpoint) continue;
+>
+>     if (segmentIntersectsStrict(a1, a2, b1, b2)) return true;
+>   }
+>   return false;
+> }
+>
+> export function computeCurrentCounts(islands, bridges) {
+>   const { byXY } = buildOccupancy(islands);
+>   const counts = new Map();
+>   for (const isl of islands) counts.set(isl.id, 0);
+>
+>   for (const [k, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const [x1, y1, x2, y2] = k.split(',').map(Number);
+>     const a = byXY.get(`${x1},${y1}`);
+>     const b = byXY.get(`${x2},${y2}`);
+>     if (!a || !b) continue;
+>     counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+>     counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+>   }
+>
+>   return counts;
+> }
+>
+> export function checkConnectivity(islands, bridges) {
+>   if (islands.length === 0) return true;
+>   const { byXY } = buildOccupancy(islands);
+>
+>   const adj = new Map();
+>   for (const isl of islands) adj.set(isl.id, new Set());
+>
+>   for (const [k, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const [x1, y1, x2, y2] = k.split(',').map(Number);
+>     const a = byXY.get(`${x1},${y1}`);
+>     const b = byXY.get(`${x2},${y2}`);
+>     if (!a || !b) continue;
+>     adj.get(a.id).add(b.id);
+>     adj.get(b.id).add(a.id);
+>   }
+>
+>   const seen = new Set();
+>   const stack = [islands[0].id];
+>   while (stack.length) {
+>     const cur = stack.pop();
+>     if (seen.has(cur)) continue;
+>     seen.add(cur);
+>     for (const nxt of adj.get(cur) || []) {
+>       if (!seen.has(nxt)) stack.push(nxt);
+>     }
+>   }
+>   return seen.size === islands.length;
+> }
+>
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   if (!from || !to || from.id === to.id) return { valid: true, error: null };
+>
+>   if (!areAdjacent(islands, from, to)) {
+>     return { valid: false, error: 'Cannot connect non-adjacent islands' };
+>   }
+>
+>   const k = keyFromCoords(from, to);
+>   const current = bridges.get(k) ?? 0;
+>   const next = current + delta;
+>
+>   if (next > 2) return { valid: false, error: 'Max 2 bridges per pair' };
+>   if (next < 0) return { valid: true, error: null };
+>
+>   const counts = computeCurrentCounts(islands, bridges);
+>   const fromCount = (counts.get(from.id) ?? 0) + delta;
+>   const toCount = (counts.get(to.id) ?? 0) + delta;
+>   if (fromCount > from.value || toCount > to.value) {
+>     return { valid: false, error: 'Island would exceed its number' };
+>   }
+>
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+dow.removeEventListener('keydown', onKeyDown);
+>   }, [islands, bridges, cursorIslandId, selectedIslandId, error]);
+>
+>   const bridgeSegments = useMemo(() => computeBridgeSegments(islands, bridges), [islands, bridges]);
+>
+>   return (
+>     <div className="app">
+>       <div className="controls">
+>         <label>
+>           Puzzle:{' '}
+>           <select value={puzzleKey} onChange={(e) => resetAllStateToPuzzle(e.target.value)}>
+>             {PUZZLE_OPTIONS.map((k) => (
+>               <option key={k} value={k}>
+>                 {k}
+>               </option>
+>             ))}
+>           </select>
+>         </label>
+>         <button
+>           onClick={() => {
+>             setBridges(new Map());
+>             setSelectedIslandId(null);
+>             setError(null);
+>             setCursorIslandId(0);
+>           }}
+>         >
+>           Reset
+>         </button>
+>       </div>
+>
+>       {error ? <div className="error-message">{error}</div> : null}
+>       {victory ? <div className="victory-banner">SOLVED!</div> : null}
+>
+>       <svg className="board" width={SVG_W} height={SVG_H} viewBox={`0 0 ${SVG_W} ${SVG_H}`}>
+>         {/* Bridges */}
+>         {bridgeSegments.flatMap((seg) => {
+>           const p1 = { x: seg.from.x * GRID, y: seg.from.y * GRID };
+>           const p2 = { x: seg.to.x * GRID, y: seg.to.y * GRID };
+>
+>           const isHoriz = p1.y === p2.y;
+>           const off = 6;
+>           if (seg.count === 1) {
+>             return [
+>               <line
+>                 key={`${seg.key}-1`}
+>                 x1={p1.x}
+>                 y1={p1.y}
+>                 x2={p2.x}
+>                 y2={p2.y}
+>                 stroke="rgba(0,255,102,0.85)"
+>                 strokeWidth={4}
+>               />
+>             ];
+>           }
+>           if (seg.count === 2) {
+>             return [
+>               <line
+>                 key={`${seg.key}-a`}
+>                 x1={p1.x + (isHoriz ? 0 : -off)}
+>                 y1={p1.y + (isHoriz ? -off : 0)}
+>                 x2={p2.x + (isHoriz ? 0 : -off)}
+>                 y2={p2.y + (isHoriz ? -off : 0)}
+>                 stroke="rgba(0,255,102,0.85)"
+>                 strokeWidth={4}
+>               />,
+>               <line
+>                 key={`${seg.key}-b`}
+>                 x1={p1.x + (isHoriz ? 0 : off)}
+>                 y1={p1.y + (isHoriz ? off : 0)}
+>                 x2={p2.x + (isHoriz ? 0 : off)}
+>                 y2={p2.y + (isHoriz ? off : 0)}
+>                 stroke="rgba(0,255,102,0.85)"
+>                 strokeWidth={4}
+>               />
+>             ];
+>           }
+>           return [];
+>         })}
+>
+>         {/* Cursor highlight (not a circle) */}
+>         {(() => {
+>           const cursor = findIslandById(islands, cursorIslandId) || islands[0];
+>           if (!cursor) return null;
+>           const { cx, cy } = islandPixel(cursor);
+>           return (
+>             <g>
+>               <rect
+>                 x={cx - 18}
+>                 y={cy - 18}
+>                 width={36}
+>                 height={36}
+>                 fill="none"
+>                 stroke={selectedIslandId != null ? 'rgba(0,255,102,1)' : 'rgba(0,255,102,0.7)'}
+>                 strokeWidth={2}
+>               />
+>               <rect
+>                 x={cx - 22}
+>                 y={cy - 22}
+>                 width={44}
+>                 height={44}
+>                 fill="none"
+>                 stroke="rgba(0,255,102,0.25)"
+>                 strokeWidth={2}
+>               />
+>             </g>
+>           );
+>         })()}
+>
+>         {/* Islands */}
+>         {islands.map((isl) => {
+>           const { cx, cy } = islandPixel(isl);
+>           const isSelected = selectedIslandId === isl.id;
+>
+>           return (
+>             <g key={isl.id}>
+>               <circle
+>                 cx={cx}
+>                 cy={cy}
+>                 r={14}
+>                 fill="#000"
+>                 stroke={isSelected ? 'rgba(0,255,102,1)' : 'rgba(0,255,102,0.85)'}
+>                 strokeWidth={3}
+>                 onClick={() => onIslandLeftClick(isl)}
+>                 onContextMenu={(e) => onIslandRightClick(e, isl)}
+>                 onMouseDown={(e) => onIslandMouseDown(e, isl)}
+>               />
+>               <text x={cx} y={cy + 5} textAnchor="middle" fontSize={14} fill="rgba(0,255,102,0.95)">
+>                 {isl.value}
+>               </text>
+>             </g>
+>           );
+>         })}
+>       </svg>
+>     </div>
+>   );
+> }
+> EOF
+root@9e5c6026fed6:/app# node -e "import('./src/utils/hashiLogic.js').then(()=>console.log('hashiLogic ok'))"
+hashiLogic ok
+root@9e5c6026fed6:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-BTihwCBT.css    0.77 kB │ gzip:  0.43 kB
+dist/assets/index-IDVd1QWq.js   150.18 kB │ gzip: 48.66 kB
+✓ built in 1.01s
+root@9e5c6026fed6:/app#

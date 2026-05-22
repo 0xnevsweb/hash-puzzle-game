@@ -1,0 +1,343 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+
+New Terminal Output:
+
+root@c86fca3e4905:/app# cat > /app/src/data/puzzles.js << 'EOF'
+> export const puzzles = [
+>   {
+>     id: 1,
+>     name: "Easy",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 2 },
+>       { id: 2, x: 2, y: 6, value: 2 },
+>       { id: 3, x: 6, y: 6, value: 2 }
+>     ]
+>   },
+>   {
+>     id: 2,
+>     name: "Medium",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 3 },
+>       { id: 2, x: 10, y: 2, value: 1 },
+>       { id: 3, x: 2, y: 6, value: 2 },
+>       { id: 4, x: 6, y: 6, value: 2 }
+>     ]
+>   },
+>   {
+>     id: 3,
+>     name: "Hard",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 3 },
+>       { id: 1, x: 6, y: 2, value: 4 },
+>       { id: 2, x: 10, y: 2, value: 2 },
+>       { id: 3, x: 2, y: 6, value: 2 },
+>       { id: 4, x: 6, y: 6, value: 3 },
+>       { id: 5, x: 10, y: 6, value: 2 }
+>     ]
+>   }
+> ];
+> EOF
+root@c86fca3e4905:/app# mkdir -p /app/src/utils
+root@c86fca3e4905:/app# cat > /app/src/utils/hashiLogic.js << 'EOF'
+> // Get canonical bridge key - endpoint with smaller x (then y) comes first
+> export function getBridgeKey(island1, island2) {
+>   const x1 = island1.x, y1 = island1.y;
+>   const x2 = island2.x, y2 = island2.y;
+>   if (x1 < x2 || (x1 === x2 && y1 < y2)) {
+>     return `${x1},${y1},${x2},${y2}`;
+>   }
+>   return `${x2},${y2},${x1},${y1}`;
+> }
+>
+> // Check if two islands are adjacent (same row/col, no island between them)
+> export function areAdjacent(islands, from, to) {
+>   if (from.id === to.id) return false;
+>   if (from.x !== to.x && from.y !== to.y) return false;
+>
+>   if (from.x === to.x) {
+>     // Same column - check for islands between them vertically
+>     const minY = Math.min(from.y, to.y);
+>     const maxY = Math.max(from.y, to.y);
+>     for (const island of islands) {
+>       if (island.id === from.id || island.id === to.id) continue;
+>       if (island.x === from.x && island.y > minY && island.y < maxY) {
+>         return false;
+>       }
+>     }
+>   } else {
+>     // Same row - check for islands between them horizontally
+>     const minX = Math.min(from.x, to.x);
+>     const maxX = Math.max(from.x, to.x);
+>     for (const island of islands) {
+>       if (island.id === from.id || island.id === to.id) continue;
+>       if (island.y === from.y && island.x > minX && island.x < maxX) {
+>         return false;
+>       }
+>     }
+>   }
+>   return true;
+> }
+>
+> // Check if a bridge between from and to would cross any existing bridge
+> export function wouldCross(islands, bridges, from, to) {
+>   // The new bridge segment
+>   const isHorizontal = from.y === to.y;
+>
+>   for (const [key, count] of bridges) {
+>     if (count === 0) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     const existingHorizontal = y1 === y2;
+>
+>     // Parallel bridges cannot cross
+>     if (isHorizontal === existingHorizontal) continue;
+>
+>     // Perpendicular - check intersection
+>     if (isHorizontal) {
+>       // New bridge is horizontal, existing is vertical
+>       const hMinX = Math.min(from.x, to.x);
+>       const hMaxX = Math.max(from.x, to.x);
+>       const hY = from.y;
+>       const vX = x1; // x1 === x2 for vertical
+>       const vMinY = Math.min(y1, y2);
+>       const vMaxY = Math.max(y1, y2);
+>
+>       if (vX > hMinX && vX < hMaxX && hY > vMinY && hY < vMaxY) {
+>         return true;
+>       }
+>     } else {
+>       // New bridge is vertical, existing is horizontal
+>       const vMinY = Math.min(from.y, to.y);
+>       const vMaxY = Math.max(from.y, to.y);
+>       const vX = from.x;
+>       const hY = y1; // y1 === y2 for horizontal
+>       const hMinX = Math.min(x1, x2);
+>       const hMaxX = Math.max(x1, x2);
+>
+>       if (vX > hMinX && vX < hMaxX && hY > vMinY && hY < vMaxY) {
+>         return true;
+>       }
+>     }
+>   }
+>   return false;
+> }
+>
+> // Compute current bridge counts for each island
+> export function computeCurrentCounts(islands, bridges) {
+>   const counts = new Map();
+>   for (const island of islands) {
+>     counts.set(island.id, 0);
+>   }
+>
+>   for (const [key, count] of bridges) {
+>     if (count === 0) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>
+>     for (const island of islands) {
+>       if ((island.x === x1 && island.y === y1) || (island.x === x2 && island.y === y2)) {
+>         counts.set(island.id, (counts.get(island.id) || 0) + count);
+>       }
+>     }
+>   }
+>
+>   return counts;
+> }
+>
+> // Check if adding delta bridges between from and to is valid
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   // Check adjacency
+>   if (!areAdjacent(islands, from, to)) {
+>     return { valid: false, error: "Cannot connect non-adjacent islands" };
+>   }
+>
+>   const key = getBridgeKey(from, to);
+>   const current = bridges.get(key) || 0;
+>   const newCount = current + delta;
+>
+>   // Check max bridges
+>   if (newCount > 2) {
+>     return { valid: false, error: "Max 2 bridges per pair" };
+>   }
+>
+>   // Check island capacity
+>   const counts = computeCurrentCounts(islands, bridges);
+>   const fromCount = counts.get(from.id) || 0;
+>   const toCount = counts.get(to.id) || 0;
+>
+>   if (fromCount + delta > from.value || toCount + delta > to.value) {
+>     return { valid: false, error: "Island would exceed its number" };
+>   }
+>
+>   // Check crossing (only for new bridges, not existing ones being incremented)
+>   if (current === 0) {
+>     if (wouldCross(islands, bridges, from, to)) {
+>       return { valid: false, error: "Bridges would cross" };
+>     }
+>   }
+>
+>   return { valid: true, error: null };
+> }
+>
+> // Check if all islands are connected through bridges
+> export function checkConnectivity(islands, bridges) {
+>   if (islands.length === 0) return true;
+>   if (islands.length === 1) return true;
+>
+>   // Build adjacency list based on bridges
+>   const adj = new Map();
+>   for (const island of islands) {
+>     adj.set(island.id, []);
+>   }
+>
+>   for (const [key, count] of bridges) {
+>     if (count === 0) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>
+>     let id1 = null, id2 = null;
+>     for (const island of islands) {
+>       if (island.x === x1 && island.y === y1) id1 = island.id;
+>       if (island.x === x2 && island.y === y2) id2 = island.id;
+>     }
+>
+>     if (id1 !== null && id2 !== null) {
+>       adj.get(id1).push(id2);
+>       adj.get(id2).push(id1);
+>     }
+>   }
+>
+>   // BFS from first island
+>   const visited = new Set();
+>   const queue = [islands[0].id];
+>   visited.add(islands[0].id);
+>
+>   while (queue.length > 0) {
+>     const current = queue.shift();
+>     for (const neighbor of adj.get(current)) {
+>       if (!visited.has(neighbor)) {
+>         visited.add(neighbor);
+>         queue.push(neighbor);
+>       }
+>     }
+>   }
+>
+>   return visited.size === islands.length;
+> }
+>
+> // Check victory condition
+> export function isVictory(islands, bridges) {
+>   // Check all island counts are satisfied
+>   const counts = computeCurrentCounts(islands, bridges);
+>   for (const island of islands) {
+>     if ((counts.get(island.id) || 0) !== island.value) {
+>       return false;
+>     }
+>   }
+>
+>   // Check no bridges cross
+>   const bridgeList = [];
+>   for (const [key, count] of bridges) {
+>     if (count === 0) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     bridgeList.push({ x1, y1, x2, y2, horizontal: y1 === y2 });
+>   }
+>
+>   for (let i = 0; i < bridgeList.length; i++) {
+>     for (let j = i + 1; j < bridgeList.length; j++) {
+>       const a = bridgeList[i];
+>       const b = bridgeList[j];
+>       if (a.horizontal === b.horizontal) continue;
+>
+>       const h = a.horizontal ? a : b;
+>       const v = a.horizontal ? b : a;
+>
+>       const hMinX = Math.min(h.x1, h.x2);
+>       const hMaxX = Math.max(h.x1, h.x2);
+>       const hY = h.y1;
+>       const vX = v.x1;
+>       const vMinY = Math.min(v.y1, v.y2);
+>       const vMaxY = Math.max(v.y1, v.y2);
+>
+>       if (vX > hMinX && vX < hMaxX && hY > vMinY && hY < vMaxY) {
+>         return false;
+>       }
+>     }
+>   }
+>
+>   // Check connectivity
+>   return checkConnectivity(islands, bridges);
+> }
+> EOF
+root@c86fca3e4905:/app# cat > /app/src/index.css << 'EOF'
+> * {
+>   margin: 0;
+>   padding: 0;
+>   box-sizing: border-box;
+> }
+>
+> body {
+>   background-color: #000;
+>   color: #0f0;
+>   font-family: 'Courier New', Courier, monospace;
+>   overflow: hidden;
+> }
+>
+> .game-container {
+>   display: flex;
+>   flex-direction: column;
+>   align-items: flex-start;
+> }
+>
+> .controls {
+>   padding: 8px;
+>   display: flex;
+>   gap: 16px;
+>   align-items: center;
+> }
+>
+> .controls select,
+> .controls button {
+>   background: #000;
+>   color: #0f0;
+>   border: 1px solid #0f0;
+>   font-family: 'Courier New', Courier, monospace;
+>   font-size: 14px;
+>   padding: 4px 8px;
+>   cursor: pointer;
+> }
+>
+> .controls select:hover,
+> .controls button:hover {
+>   background: #0f0;
+>   color: #000;
+> }
+>
+> .error-message {
+>   color: #f00;
+>   font-family: 'Courier New', Courier, monospace;
+>   font-size: 14px;
+>   padding: 4px 8px;
+>   min-height: 20px;
+> }
+>
+> .victory-banner {
+>   color: #0f0;
+>   font-family: 'Courier New', Courier, monospace;
+>   font-size: 24px;
+>   padding: 8px;
+>   border: 2px solid #0f0;
+>   text-align: center;
+>   animation: blink 1s infinite;
+> }
+>
+> @keyframes blink {
+>   0%, 100% { opacity: 1; }
+>   50% { opacity: 0.5; }
+> }
+>
+> svg {
+>   display: block;
+> }
+> EOF
+root@c86fca3e4905:/app#

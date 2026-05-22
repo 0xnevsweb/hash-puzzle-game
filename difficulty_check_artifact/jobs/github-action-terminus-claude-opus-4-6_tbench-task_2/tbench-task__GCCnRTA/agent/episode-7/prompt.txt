@@ -1,0 +1,25 @@
+New Terminal Output:
+
+root@c86fca3e4905:/app# ls -la /app/dist/
+total 16
+drwxr-xr-x 3 root root   75 May 22 09:46 .
+drwxr-xr-x 8 root root 4096 May 22 09:46 ..
+drwxr-xr-x 2 root root   57 May 22 09:46 assets
+-rw-r--r-- 1 root root  216 May 22 09:46 favicon.svg
+-rw-r--r-- 1 root root  404 May 22 09:46 index.html
+-rw-r--r-- 1 root root   23 May 22 09:46 robots.txt
+root@c86fca3e4905:/app# cat /app/dist/index.html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hashi Puzzle Terminal</title>
+    <script type="module" crossorigin src="/assets/index-CdsrchkJ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CE2rkiJY.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+root@c86fca3e4905:/app#

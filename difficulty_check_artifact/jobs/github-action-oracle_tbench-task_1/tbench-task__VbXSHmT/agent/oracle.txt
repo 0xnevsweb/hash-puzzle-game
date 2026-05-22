@@ -1,0 +1,18 @@
+/solution/solve.sh: line 1: ﻿#!/bin/bash: No such file or directory
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 37 modules transformed.
+[plugin:vite:reporter] [plugin vite:reporter] 
+(!) /app/src/utils/hashiLogic.js is dynamically imported by /app/src/App.jsx but also statically imported by /app/src/components/Board.jsx, dynamic import will not move module into another chunk.
+
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-B_drzo9c.css    0.94 kB │ gzip:  0.43 kB
+dist/assets/index-CLGFnz_x.js   151.23 kB │ gzip: 49.17 kB
+✓ built in 968ms
+Oracle solution deployed

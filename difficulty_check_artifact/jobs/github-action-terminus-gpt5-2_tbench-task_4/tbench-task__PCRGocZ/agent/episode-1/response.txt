@@ -1,0 +1,31 @@
+{
+  "analysis": "Project is a Vite + React app. src/ exists with App.jsx, index.jsx, index.css, and src/data/puzzles.js already present (likely stub). Need to implement full Hashi game per spec: retro styling, fixed 800x600 SVG at top-left, puzzle select (Easy/Medium/Hard), reset, bridge toggling with mouse and keyboard, window-level key listeners, error messages with exact strings, victory detection, and required game logic in /app/src/utils/hashiLogic.js. Also ensure build outputs to /app/dist (check vite.config.js).",
+  "plan": "1) Inspect existing src files and vite.config.js to see current stubs and dist output. 2) Create /app/src/utils/hashiLogic.js implementing bridge storage, validation (adjacency, max 2, island counts, crossing), connectivity, victory. 3) Update puzzles.js to match exact puzzle requirements (Easy ring, Medium 5 islands, Hard denser but fitting 800x600 using 40px grid). 4) Implement App.jsx UI: SVG rendering of islands (circles + numbers), bridges (lines; two for double), non-circle cursor indicator, selection logic, mouse interactions including right-click/Ctrl+click removal, keyboard navigation + Enter/Esc behavior, error + victory banner. 5) Apply retro terminal CSS in index.css with black bg and green monospace; ensure no centering/padding. 6) Run npm run build to confirm succeeds.",
+  "commands": [
+    {
+      "keystrokes": "cat vite.config.js\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' src/App.jsx\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' src/index.jsx\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' src/index.css\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' src/data/puzzles.js\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "mkdir -p src/utils\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

@@ -1,0 +1,329 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+
+New Terminal Output:
+
+root@7ac4ab2c80d7:/app# python3 -c "
+);
+    setPuzzleIndex(idx);
+    setBridges(new Map());
+    setSelectedIsland(null);
+    setCursorIslandId(0);
+    setErrorMessage(null);
+    setVictory(false);
+  };
+
+  const handleReset = () => {
+    resetPuzzle();
+  };
+
+  // Toggle bridge between two islands: none -> single -> double -> none
+  const toggleBridge = useCallback((fromIsland, toIsland) => {
+    const key = bridgeKey(fromIsland, toIsland);
+    const current = bridges.get(key) || 0;
+
+    if (current === 0) {
+      // Try to add single
+      const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+      if (!result.valid) {
+        setErrorMessage(result.error);
+        return;
+      }
+      setErrorMessage(null);
+      const newBridges = new Map(bridges);
+      newBridges.set(key, 1);
+      setBridges(newBridges);
+      // Check victory
+      if (isVictory(islands, newBridges)) {
+        setVictory(true);
+      }
+    } else if (current === 1) {
+      // Try to add second
+      const result = canAddBridge(islands, bridges, fromIsland> import os
+>
+> app_code = '''import React, { useState, useEffect, useCallback, useRef } from 'react';
+> import { puzzles } from './data/puzzles';
+> import {
+>   bridgeKey,
+>   parseBridgeKey,
+useEffect(() => {
+    const handleKeyDown = (e) => {
+      const currentIsland = islands.find(i => i.id === cursorIslandId);
+      if (!currentIsland) return;
+
+      if (e.key === 'Escape') {
+>   canAddBridge,
+>   computeCurrentCounts,
+>   isVictory,
+>   areAdjacent
+> } from './utils/hashiLogic';
+>
+> function App() {
+>   const [puzzleIndex, setPuzzleIndex] = useState(0);
+>   const [bridges, setBridges] = useState(new Map());
+>   const [selectedIsland, setSelectedIsland] = useState(null);
+>   const [cursorIslandId, setCursorIslandId] = useState(0);
+>   const [errorMessage, setErrorMessage] = useState(null);
+>   const [victory, setVictory] = useState(false);
+>
+>   const puzzle = puzzles[puzzleIndex];
+>   const islands = puzzle.islands;
+>
+a>   // Reset everything when puzzle changes
+>   const resetPuzzle = useCallback(() => {
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setCursorIslandId(0);
+>     setErrorMessage(null);
+>     setVictory(false);
+>   }, []);
+>
+>   const handlePuzzleChange = (e) => {
+>     const idx = parseInt(e.target.value, 10);
+>     setPuzzleIndex(idx);
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setCursorIslandId(0);
+>     setErrorMessage(null);
+>     setVictory(false);
+>   };
+>
+>   const handleReset = () => {
+>     resetPuzzle();
+>   };
+>
+>   // Toggle bridge between two islands: none -> single -> double -> none
+>   const toggleBridge = useCallback((fromIsland, toIsland) => {
+>     const key = bridgeKey(fromIsland, toIsland);
+>     const current = bridges.get(key) || 0;
+>
+>     if (current === 0) {
+>       // Try to add single
+>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+>       if (!result.valid) {
+bash: !result.valid: event not found
+>         setErrorMessage(result.error);
+>         return;
+>       }
+>       setErrorMessage(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.set(key, 1);
+>       setBridges(newBridges);
+>       // Check victory
+>       if (isVictory(islands, newBridges)) {
+>         setVictory(true);
+>       }
+>     } else if (current === 1) {
+>       // Try to add second
+>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+>       if (!result.valid) {
+bash: !result.valid: event not found
+>         setErrorMessage(result.error);
+>         return;
+>       }
+>       setErrorMessage(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.set(key, 2);
+>       setBridges(newBridges);
+>       if (isVictory(islands, newBridges)) {
+>         setVictory(true);
+>       }
+>     } else {
+>       // Remove (double -> none)
+>       setErrorMessage(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.delete(key);
+>       setBridges(newBridges);
+>       setVictory(false);
+>     }
+>   }, [bridges, islands]);
+>
+>   // Remove bridge entirely
+>   const removeBridge = useCallback((fromIsland, toIsland) => {
+>     const key = bridgeKey(fromIsland, toIsland);
+>     const current = bridges.get(key) || 0;
+>     if (current > 0) {
+>       setErrorMessage(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.delete(key);
+>       setBridges(newBridges);
+>       setVictory(false);
+>     }
+>   }, [bridges]);
+>
+>   // Mouse click on island
+>   const handleIslandClick = (island, e) => {
+>     if (e.ctrlKey || e.button === 2) {
+>       // Right-click or ctrl+click - if we have a selected island, remove bridge
+>       if (selectedIsland !== null && selectedIsland.id !== island.id) {
+>         removeBridge(selectedIsland, island);
+>         setSelectedIsland(null);
+>         setCursorIslandId(island.id);
+>       }
+>       return;
+>     }
+>
+>     if (selectedIsland === null) {
+>       
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+ y2={y2}
+>               stroke=\"#0f0\"
+>               strokeWidth=\"2\"
+>               onContextMenu={(e) => handleBridgeRightClick(e, key)}
+>               onClick={(e) => {
+>                 if (e.ctrlKey) {
+>                   e.preventDefault();
+>                   const newBridges = new Map(bridges);
+>                   newBridges.delete(key);
+>                   setBridges(newBridges);
+>                   setErrorMessage(null);
+>                   setVictory(false);
+>                 }
+>               }}
+>               style={{ cursor: 'pointer' }}
+>             />
+>           );
+>           lines.push(
+>             <line
+>               key={key + '_b'}
+>               x1={x1 + offset} y1={y1} x2={x2 + offset} y2={y2}
+>               stroke=\"#0f0\"
+>               strokeWidth=\"2\"
+>               onContextMenu={(e) => handleBridgeRightClick(e, key)}
+>               onClick={(e) => {
+>                 if (e.ctrlKey) {
+>                   e.preventDefault();
+>                   const newBridges = new Map(bridges);
+>                   newBridges.delete(key);
+>                   setBridges(newBridges);
+>                   setErrorMessage(null);
+>                   setVictory(false);
+>                 }
+>               }}
+>               style={{ cursor: 'pointer' }}
+>             />
+>           );
+>         }
+>       }
+>     }
+>     return lines;
+>   };
+>
+>   // Render islands
+>   const renderIslands = () => {
+>     return islands.map(island => {
+>       const cx = island.x * 40;
+>       const cy = island.y * 40;
+>       const isSelected = selectedIsland && selectedIsland.id === island.id;
+>
+>       return (
+>         <g key={island.id}>
+>           <circle
+>             cx={cx}
+>             cy={cy}
+>             r={16}
+>             fill=\"black\"
+>             stroke={isSelected ? \"#ff0\" : \"#0f0\"}
+>             strokeWidth={isSelected ? 3 : 2}
+>             onClick={(e) => handleIslandClick(island, e)}
+>             onContextMenu={(e) => {
+>               e.preventDefault();
+>               if (selectedIsland && selectedIsland.id !== island.id) {
+>                 removeBridge(selectedIsland, island);
+>                 setSelectedIsland(null);
+>                 setCursorIslandId(island.id);
+>               }
+>             }}
+>             style={{ cursor: 'pointer' }}
+>           />
+>           <text
+>             x={cx}
+>             y={cy}
+>             textAnchor=\"middle\"
+>             dominantBaseline=\"central\"
+>             fill=\"#0f0\"
+>             fontSize=\"14\"
+>             fontFamily=\"monospace\"
+>             style={{ pointerEvents: 'none' }}
+>           >
+>             {island.value}
+>           </text>
+>         </g>
+>       );
+>     });
+>   };
+>
+>   // Render cursor (NOT a circle - use rect)
+>   const renderCursor = () => {
+>     const island = islands.find(i => i.id === cursorIslandId);
+>     if (!island) return null;
+bash: !island: event not found
+>     const cx = island.x * 40;
+>     const cy = island.y * 40;
+>     return (
+>       <rect
+>         x={cx - 20}
+>         y={cy - 20}
+>         width={40}
+>         height={40}
+>         fill=\"none\"
+>         stroke=\"#0ff\"
+>         strokeWidth=\"2\"
+>         strokeDasharray=\"4 2\"
+>         style={{ pointerEvents: 'none' }}
+>       />
+>     );
+>   };
+>
+>   return (
+>     <div style={{ background: 'black', minHeight: '100vh', padding: 0, margin: 0 }}>
+>       <div style={{ padding: '10px', fontFamily: 'monospace', color: '#0f0' }}>
+>         <select
+>           value={puzzleIndex}
+>           onChange={handlePuzzleChange}
+>           style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace', marginRight: '10px' }}
+>         >
+>           {puzzles.map((p, idx) => (
+>             <option key={p.id} value={idx}>{p.name}</option>
+>           ))}
+>         </select>
+>         <button
+>           onClick={handleReset}
+>           style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace', cursor: 'pointer' }}
+>         >
+>           Reset
+>         </button>
+>       </div>
+>       {errorMessage && (
+>         <div className=\"error-message\" style={{ color: '#f00', fontFamily: 'monospace', padding: '5px 10px' }}>
+>           {errorMessage}
+>         </div>
+>       )}
+>       {victory && (
+>         <div className=\"victory-banner\" style={{ color: '#0f0', fontFamily: 'monospace', padding: '5px 10px', fontSize: '24px', fontWeight: 'bold' }}>
+>           SOLVED!
+>         </div>
+>       )}
+>       <svg
+>         width={800}
+>         height={600}
+>         style={{ display: 'block' }}
+>         onContextMenu={handleContextMenu}
+>       >
+>         {renderBridges()}
+>         {renderIslands()}
+>         {renderCursor()}
+>       </svg>
+>     </div>
+>   );
+> }
+>
+> export default App;
+> '''
+>
+> with open('/app/src/App.jsx', 'w') as f:
+>     f.write(app_code)
+> print('App.jsx written successfully')
+> "
+App.jsx written successfully
+root@7ac4ab2c80d7:/app#

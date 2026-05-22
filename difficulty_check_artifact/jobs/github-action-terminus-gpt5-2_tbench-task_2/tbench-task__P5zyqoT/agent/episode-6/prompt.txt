@@ -1,0 +1,41 @@
+Current Terminal Screen:
+dist/robots.txt
+dist/assets/index-BtJduZyr.css
+dist/assets/index-R6YvxfFG.js
+dist/index.html
+root@3c6e8d91c1b3:/app# grep -R "error-message\|victory-banner\|SOLVED!\|Cannot connect non-adjacent islands\|Max 2 bridges per pair\|Island would exceed its nu
+mber\|Bridges would cross" -n src | sed -n '1,200p'
+bash: !\: event not found
+root@3c6e8d91c1b3:/app# grep -R -n 'error-message\|victory-banner\|SOLVED\|Cannot connect non-adjacent islands\|Max 2 bridges per pair\|Island would exceed its
+number\|Bridges would cross' src | sed -n '1,200p'
+src/App.jsx:240:      {error ? <div className="error-message">{error}</div> : null}
+src/App.jsx:241:      {!error && victory ? <div className="victory-banner">SOLVED!</div> : null}
+src/index.css:40:.error-message {
+src/index.css:50:.victory-banner {
+src/utils/hashiLogic.js:1:const ERROR_NON_ADJ = 'Cannot connect non-adjacent islands';
+src/utils/hashiLogic.js:2:const ERROR_MAX2 = 'Max 2 bridges per pair';
+src/utils/hashiLogic.js:3:const ERROR_EXCEED = 'Island would exceed its number';
+src/utils/hashiLogic.js:4:const ERROR_CROSS = 'Bridges would cross';
+root@3c6e8d91c1b3:/app# perl -0777 -i -pe 's/const onIslandRemoveGesture = \(e, isl\) => \{\n    e\.preventDefault\(\);\n    if \(selectedId === null\) return;\
+n    if \(selectedId === isl\.id\) return;\n    const from = islandsById\.get\(selectedId\);\n    removeBridge\(from, isl\);\n  \};/const onIslandRemoveGesture
+= (e, isl) => {\n    e.preventDefault();\n    if (selectedId === null) {\n      setSelectedId(isl.id);\n      setCursorId(isl.id);\n      return;\n    }\n    if
+ (selectedId === isl.id) return;\n    const from = islandsById.get(selectedId);\n    removeBridge(from, isl);\n  };/s' src/App.jsx
+root@3c6e8d91c1b3:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-BtJduZyr.css    0.62 kB │ gzip:  0.31 kB
+dist/assets/index-YbSwSSZc.js   149.71 kB │ gzip: 48.72 kB
+✓ built in 1.11s
+root@3c6e8d91c1b3:/app#
+root@3c6e8d91c1b3:/app# ls -la dist/assets | sed -n '1,120p'
+total 152
+drwxr-xr-x 2 root root     57 May 22 09:47 .
+drwxr-xr-x 3 root root     75 May 22 09:47 ..
+-rw-r--r-- 1 root root    617 May 22 09:47 index-BtJduZyr.css
+-rw-r--r-- 1 root root 149707 May 22 09:47 index-YbSwSSZc.js
+root@3c6e8d91c1b3:/app#

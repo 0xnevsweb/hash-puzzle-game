@@ -1,0 +1,37 @@
+New Terminal Output:
+
+root@93b5f974abb4:/app# cat dist/index.html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hashi Puzzle Terminal</title>
+    <script type="module" crossorigin src="/assets/index-CqQJhrJM.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-R8CJUEfB.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+root@93b5f974abb4:/app# grep -n 'function App' src/App.jsx
+5:function App() {
+root@93b5f974abb4:/app# sed -n '1,5p' src/App.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { puzzles } from './data/puzzles';
+import { makeBridgeKey, canAddBridge, computeCurrentCounts, isVictory, areAdjacent } from './utils/hashiLogic';
+
+function App() {
+root@93b5f974abb4:/app# sed -n '280,290p' src/App.jsx
+  };
+
+  // Render cursor as a rect (NOT a circle)
+  const renderCursor = () => {
+    const island = islands.find(i => i.id === cursorIslandId);
+    if (!island) return null;
+    const px = island.x * 40;
+    const py = island.y * 40;
+    const size = 34;
+    return (
+      <rect
+root@93b5f974abb4:/app#

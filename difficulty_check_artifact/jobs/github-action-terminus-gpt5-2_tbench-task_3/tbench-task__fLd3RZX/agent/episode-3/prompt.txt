@@ -1,0 +1,317 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected after JSON object
+
+New Terminal Output:
+
+root@668653bc8018:/app# mkdir -p src/utils
+root@668653bc8018:/app# cat > src/utils/hashiLogic.js <<'EOF'
+> // Game logic utilities for Hashi (Bridges)
+>
+> export const ERR_NON_ADJACENT = 'Cannot connect non-adjacent islands';
+> export const ERR_MAX_PER_PAIR = 'Max 2 bridges per pair';
+> export const ERR_EXCEED_ISLAND = 'Island would exceed its number';
+> export const ERR_CROSS = 'Bridges would cross';
+>
+> export function canonicalKey(a, b) {
+>   const p1 = { x: a.x, y: a.y };
+>   const p2 = { x: b.x, y: b.y };
+>   const first = p1.x < p2.x || (p1.x === p2.x && p1.y <= p2.y) ? p1 : p2;
+>   const second = first === p1 ? p2 : p1;
+>   return `${first.x},${first.y},${second.x},${second.y}`;
+> }
+>
+> function isAligned(a, b) {
+>   return a.x === b.x || a.y === b.y;
+> }
+>
+ > function isBetween(v, a, b) {
+>   return v > Math.min(a, b) && v < Math.max(a, b);
+> }
+>
+> export function getBridgeSegments(bridges) {
+>   // returns array of {x1,y1,x2,y2}
+>   const segs = [];
+>   for (const [key, count] of bridges.entries()) {
+>     if (!count) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     segs.push({ x1, y1, x2, y2, count });
+>   }
+>   return segs;
+> }
+>
+> export function areAdjacent(islands, from, to) {
+>   if (!from || !to) return false;
+>   if (!isAligned(from, to)) return false;
+>   // No island strictly between them along the line.
+>   if (from.x === to.x) {
+>     const x = from.x;
+>     const y1 = from.y;
+>     const y2 = to.y;
+>     for (const isl of islands) {
+>       if (isl.id === from.id || isl.id === to.id) continue;
+>       if (isl.x === x && isBetween(isl.y, y1, y2)) return false;
+>     }
+>     return true;
+>   }
+>   const y = from.y;
+>   const x1 = from.x;
+>   const x2 = to.x;
+>   for (const isl of islands) {
+>     if (isl.id === from.id || isl.id === to.id) continue;
+>     if (isl.y === y && isBetween(isl.x, x1, x2)) return false;
+>   }
+>   return true;
+> }
+>
+> function segmentsCross(segA, segB) {
+>   // Only consider perpendicular crossings that intersect at a point that is not an endpoint.
+>   const aVert = segA.x1 === segA.x2;
+>   const bVert = segB.x1 === segB.x2;
+>   if (aVert === bVert) return false;
+>
+>   const vert = aVert ? segA : segB;
+>   const hori = aVert ? segB : segA;
+>
+>   const ix = vert.x1;
+>   const iy = hori.y1;
+>
+>   // intersection must be strictly inside both segments
+>   if (!isBetween(ix, hori.x1, hori.x2)) return false;
+>   if (!isBetween(iy, vert.y1, vert.y2)) return false;
+>
+>   return true;
+> }
+>
+> export function anyCrossing(bridges) {
+>   const segs = getBridgeSegments(bridges);
+>   for (let i = 0; i < segs.length; i++) {
+>     for (let j = i + 1; j < segs.length; j++) {
+>       if (segmentsCross(segs[i], segs[j])) return true;
+>     }
+>   }
+>   return false;
+> }
+>
+> export function computeCurrentCounts(islands, bridges) {
+>   const counts = new Map();
+>   for (const isl of islands) counts.set(isl.id, 0);
+>
+>   for (const [key, count] of bridges.entries()) {
+>     if (!count) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     const a = islands.find((i) => i.x === x1 && i.y === y1);
+>     const b = islands.find((i) => i.x === x2 && i.y === y2);
+>     if (!a || !b) continue;
+>     counts.set(a.id, (counts.get(a.id) ?? 0) + count);
+>     counts.set(b.id, (counts.get(b.id) ?? 0) + count);
+>   }
+>   return counts;
+> }
+>
+> export function checkConnectivity(islands, bridges) {
+>   if (islands.length === 0) return true;
+>   const adj = new Map();
+>   for (const isl of islands) adj.set(isl.id, []);
+>
+>   for (const [key, count] of bridges.entries()) {
+>     if (!count) continue;
+>     const [x1, y1, x2, y2] = key.split(',').map(Number);
+>     const a = islands.find((i) => i.x === x1 && i.y === y1);
+>     const b = islands.find((i) => i.x === x2 && i.y === y2);
+>     if (!a || !b) continue;
+>     adj.get(a.id).push(b.id);
+>     adj.get(b.id).push(a.id);
+>   }
+>
+>   const startId = islands[0].id;
+>   const seen = new Set([startId]);
+>   const q = [startId];
+>   while (q.length) {
+>     const cur = q.shift();
+>     for (const nxt of adj.get(cur) || []) {
+>       if (!seen.has(nxt)) {
+>         seen.add(nxt);
+>         q.push(nxt);
+>       }
+>     }
+>   }
+>
+>   return seen.size === islands.length;
+> }
+>
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   if (!from || !to || from.id === to.id) return { valid: true, error: null };
+>   if (!areAdjacent(islands, from, to)) return { valid: false, error: ERR_NON_ADJACENT };
+>
+>   const key = canonicalKey(from, to);
+>   const current = bridges.get(key) ?? 0;
+>   const next = current + delta;
+>
+>   if (next < 0) return { valid: true, error: null };
+>   if (next > 2) return { valid: false, error: ERR_MAX_PER_PAIR };
+>
+>   // island counts
+>   const counts = computeCurrentCounts(islands, bridges);
+>   const fromCount = (counts.get(from.id) ?? 0) + delta;
+>   const toCount = (counts.get(to.id) ?? 0) + delta;
+>   if (fromCount > from.value || toCount > to.val
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+ft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown') {
+>         e.preventDefault();
+>         const dir =
+>           key === 'ArrowLeft'
+>             ? 'left'
+>             : key === 'ArrowRight'
+>               ? 'right'
+>               : key === 'ArrowUp'
+>                 ? 'up'
+>                 : 'down';
+>         const next = findNextIslandInDirection(islandsRef.current, cur, dir);
+>         if (next) setCursorId(next.id);
+>         return;
+>       }
+>
+>       if (key === 'Enter') {
+>         e.preventDefault();
+>         const sel = selectedRef.current;
+>         if (sel == null) {
+>           setSelectedId(cur.id);
+>           return;
+>         }
+>         if (sel === cur.id) {
+>           setSelectedId(cur.id);
+>           return;
+>         }
+>         const from = islandById(islandsRef.current, sel);
+>         cycleBridge(from, cur);
+>       }
+>     }
+>
+>     window.addEventListener('keydown', onKeyDown);
+>     return () => window.removeEventListener('keydown', onKeyDown);
+>   }, []);
+>
+>   const cursorIsland = islandById(islands, cursorId) || islands[0];
+>
+>   const bridgeLineEls = [];
+>   for (const [key, count] of bridges.entries()) {
+>     const lines = bridgeLinesFor(key, count);
+>     for (let i = 0; i < lines.length; i++) {
+>       const ln = lines[i];
+>       bridgeLineEls.push(
+>         <line key={`${key}:${i}`} {...ln} {...svgLineProps()} />
+>       );
+>     }
+>   }
+>
+>   return (
+>     <div style={{ position: 'relative' }}>
+>       <div style={{ padding: 8 }}>
+>         <label>
+>           Puzzle:{' '}
+>           <select
+>             value={puzzleIndex}
+>             onChange={(e) => changePuzzle(Number(e.target.value))}
+>             style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace' }}
+>           >
+>             <option value={0}>Easy</option>
+>             <option value={1}>Medium</option>
+>             <option value={2}>Hard</option>
+>           </select>
+>         </label>
+>         <button
+>           onClick={resetAll}
+>           style={{
+>             marginLeft: 8,
+>             background: 'black',
+>             color: '#0f0',
+>             border: '1px solid #0f0',
+>             fontFamily: 'monospace',
+>             cursor: 'pointer',
+>           }}
+>         >
+>           Reset
+>         </button>
+>         {error ? <div className="error-message" style={{ marginTop: 8 }}>{error}</div> : null}
+>         {victory ? <div className="victory-banner" style={{ marginTop: 8, fontWeight: 'bold' }}>SOLVED!</div> : null}
+>       </div>
+>
+>       <svg
+>         width={SVG_W}
+>         height={SVG_H}
+>         style={{ display: 'block' }}
+>         onContextMenu={(e) => e.preventDefault()}
+>       >
+>         {bridgeLineEls}
+>
+>         {/* cursor (must not be a circle) */}
+>         {cursorIsland ? (
+>           <rect
+>             x={cursorIsland.x * GRID_PX - 18}
+>             y={cursorIsland.y * GRID_PX - 18}
+>             width={36}
+>             height={36}
+>             fill="none"
+>             stroke="#0f0"
+>             strokeWidth={2}
+>             strokeDasharray="4 2"
+>           />
+>         ) : null}
+>
+>         {islands.map((isl) => {
+>           const px = isl.x * GRID_PX;
+>           const py = isl.y * GRID_PX;
+>           const isSelected = selectedId === isl.id;
+>           return (
+>             <g key={isl.id}>
+>               <circle
+>                 cx={px}
+>                 cy={py}
+>                 r={14}
+>                 fill="black"
+>                 stroke={isSelected ? '#0f0' : '#0f0'}
+>                 strokeWidth={isSelected ? 4 : 2}
+>                 onMouseDown={(e) => onIslandMouseDown(e, isl)}
+>               />
+>               <text
+>                 x={px}
+>                 y={py + 5}
+>                 textAnchor="middle"
+>                 fontSize={14}
+>                 fill="#0f0"
+>                 style={{ userSelect: 'none', pointerEvents: 'none' }}
+>               >
+>                 {isl.value}
+>               </text>
+>
+>               {/* optional current count indicator */}
+>               <text
+>                 x={px}
+>                 y={py + 28}
+>                 textAnchor="middle"
+>                 fontSize={10}
+>                 fill="#0f0"
+>                 style={{ userSelect: 'none', pointerEvents: 'none', opacity: 0.7 }}
+>               >
+>                 {counts.get(isl.id) ?? 0}/{isl.value}
+>               </text>
+>             </g>
+>           );
+>         })}
+>       </svg>
+>
+>       {/* prevent default context menu selection issues */}
+>       <div style={{ padding: 8, opacity: 0.7 }}>
+>         Mouse: click island A then B to cycle bridge. Right-click or Ctrl+click removes. Keyboard: arrows move cursor, Enter selects/toggles, Esc cancels.
+>       </div>
+>     </div>
+>   );
+> }
+> EOF
+root@668653bc8018:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming (24) node_modules/react-dom/client.js

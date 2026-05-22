@@ -1,0 +1,67 @@
+New Terminal Output:
+
+root@93b5f974abb4:/app# head -40 src/App.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { puzzles } from './data/puzzles';
+import { makeBridgeKey, canAddBridge, computeCurrentCounts, isVictory, areAdjacent } from './utils/hashiLogic';
+
+function App() {
+  const [puzzleIndex, setPuzzleIndex] = useState(0);
+  const [bridges, setBridges] = useState(new Map());
+  const [selectedIsland, setSelectedIsland] = useState(null);
+  const [cursorIslandId, setCursorIslandId] = useState(0);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [victory, setVictory] = useState(false);
+
+  const puzzle = puzzles[puzzleIndex];
+  const islands = puzzle.islands;
+
+  // Reset everything when puzzle changes
+  const resetPuzzle = useCallback(() => {
+    setBridges(new Map());
+    setSelectedIsland(null);
+    setCursorIslandId(0);
+    setErrorMsg(null);
+    setVictory(false);
+  }, []);
+
+  const handlePuzzleChange = (e) => {
+    const idx = parseInt(e.target.value, 10);
+    setPuzzleIndex(idx);
+    setBridges(new Map());
+    setSelectedIsland(null);
+    setCursorIslandId(0);
+    setErrorMsg(null);
+    setVictory(false);
+  };
+
+  const handleReset = () => {
+    setBridges(new Map());
+    setSelectedIsland(null);
+    setCursorIslandId(0);
+    setErrorMsg(null);
+    setVictory(false);
+root@93b5f974abb4:/app# tail -20 src/App.jsx
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="controls">
+        <select value={puzzleIndex} onChange={handlePuzzleChange}>
+          {puzzles.map((p, idx) => (
+            <option key={p.id} value={idx}>{p.name}</option>
+          ))}
+        </select>
+        <button onClick={handleReset}>Reset</button>
+        {errorMsg && <span className="error-message">{errorMsg}</span>}
+        {victory && <span className="victory-banner">SOLVED!</span>}
+      </div>
+    </div>
+  );
+}
+
+export default App;
+root@93b5f974abb4:/app# wc -l src/App.jsx
+345 src/App.jsx
+root@93b5f974abb4:/app#

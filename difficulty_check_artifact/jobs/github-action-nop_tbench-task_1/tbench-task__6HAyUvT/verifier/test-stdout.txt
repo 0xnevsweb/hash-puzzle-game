@@ -1,0 +1,35 @@
+[WebServer] [43m[1m WARN [22m[49m Checking for updates failed (use `--debug` to see full error)
+Error: Timed out waiting 15000ms from config.webServer.
+
+
+ RUN  v2.1.9 /tests
+
+ ❯ unit/hashiLogic.spec.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  unit/hashiLogic.spec.ts [ unit/hashiLogic.spec.ts ]
+Error: Failed to resolve import "../../app/src/utils/hashiLogic.js" from "unit/hashiLogic.spec.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /tests/unit/hashiLogic.spec.ts:7:7
+  5  |    checkConnectivity,
+  6  |    computeCurrentCounts
+  7  |  } from "../../app/src/utils/hashiLogic.js";
+     |          ^
+  8  |  const makeEasy = () => [
+  9  |    { id: 0, x: 2, y: 2, value: 2 },
+ ❯ TransformPluginContext._formatError ../opt/tests-staging/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49258:41
+ ❯ TransformPluginContext.error ../opt/tests-staging/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49253:16
+ ❯ normalizeUrl ../opt/tests-staging/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64307:23
+ ❯ ../opt/tests-staging/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64439:39
+ ❯ TransformPluginContext.transform ../opt/tests-staging/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:64366:7
+ ❯ PluginContainer.transform ../opt/tests-staging/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:49099:18
+ ❯ loadAndTransform ../opt/tests-staging/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51978:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  09:37:21
+   Duration  555ms (transform 14ms, setup 0ms, collect 0ms, tests 0ms, environment 276ms, prepare 61ms)
+

@@ -1,0 +1,319 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+
+New Terminal Output:
+
+root@7ac4ab2c80d7:/app# cat > /tmp/write_app2.py << 'PYEOF'
+dges);
+      newBridges.set(key, 2);
+      setBridges(newBridges);
+      if (isVictory(islands, newBridges)) {
+        setVictory(true);
+      }
+    } else {
+      setErrorMessage(null);
+      const newBridges = new Map(bridges);
+      newBridges.delete(key);
+      setBridges(newBridges);
+      setVictory(false);
+    }
+  }, [bridges, islands]);
+
+  const removeBridge = useCallback((fromIsland, toIsland) => {
+    const key = bridgeKey(fromIsland, toIsland);
+    const current = bridges.get(key) || 0;
+    if (current > 0) {
+      setErrorMessage(null);
+      const newBridges = new Map(bridges);
+      newBridges.delete(key);
+      setBridges(newBridges);
+      setVictory(false);
+    }
+  }, [bridges]);
+
+  const handleIslandClick = (island, e) => {
+    if (e.ctrlKey || e.button === 2) {
+      if (selectedIsland !== null && selectedIsland.id !== island.id) {
+        removeBridge(selectedIsland, island);
+        setSelectedIsland(null);
+        setCursorIslandId(island.id);
+      }
+      return;
+    }
+
+    if (selectedIsland === null) {
+      setSelectedIsland(island);
+      setCursorIslandId(island.id);
+    } else if (selectedIsland.id === island.id) {
+      setSelectedIsland(null);
+    } else {
+      toggleBridge(selectedIsland, island);
+      setSelectedIsland(null);
+      setCursorIslandId(island.id);
+    }
+  };
+
+  const handleBridgeRightClick = (e, key) => {
+    e.preventDefault();
+    const current = bridges.get(key) || 0;
+    if (current > 0) {
+      setErrorMessage(null);
+      const newBridges = new Map(bridges);
+      newBridges.delete(key);
+      setBridges(newBridges);
+      setVictory(false);
+    }
+  };
+
+  const handleBridgeCtrlClick = (e, key) => {
+    if (e.ctrlKey) {
+      e.preventDefault();
+      const current = bridges.get(key) || 0;
+      if (current > 0) {
+        setErrorMessage(null);
+        const newBridges = new Map(bridges);
+        newBridges.delete(key);
+        setBridges(newBridges);
+        setVictory(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const currentIsland = islands.find(i> content = '''import React, { useState, useEffect, useCallback } from 'react';
+> import { puzzles } from './data/puzzles';
+> import {
+>   bridgeKey,
+>   parseBridgeKey,
+>   canAddBridge,
+>   computeCurrentCounts,
+>   isVictory,
+>   areAdjacent
+> } from './utils/hashiLogic';
+>
+> function App() {
+>   const [puzzleIndex, setPuzzleIndex] = useState(0);
+>   const [bridges, setBridges] = useState(new Map());
+>   const [selectedIsland, setSelectedIsland] = useState(null);
+>   const [cursorIslandId, setCursorIslandId] = useState(0);
+>   const [errorMessage, setErrorMessage] = useState(null);
+>   const [victory, setVictory] = useState(false);
+>
+>   const puzzle = puzzles[puzzleIndex];
+>   const islands = puzzle.islands;
+>
+>   const resetPuzzle = useCallback(() => {
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setCursorIslandId(0);
+>     setErrorMessage(null);
+>     setVictory(false);
+>   }, []);
+>
+ >   const handlePuzzleChange = (e) => {
+>     const idx = parseInt(e.target.value, 10);
+>     setPuzzleIndex(idx);
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setCursorIslandId(0);
+>     setErrorMessage(null);
+>     setVictory(false);
+>   };
+>
+>   const handleReset = () => {
+>     resetPuzzle();
+>   };
+>
+b>   const toggleBridge = useCallback((fromIsland, toIsland) => {
+>     const key = bridgeKey(fromIsland, toIsland);
+>     const current = bridges.get(key) || 0;
+>
+ >     if (current === 0) {
+>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+>       if (result.valid === false) {
+>         setErrorMessage(result.error);
+>         return;
+>       }
+>       setErrorMessage(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.set(key, 1);
+>       setBridges(newBridges);
+>       if (isVictory(islands, newBridges)) {
+>         setVictory(true);
+>       }
+>     } else if (current === 1) {
+>       const result = canAddBridge(islands, bridges, fromIsland, toIsland, 1);
+>       if (result.valid === false) {
+>         setErrorMessage(result.error);
+>         return;
+>       }
+>       setErrorMessage(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.set(key, 2);
+>       setBridges(newBridges);
+>       if (isVictory(islands, newBridges)) {
+>         setVictory(true);
+>       }
+>     } else {
+>       setErrorMessage(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.delete(key);
+>       setBridges(newBridges);
+>       setVictory(false);
+>     }
+>   }, [bridges, islands]);
+>
+>   const removeBridge = useCallback((fromIsland, toIsland) => {
+>     const key = bridgeKey(fromIsland, toIsland);
+>     const current = bridges.get(key) || 0;
+>     if (current > 0) {
+>       setErrorMessage(null);
+>       const newBridges = new Map(bridges);
+>       newBridges.delete(key);
+>       setBridges(n
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+>               x1: x1 - offset, y1: y1, x2: x2 - offset, y2: y2,
+>               stroke: \'#0f0\',
+>               strokeWidth: \'2\',
+>               onContextMenu: (e) => handleBridgeRightClick(e, key),
+>               onClick: (e) => handleBridgeCtrlClick(e, key),
+>               style: { cursor: \'pointer\' }
+>             })
+>           );
+>           lines.push(
+>             React.createElement(\'line\', {
+>               key: key + \'_b\',
+>               x1: x1 + offset, y1: y1, x2: x2 + offset, y2: y2,
+>               stroke: \'#0f0\',
+>               strokeWidth: \'2\',
+>               onContextMenu: (e) => handleBridgeRightClick(e, key),
+>               onClick: (e) => handleBridgeCtrlClick(e, key),
+>               style: { cursor: \'pointer\' }
+>             })
+>           );
+>         }
+>       }
+>     }
+>     return lines;
+>   };
+>
+>   const renderIslands = () => {
+>     return islands.map(island => {
+>       const cx = island.x * 40;
+>       const cy = island.y * 40;
+>       const isSelected = selectedIsland && selectedIsland.id === island.id;
+>
+>       return React.createElement(\'g\', { key: island.id },
+>         React.createElement(\'circle\', {
+>           cx: cx,
+>           cy: cy,
+>           r: 16,
+>           fill: \'black\',
+>           stroke: isSelected ? \'#ff0\' : \'#0f0\',
+>           strokeWidth: isSelected ? 3 : 2,
+>           onClick: (e) => handleIslandClick(island, e),
+>           onContextMenu: (e) => {
+>             e.preventDefault();
+>             if (selectedIsland && selectedIsland.id !== island.id) {
+>               removeBridge(selectedIsland, island);
+>               setSelectedIsland(null);
+>               setCursorIslandId(island.id);
+>             }
+>           },
+>           style: { cursor: \'pointer\' }
+>         }),
+>         React.createElement(\'text\', {
+>           x: cx,
+>           y: cy,
+>           textAnchor: \'middle\',
+>           dominantBaseline: \'central\',
+>           fill: \'#0f0\',
+>           fontSize: \'14\',
+>           fontFamily: \'monospace\',
+>           style: { pointerEvents: \'none\' }
+>         }, island.value)
+>       );
+>     });
+>   };
+>
+>   const renderCursor = () => {
+>     const island = islands.find(i => i.id === cursorIslandId);
+>     if (island === undefined || island === null) return null;
+>     const cx = island.x * 40;
+>     const cy = island.y * 40;
+>     return React.createElement(\'rect\', {
+>       x: cx - 20,
+>       y: cy - 20,
+>       width: 40,
+>       height: 40,
+>       fill: \'none\',
+>       stroke: \'#0ff\',
+>       strokeWidth: \'2\',
+>       strokeDasharray: \'4 2\',
+>       style: { pointerEvents: \'none\' }
+>     });
+>   };
+>
+>   return React.createElement(\'div\', { style: { margin: 0, padding: 0 } },
+>     React.createElement(\'svg\', {
+>       width: 800,
+>       height: 600,
+>       style: { display: \'block\', position: \'absolute\', top: 0, left: 0 },
+>       onContextMenu: handleContextMenu
+>     },
+>       renderBridges(),
+>       renderIslands(),
+>       renderCursor()
+>     ),
+>     React.createElement(\'div\', {
+>       style: { position: \'relative\', zIndex: 10, padding: \'10px\', fontFamily: \'monospace\', color: \'#0f0\' }
+>     },
+>       React.createElement(\'select\', {
+>         value: puzzleIndex,
+>         onChange: handlePuzzleChange,
+>         style: { background: \'black\', color: \'#0f0\', border: \'1px solid #0f0\', fontFamily: \'monospace\', marginRight: \'10px\' }
+>       },
+>         puzzles.map((p, idx) => React.createElement(\'option\', { key: p.id, value: idx }, p.name))
+>       ),
+>       React.createElement(\'button\', {
+>         onClick: handleReset,
+>         style: { background: \'black\', color: \'#0f0\', border: \'1px solid #0f0\', fontFamily: \'monospace\', cursor: \'pointer\' }
+>       }, \'Reset\')
+>     ),
+>     errorMessage ? React.createElement(\'div\', {
+>       className: \'error-message\',
+>       style: { position: \'relative\', zIndex: 10, color: \'#f00\', fontFamily: \'monospace\', padding: \'5px 10px\' }
+>     }, errorMessage) : null,
+>     victory ? React.createElement(\'div\', {
+>       className: \'victory-banner\',
+>       style: { position: \'relative\', zIndex: 10, color: \'#0f0\', fontFamily: \'monospace\', padding: \'5px 10px\', fontSize: \'24px\', fontWeight: \'bold\'
+ }
+>     }, \'SOLVED!\') : null
+>   );
+> }
+>
+> export default App;
+> '''
+>
+> with open('/app/src/App.jsx', 'w') as f:
+>     f.write(content)
+> print('Done')
+> PYEOF
+root@7ac4ab2c80d7:/app# python3 /tmp/write_app2.py
+Done
+root@7ac4ab2c80d7:/app# cd /app && npm run build 2>&1 | tail -20
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 33 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-D36fXC7D.css    0.07 kB │ gzip:  0.08 kB
+dist/assets/index-kHolc-FX.js   150.45 kB │ gzip: 48.36 kB
+✓ built in 975ms
+root@7ac4ab2c80d7:/app#
