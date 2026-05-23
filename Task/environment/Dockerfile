@@ -36,30 +36,12 @@ COPY docs/ /app/docs/
 # Pre-stage verifier node_modules + the Playwright Chromium browser at a stable
 # location outside /tests (which gets populated at runtime). test.sh symlinks
 # /tests/node_modules -> here so vitest / playwright resolve their deps offline.
-RUN mkdir -p /opt/tests-staging
-RUN cat > /opt/tests-staging/package.json <<'EOF'
-{
-  "name": "ui-task-tests",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:e2e": "playwright test"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.49.0",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/user-event": "^14.5.2",
-    "happy-dom": "^15.11.7",
-    "serve": "^14.2.4",
-    "vitest": "^2.1.6"
-  }
-}
-EOF
+# The manifest + lockfile are kept in sync with tests/ and copied in so
+# `npm ci` enforces the same pinned versions the verifier expects.
+COPY tests-staging/package.json tests-staging/package-lock.json /opt/tests-staging/
 
 RUN cd /opt/tests-staging \
-    && npm install --no-audit --no-fund \
+    && npm ci --no-audit --no-fund \
     && npx playwright install chromium
 
 WORKDIR /app

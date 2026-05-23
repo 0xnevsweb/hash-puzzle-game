@@ -77,7 +77,7 @@ test('keyboard navigation toggles bridge', async ({ page }) => {
   await page.keyboard.press('Enter');
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('Enter');
-  expect(await page.locator('line').count()).toBeGreaterThan(0);
+  expect(await page.locator('line').count()).toBe(1);
   expect(await page.locator('circle').count()).toBe(4);
 });
 
@@ -85,10 +85,20 @@ test('right-click removes a bridge', async ({ page }) => {
   await page.goto('http://localhost:3000');
   await page.selectOption('select', 'Easy');
   await page.click('button:has-text("Reset")');
+  // Cycle to a double bridge (none -> single -> double) so we can verify
+  // that right-clicking one of the two parallel <line>s clears the pair.
   await page.mouse.click(80, 80);
   await page.mouse.click(240, 80);
-  expect(await page.locator('line').count()).toBe(1);
-  await page.mouse.click(160, 80, { button: 'right' });
+  await page.mouse.click(80, 80);
+  await page.mouse.click(240, 80);
+  expect(await page.locator('line').count()).toBe(2);
+  // Click directly on one of the rendered <line> elements. Use boundingBox +
+  // mouse.click because Playwright's locator.click visibility check doesn't
+  // handle SVG <line> reliably (no HTML layout box); stroke offsets are
+  // implementation-defined, so we target the element rather than a fixed pixel.
+  const rcBox = await page.locator('line').first().boundingBox();
+  if (!rcBox) throw new Error('no bounding box for first <line>');
+  await page.mouse.click(rcBox.x + rcBox.width / 2, rcBox.y + rcBox.height / 2, { button: 'right' });
   expect(await page.locator('line').count()).toBe(0);
 });
 
@@ -108,11 +118,18 @@ test('ctrl+click removes a bridge', async ({ page }) => {
   await page.goto('http://localhost:3000');
   await page.selectOption('select', 'Easy');
   await page.click('button:has-text("Reset")');
+  // Cycle to a double bridge so Ctrl+click on one <line> must clear both.
   await page.mouse.click(80, 80);
   await page.mouse.click(240, 80);
-  expect(await page.locator('line').count()).toBe(1);
+  await page.mouse.click(80, 80);
+  await page.mouse.click(240, 80);
+  expect(await page.locator('line').count()).toBe(2);
+  // Same approach as the right-click test: compute the line's bounding box
+  // and mouse-click its center with the Control modifier held.
+  const ccBox = await page.locator('line').first().boundingBox();
+  if (!ccBox) throw new Error('no bounding box for first <line>');
   await page.keyboard.down('Control');
-  await page.mouse.click(160, 80);
+  await page.mouse.click(ccBox.x + ccBox.width / 2, ccBox.y + ccBox.height / 2);
   await page.keyboard.up('Control');
   expect(await page.locator('line').count()).toBe(0);
 });
