@@ -1,0 +1,42 @@
+New Terminal Output:
+
+root@8d3b79672224:/app# ls /app/dist/
+assets  favicon.svg  index.html  robots.txt
+root@8d3b79672224:/app# cat /app/dist/index.html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hashi Puzzle Terminal</title>
+    <script type="module" crossorigin src="/assets/index-DyYQlbg8.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-B8P3TPXY.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+root@8d3b79672224:/app# tail -20 /app/src/App.jsx
+      <svg width={SVG_WIDTH} height={SVG_HEIGHT} style={{ backgroundColor: '#000' }}>
+        {renderBridges()}
+        {renderIslands()}
+        {renderCursor()}
+      </svg>
+      <div className="controls">
+        <select value={puzzleIndex} onChange={handlePuzzleChange}>
+          {puzzles.map((p, idx) => (
+            <option key={p.id} value={idx}>{p.name}</option>
+          ))}
+        </select>
+        <button onClick={handleReset}>Reset</button>
+      </div>
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
+      {victory && <div className="victory-banner">SOLVED!</div>}
+    </div>
+  );
+}
+
+export default App;
+root@8d3b79672224:/app# grep -c 'circle' /app/src/App.jsx
+2
+root@8d3b79672224:/app#

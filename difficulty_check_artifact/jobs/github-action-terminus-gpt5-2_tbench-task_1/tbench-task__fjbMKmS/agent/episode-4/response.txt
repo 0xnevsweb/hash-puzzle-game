@@ -1,0 +1,15 @@
+{
+  "analysis": "We successfully replaced src/utils/hashiLogic.js with a clean file (head/tail look correct) and `npm run build` succeeds. The earlier corruption shown was just terminal echo from the heredoc entry, not the final file. App implements required SVG rendering, bridge toggling and per-line contextmenu/Ctrl+click removal, keyboard cursor with global listeners, error-message and victory-banner conditional rendering, puzzle select and reset, and puzzle data with required Easy/Medium/Hard constraints.",
+  "plan": "Do a quick sanity check that no old corrupted file remains and that App.jsx imports work, then mark complete.",
+  "commands": [
+    {
+      "keystrokes": "node -e \"import('./src/utils/hashiLogic.js').then(m=>console.log('hashiLogic exports',Object.keys(m)))\"\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "node -e \"import('./src/data/puzzles.js').then(m=>console.log(m.PUZZLE_OPTIONS.map(o=>o.label).join(','), Object.keys(m.PUZZLES)))\"\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": true
+}

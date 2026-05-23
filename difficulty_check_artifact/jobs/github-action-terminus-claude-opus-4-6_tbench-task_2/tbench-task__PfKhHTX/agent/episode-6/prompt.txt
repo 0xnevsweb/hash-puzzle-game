@@ -1,0 +1,25 @@
+New Terminal Output:
+
+root@9ccdd54d65b8:/app# cat > /app/vite.config.js << 'EOF'
+> import { defineConfig } from 'vite';
+> import react from '@vitejs/plugin-react';
+>
+> export default defineConfig({
+>   plugins: [react()],
+>   build: {
+>     outDir: 'dist',
+>   },
+> });
+> EOF
+root@9ccdd54d65b8:/app# cd /app && npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-D36fXC7D.css    0.07 kB │ gzip:  0.08 kB
+dist/assets/index-C6QYCYlz.js   150.02 kB │ gzip: 48.34 kB
+✓ built in 1.00s
+root@9ccdd54d65b8:/app#

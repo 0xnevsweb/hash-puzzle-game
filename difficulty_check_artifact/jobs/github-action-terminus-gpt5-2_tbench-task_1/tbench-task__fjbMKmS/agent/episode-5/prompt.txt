@@ -1,0 +1,19 @@
+Current terminal state:
+New Terminal Output:
+
+root@d78c38710e28:/app# node -e "import('./src/utils/hashiLogic.js').then(m=>console.log('hashiLogic exports',Object.keys(m)))"
+hashiLogic exports [
+  'areAdjacent',
+  'bridgesWouldCross',
+  'canAddBridge',
+  'checkConnectivity',
+  'computeCurrentCounts',
+  'isVictory',
+  'makeBridgeKey'
+]
+root@d78c38710e28:/app# node -e "import('./src/data/puzzles.js').then(m=>console.log(m.PUZZLE_OPTIONS.map(o=>o.label).join(','), Object.keys(m.PUZZLES)))"
+Easy,Medium,Hard [ 'Easy', 'Medium', 'Hard' ]
+root@d78c38710e28:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

@@ -1,0 +1,27 @@
+{
+  "analysis": "This is a Vite+React project. src/ already exists with App.jsx, index.jsx, index.css, and src/data/puzzles.js (currently likely placeholder). There is no src/utils/hashiLogic.js yet. We need to implement the full game per spec: puzzles.js with 3 puzzles, hashiLogic utilities, and update App.jsx/index.css accordingly. Also ensure Vite build outputs to /app/dist (default is dist) and npm run build succeeds.",
+  "plan": "1) Inspect current contents of App.jsx, puzzles.js, index.jsx, index.css.\n2) Create src/utils/hashiLogic.js implementing bridge keying, counts, adjacency/crossing, connectivity, victory.\n3) Replace App.jsx with full UI and interaction logic: SVG board, island selection/toggling, per-line handlers for removal, keyboard cursor+selection, error-message and victory-banner conditional, dropdown and reset that fully clears state.\n4) Update index.css to enforce retro terminal look and ensure SVG is anchored top-left with no padding/margins.\n5) Run npm run build to validate.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '1,200p' src/App.jsx\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' src/data/puzzles.js\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' src/index.jsx\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' src/index.css\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "mkdir -p src/utils\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

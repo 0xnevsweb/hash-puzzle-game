@@ -1,0 +1,384 @@
+New Terminal Output:
+
+root@6c315548159e:/app# cat > src/utils/hashiLogic.js <<'EOF'
+> const DIRS = [
+>   { dx: 1, dy: 0 },
+>   { dx: -1, dy: 0 },
+>   { dx: 0, dy: 1 },
+>   { dx: 0, dy: -1 }
+> ];
+>
+> export function canonicalKey(from, to) {
+>   const a = { x: from.x, y: from.y };
+>   const b = { x: to.x, y: to.y };
+>   const firstIsA = a.x < b.x || (a.x === b.x && a.y <= b.y);
+>   const p1 = firstIsA ? a : b;
+>   const p2 = firstIsA ? b : a;
+>   return `${p1.x},${p1.y},${p2.x},${p2.y}`;
+> }
+>
+> export function parseKey(key) {
+>   const [x1, y1, x2, y2] = key.split(',').map((n) => Number(n));
+>   return { x1, y1, x2, y2 };
+> }
+>
+> function isHorizontal(seg) {
+>   return seg.y1 === seg.y2;
+> }
+>
+> function isVertical(seg) {
+>   return seg.x1 === seg.x2;
+> }
+>
+> function segsCross(segA, segB) {
+>   // Cross only if one is horizontal and the other vertical, and they intersect at a point
+>   // that is strictly inside both segments (not at endpoints).
+>   const a = segA;
+>   const b = segB;
+>   if (isHorizontal(a) && isVertical(b)) {
+>     const ay = a.y1;
+>     const axMin = Math.min(a.x1, a.x2);
+>     const axMax = Math.max(a.x1, a.x2);
+>
+>     const bx = b.x1;
+>     const byMin = Math.min(b.y1, b.y2);
+>     const byMax = Math.max(b.y1, b.y2);
+>
+>     const intersects = bx > axMin && bx < axMax && ay > byMin && ay < byMax;
+>     return intersects;
+>   }
+>   if (isVertical(a) && isHorizontal(b)) {
+>     return segsCross(b, a);
+>   }
+>   return false;
+> }
+>
+> function hasCrossing(bridges, candidateKey) {
+>   const cand = parseKey(candidateKey);
+>   for (const [key, count] of bridges.entries()) {
+>     if (count <= 0) continue;
+>     if (key === candidateKey) continue;
+>     const seg = parseKey(key);
+>     if (segsCross(cand, seg)) return true;
+>   }
+>   return false;
+> }
+>
+> function buildIslandByXY(islands) {
+>   const m = new Map();
+>   for (const isl of islands) {
+>     m.set(`${isl.x},${isl.y}`, isl);
+>   }
+>   return m;
+> }
+>
+> function isClearLine(islandsByXY, from, to) {
+>   if (from.x !== to.x && from.y !== to.y) return false;
+>   const dx = Math.sign(to.x - from.x);
+>   const dy = Math.sign(to.y - from.y);
+>   let x = from.x + dx;
+>   let y = from.y + dy;
+>   while (x !== to.x || y !== to.y) {
+>     if (islandsByXY.has(`${x},${y}`)) return false;
+>     x += dx;
+>     y += dy;
+>   }
+>   return true;
+> }
+>
+> export function computeCurrentCounts(islands, bridges) {
+>   const counts = new Map();
+>   for (const isl of islands) counts.set(isl.id, 0);
+>
+>   for (const [key, n] of bridges.entries()) {
+>     if (n <= 0) continue;
+>     const { x1, y1, x2, y2 } = parseKey(key);
+>     const a = islands.find((i) => i.x === x1 && i.y === y1);
+>     const b = islands.find((i) => i.x === x2 && i.y === y2);
+>     if (!a || !b) continue;
+>     counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+>     counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+>   }
+>
+>   return counts;
+> }
+>
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   if (!from || !to) return { valid: false, error: 'Invalid islands' };
+>   if (from.id === to.id) return { valid: false, error: 'Cannot connect island to itself' };
+>   if (from.x !== to.x && from.y !== to.y) {
+>     return { valid: false, error: 'Cannot connect non-adjacent islands' };
+>   }
+>
+>   const islandsByXY = buildIslandByXY(islands);
+>   if (!isClearLine(islandsByXY, from, to)) {
+>     return { valid: false, error: 'Cannot connect non-adjacent islands' };
+>   }
+>
+>   const key = canonicalKey(from, to);
+>   const existing = bridges.get(key) ?? 0;
+>   const next = existing + delta;
+>
+>   if (next < 0) {
+>     return { valid: false, error: 'Invalid bridge change' };
+>   }
+>   if (next > 2) {
+>     return { valid: false, error: 'Max 2 bridges per pair' };
+>   }
+>
+>   // Crossing check only relevant if adding (increasing count)
+>   if (delta > 0) {
+>     if (hasCrossing(bridges, key)) {
+>       return { valid: false, error: 'Bridges would cross' };
+>     }
+>   }
+>
+>   // Island counts constraint (only for adding)
+>   if (delta > 0) {
+>     const counts = computeCurrentCounts(islands, bridges);
+>     const fromCount = counts.get(from.id) ?? 0;
+>     const toCount = counts.get(to.id) ?? 0;
+>     if (fromCount + delta > from.value || toCount + delta > to.value) {
+>       return { valid: false, error: 'Island would exceed its number' };
+>     }
+>   }
+>
+>   return { valid: true, error: null };
+> }
+>
+> export function checkConnectivity(islands, bridges) {
+>   if (islands.length === 0) return true;
+>
+>   const byXY = buildIslandByXY(islands);
+>   const adj = new Map();
+>   for (const isl of islands) adj.set(isl.id, []);
+>
+>   for (const [key, n] of bridges.entries()) {
+>     if (n <= 0) continue;
+>     const { x1, y1, x2, y2 } = parseKey(key);
+>     const a = byXY.get(`${x1},${y1}`);
+>     const b = byXY.get(`${x2},${y2}`);
+>     if (!a || !b) continue;
+>     adj.get(a.id).push(b.id);
+>     adj.get(b.id).push(a.id);
+>   }
+>
+>   const startId = islands[0].id;
+>   const q = [startId];
+
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+       style={baseStyle}
+>             />
+>           );
+>         }
+>       }
+>     }
+>     return lines;
+>   }
+>
+>   const cursorIsland = islandsById.get(cursorIslandId) || islands[0];
+>   const cursorPx = cursorIsland
+>     ? { x: cursorIsland.x * GRID, y: cursorIsland.y * GRID }
+>     : { x: 0, y: 0 };
+>
+>   return (
+>     <div className="app-root">
+>       <div className="hud">
+>         <label>
+>           Puzzle:{' '}
+>           <select
+>             value={puzzleName}
+>             onChange={(e) => {
+>               // fully reset bridges/selection/error/victory in same update via effect
+>               setPuzzleName(e.target.value);
+>             }}
+>           >
+>             <option value="Easy">Easy</option>
+>             <option value="Medium">Medium</option>
+>             <option value="Hard">Hard</option>
+>           </select>
+>         </label>
+>         <button
+>           onClick={() => {
+>             setBridges(new Map());
+>             setSelectedIslandId(null);
+>             setCursorIslandId(0);
+>             setError(null);
+>             setVictory(false);
+>           }}
+>         >
+>           Reset
+>         </button>
+>         <div className="status">
+>           {selectedIslandId != null ? `Selected: ${selectedIslandId}` : 'Selected: (none)'}
+>         </div>
+>       </div>
+>
+>       {error ? <div className="error-message">{error}</div> : null}
+>       {victory ? <div className="victory-banner">SOLVED!</div> : null}
+>
+>       <svg
+>         width={SVG_W}
+>         height={SVG_H}
+>         viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+>         className="board"
+>       >
+>         {/* Bridges */}
+>         {renderBridgeLines()}
+>
+>         {/* Cursor (must not be a circle) */}
+>         <rect
+>           x={cursorPx.x - 18}
+>           y={cursorPx.y - 18}
+>           width={36}
+>           height={36}
+>           fill="none"
+>           stroke="#0f0"
+>           strokeWidth={2}
+>           strokeDasharray="4 3"
+>           className="cursor"
+>         />
+>
+>         {/* Islands */}
+>         {islands.map((isl) => {
+>           const px = isl.x * GRID;
+>           const py = isl.y * GRID;
+>           const isSelected = selectedIslandId === isl.id;
+>           const curCount = counts.get(isl.id) ?? 0;
+>           return (
+>             <g key={isl.id} className="island" onClick={() => onIslandClick(isl.id)}>
+>               <circle
+>                 cx={px}
+>                 cy={py}
+>                 r={16}
+>                 fill="black"
+>                 stroke={isSelected ? '#9f9' : '#0f0'}
+>                 strokeWidth={isSelected ? 4 : 2}
+>               />
+>               <text
+>                 x={px}
+>                 y={py + 5}
+>                 textAnchor="middle"
+>                 fontSize="16"
+>                 fill="#0f0"
+>               >
+>                 {isl.value}
+>               </text>
+>               <text
+>                 x={px}
+>                 y={py + 28}
+>                 textAnchor="middle"
+>                 fontSize="10"
+>                 fill="#0f0"
+>               >
+>                 {curCount}/{isl.value}
+>               </text>
+>             </g>
+>           );
+>         })}
+>       </svg>
+>     </div>
+>   );
+> }
+>
+> export default App;
+> EOF
+root@6c315548159e:/app# cat > src/index.css <<'EOF'
+> :root {
+>   color-scheme: dark;
+> }
+>
+> html,
+> body {
+>   margin: 0;
+>   padding: 0;
+>   width: 100%;
+>   height: 100%;
+> }
+>
+> body {
+>   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+>     "Courier New", monospace;
+>   background-color: #000;
+>   color: #0f0;
+> }
+>
+> .app-root {
+>   position: relative;
+>   width: 100%;
+>   height: 100%;
+> }
+>
+> .hud {
+>   position: absolute;
+>   top: 0;
+>   left: 0;
+>   display: flex;
+>   gap: 12px;
+>   align-items: center;
+>   padding: 8px;
+>   z-index: 2;
+>   background: rgba(0, 0, 0, 0.6);
+> }
+>
+> select,
+> button {
+>   background: #000;
+>   color: #0f0;
+>   border: 1px solid #0f0;
+>   font-family: inherit;
+>   padding: 4px 8px;
+> }
+>
+> button {
+>   cursor: pointer;
+> }
+>
+> .error-message {
+>   position: absolute;
+>   top: 44px;
+>   left: 8px;
+>   z-index: 3;
+>   border: 1px solid #0f0;
+>   padding: 6px 8px;
+>   background: rgba(0, 0, 0, 0.85);
+> }
+>
+> .victory-banner {
+>   position: absolute;
+>   top: 44px;
+>   right: 8px;
+>   z-index: 3;
+>   border: 1px solid #0f0;
+>   padding: 6px 10px;
+>   background: rgba(0, 0, 0, 0.85);
+>   font-weight: 700;
+> }
+>
+> .board {
+>   position: absolute;
+>   top: 0;
+>   left: 0;
+>   display: block;
+> }
+>
+> .island {
+>   cursor: pointer;
+> }
+>
+> .cursor {
+>   pointer-events: none;
+> }
+> EOF
+root@6c315548159e:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-BLWfacRJ.css    0.87 kB │ gzip:  0.42 kB
+dist/assets/index-C7VNIEzo.js   150.11 kB │ gzip: 48.67 kB
+✓ built in 1.06s
+root@6c315548159e:/app#

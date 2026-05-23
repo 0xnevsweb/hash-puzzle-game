@@ -1,0 +1,13 @@
+Current terminal state:
+New Terminal Output:
+
+root@c95ff8f43374:/app# npm run build 2>&1 | tail -5
+computing gzip size...
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-cXB3tBJj.css    0.18 kB │ gzip:  0.15 kB
+dist/assets/index-3uJLMdX-.js   149.38 kB │ gzip: 48.36 kB
+✓ built in 1.05s
+root@c95ff8f43374:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

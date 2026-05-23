@@ -1,0 +1,323 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+
+New Terminal Output:
+
+root@c95ff8f43374:/app# cat > /app/src/App.jsx << 'ENDOFFILE'
+> import React, { useState, useEffect, useCallback } from 'react';
+> import { puzzles } from './data/puzzles.js';
+> import { bridgeKey, parseBridgeKey, canAddBridge, isVictory } from './utils/hashiLogic.js';
+>
+> function App() {
+>   const [puzzleIndex, setPuzzleIndex] = useState(0);
+>   const [bridges, setBridges] = useState(new Map());
+>   const [selectedIsland, setSelectedIsland] = useState(null);
+>   const [errorMessage, setErrorMessage] = useState(null);
+>   const [victory, setVictory] = useState(false);
+>   const [cursorIslandId, setCursorIslandId] = useState(0);
+>
+>   const currentPuzzle = puzzles[puzzleIndex];
+>   const islands = currentPuzzle.islands;
+>
+>   // Reset everything when puzzle changes
+>   const resetPuzzle = useCallback(() => {
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setErrorMessage(null);
+>     setVictory(false);
+>     setCursorIslandId(0);
+>   }, []);
+>
+>   const handlePuzzleChange = (e) => {
+>     setPuzzleIndex(Number(e.target.value));
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setErrorMessage(null);
+>     setVictory(false);
+>     setCursorIslandId(0);
+>   };
+>
+>   const handleReset = () => {
+>     resetPuzzle();
+>   };
+>
+>   // Toggle bridge between two islands (cycle: none -> single -> double -> none)
+>   const toggleBridge = useCallback((fromIsland, toIsland) => {
+>     const key = bridgeKey(fromIsland, toIsland);
+>     const current = bridges.get(key) || 0;
+>
+>     if (current === 2) {
+>       // Cycle back to none
+>       const newBridges = new Map(bridges);
+>       newBridges.delete(key);
+>       setBridges(newBridges);
+>       setErrorMessage(null);
+>       setSelectedIsland(null);
+>       const v = isVictory(islands, newBridges);
+>       setVictory(v);
+>       return;
+>     }
+>
+ >     // Try to add one more bridge
+>     const delta = 1;
+>     const result = canAddBridge(islands, bridges, fromIsland, toIsland, delta);
+>
+>     if (!result.valid) {
+>       setErrorMessage(result.error);
+>       setSelectedIsland(null);
+>       return;
+>     }
+>
+o>     const newBridges = new Map(bridges);
+>     newBridges.set(key, current + 1);
+>     setBridges(newBridges);
+>     setErrorMessage(null);
+>     setSelectedIsland(null);
+>     const v = isVictory(islands, newBridges);
+>     setVictory(v);
+>   }, [bridges, islands]);
+>
+>   // Handle island click (mouse)
+>   const handleIslandClick = useCallback((island) => {
+>     if (victory) return;
+>
+>     if (selectedIsland === null) {
+>       setSelectedIsland(island.id);
+>       setCursorIslandId(island.id);
+>     } else if (selectedIsland === island.id) {
+>       setSelectedIsland(null);
+>     } else {
+>       const fromIsland = islands.find(i => i.id === selectedIsland);
+>       toggleBridge(fromIsland, island);
+>     }
+>   }, [selectedIsland, islands, toggleBridge, victory]);
+>
+>   // Handle right-click / ctrl+click on bridge line to remove
+>   const handleBridgeRemove = useCallback((e, key) => {
+>     e.preventDefault();
+>     e.stopPropagation();
+>     if (victory) return;
+>     const newBridges = new Map(bridges);
+>     newBridges.delete(key);
+>     setBridges(newBridges);
+>     setErrorMessage(null);
+>     setSelectedIsland(null);
+>     const v = isVictory(islands, newBridges);
+>     setVictory(v);
+>   }, [bridges, islands, victory]);
+>
+>   // Keyboard navigation
+>   useEffect(() => {
+>     const handleKeyDown = (e) => {
+>       if (e.key === 'Escape') {
+>         setSelectedIsland(null);
+>         return;
+>       }
+>
+>       const cursorIsland = islands.find(i => i.id === cursorIslandId);
+>       if (!cursorIsland) return;
+>
+>       if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+>         e.preventDefault();
+>         let bestIsland = null;
+>         let bestDist = Infinity;
+>
+>>         for (const island of islands) {
+>           if (island.id === cursorIslandId) continue;
+>
+>           let valid = false;
+>           let dist = 0;
+>
+ >           if (e.key === 'ArrowUp' && island.x === cursorIsland.x && island.y < cursorIsland.y) {
+>             valid = true;
+>             dist = cursorIsland.y - island.y;
+>           } else if (e.key === 'ArrowDown' && island.x === cursorIsland.x && island.y > cursorIsland.y) {
+>             valid = true;
+>             dist = island.y - cursorIsland.y;
+>           } else if (e.key === 'ArrowLeft' && island.y === cursorIsland.y && island.x < cursorIsland.x) {
+>             valid = true;
+>             dist = cursorIsland.x - island.x;
+>           } else if (e.key === 'ArrowRight' && island.y === cursorIsland.y && island.x > cursorIsland.x) {
+>             valid = true;
+>             dist = island.x - cursorIsland.x;
+>           }
+>
+>           if (valid && dist < bestDist) {
+>             bestDist = dist;
+>             bestIsland = island;
+>           }
+>         }
+>
+>         if (bestIsland) {
+>           setCursorIslan
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+ove(e, key);
+>       };
+>       const handleClick = (e) => {
+>         if (e.ctrlKey) {
+>           handleBridgeRemove(e, key);
+>         }
+>       };
+>
+>       if (count === 1) {
+>         lines.push(
+>           <line
+>             key={key}
+>             x1={px1} y1={py1}
+>             x2={px2} y2={py2}
+>             stroke="#0f0"
+>             strokeWidth="2"
+>             onContextMenu={handleContext}
+>             onClick={handleClick}
+>             style={{ cursor: 'pointer' }}
+>           />
+>         );
+>       } else if (count === 2) {
+>         const offX = isHorizontal ? 0 : offset;
+>         const offY = isHorizontal ? offset : 0;
+>         lines.push(
+>           <line
+>             key={key + '_a'}
+>             x1={px1 - offX} y1={py1 - offY}
+>             x2={px2 - offX} y2={py2 - offY}
+>             stroke="#0f0"
+>             strokeWidth="2"
+>             onContextMenu={handleContext}
+>             onClick={handleClick}
+>             style={{ cursor: 'pointer' }}
+>           />
+>         );
+>         lines.push(
+>           <line
+>             key={key + '_b'}
+>             x1={px1 + offX} y1={py1 + offY}
+>             x2={px2 + offX} y2={py2 + offY}
+>             stroke="#0f0"
+>             strokeWidth="2"
+>             onContextMenu={handleContext}
+>             onClick={handleClick}
+>             style={{ cursor: 'pointer' }}
+>           />
+>         );
+>       }
+>     }
+>     return lines;
+>   };
+>
+>   // Render islands
+>   const renderIslands = () => {
+>     return islands.map(island => {
+>       const px = island.x * 40;
+>       const py = island.y * 40;
+>       const isSelected = selectedIsland === island.id;
+>
+>       return (
+>         <g key={island.id} onClick={() => handleIslandClick(island)} style={{ cursor: 'pointer' }}>
+>           <circle
+>             cx={px} cy={py} r={16}
+>             fill="black"
+>             stroke={isSelected ? '#ff0' : '#0f0'}
+>             strokeWidth={isSelected ? 3 : 2}
+>           />
+>           <text
+>             x={px} y={py}
+>             textAnchor="middle"
+>             dominantBaseline="central"
+>             fill="#0f0"
+>             fontSize="14"
+>             fontFamily="monospace"
+>           >
+>             {island.value}
+>           </text>
+>         </g>
+>       );
+>     });
+>   };
+>
+>   // Render cursor (not a circle!)
+>   const renderCursor = () => {
+>     const island = islands.find(i => i.id === cursorIslandId);
+>     if (!island) return null;
+>     const px = island.x * 40;
+>     const py = island.y * 40;
+>     return (
+>       <rect
+>         x={px - 20} y={py - 20}
+>         width={40} height={40}
+>         fill="none"
+>         stroke="#0ff"
+>         strokeWidth="2"
+>         strokeDasharray="4 2"
+>         pointerEvents="none"
+>       />
+>     );
+>   };
+>
+>   return (
+>     <div>
+>       <div style={{ position: 'absolute', top: 0, left: 0, padding: '4px 8px', zIndex: 10 }}>
+>         <select value={puzzleIndex} onChange={handlePuzzleChange} style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospac
+e', marginRight: '8px' }}>
+>           {puzzles.map((p, idx) => (
+>             <option key={p.id} value={idx}>{p.name}</option>
+>           ))}
+>         </select>
+>         <button onClick={handleReset} style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace', cursor: 'pointer' }}>Res
+et</button>
+>       </div>
+>       <svg width={800} height={600} style={{ display: 'block', position: 'absolute', top: 0, left: 0 }}>
+>         {renderBridges()}
+>         {renderIslands()}
+>         {renderCursor()}
+>       </svg>
+>       {errorMessage && (
+>         <div className="error-message" style={{ position: 'absolute', bottom: '20px', left: '20px', color: '#f00', fontFamily: 'monospace', fontSize: '14px' }
+}>
+>           {errorMessage}
+>         </div>
+>       )}
+>       {victory && (
+>         <div className="victory-banner" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#0f0', fontFamily:
+ 'monospace', fontSize: '48px', border: '2px solid #0f0', padding: '20px', background: 'rgba(0,0,0,0.9)' }}>
+>           SOLVED!
+>         </div>
+>       )}
+>     </div>
+>   );
+> }
+>
+> export default App;
+> ENDOFFILE
+root@c95ff8f43374:/app# cat > /app/src/index.css << 'EOF'
+> * {
+>   margin: 0;
+>   padding: 0;
+>   box-sizing: border-box;
+> }
+>
+> html, body {
+>   background-color: black;
+>   color: #0f0;
+>   font-family: monospace;
+>   overflow: hidden;
+>   width: 100%;
+>   height: 100%;
+> }
+>
+> #root {
+>   width: 100%;
+>   height: 100%;
+> }
+> EOF
+root@c95ff8f43374:/app# cd /app && npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-cXB3tBJj.css    0.18 kB │ gzip:  0.15 kB
+dist/assets/index-3uJLMdX-.js   149.38 kB │ gzip: 48.36 kB
+✓ built in 1.12s
+root@c95ff8f43374:/app#

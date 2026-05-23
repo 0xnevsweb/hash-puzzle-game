@@ -1,0 +1,195 @@
+New Terminal Output:
+
+root@c76eac6a0558:/app# cat /app/src/utils/hashiLogic.js
+// Utility: create canonical bridge key from two islands (grid coords)
+export function bridgeKey(island1, island2) {
+  const [a, b] = [island1, island2].sort((p, q) => p.x - q.x || p.y - q.y);
+  return `${a.x},${a.y},${b.x},${b.y}`;
+}
+
+// Check if two islands are adjacent (same row/col, no island between them)
+export function areAdjacent(islands, from, to) {
+  if (from.x !== to.x && from.y !== to.y) return false;
+  if (from.x === to.x && from.y === to.y) return false;
+
+  if (from.x === to.x) {
+    // Vertical
+    const minY = Math.min(from.y, to.y);
+    const maxY = Math.max(from.y, to.y);
+    return !islands.some(i =>
+      i.id !== from.id && i.id !== to.id &&
+      i.x === from.x && i.y > minY && i.y < maxY
+    );
+  } else {
+    // Horizontal
+    const minX = Math.min(from.x, to.x);
+    const maxX = Math.max(from.x, to.x);
+    return !islands.some(i =>
+      i.id !== from.id && i.id !== to.id &&
+      i.y === from.y && i.x > minX && i.x < maxX
+    );
+  }
+}
+
+// Check if a bridge between from and to would cross any existing bridge
+export function wouldCross(islands, bridges, from, to) {
+  // A bridge from->to is either horizontal or vertical
+  const isHorizontal = from.y === to.y;
+
+  for (const [key, count] of bridges.entries()) {
+    if (count === 0) continue;
+    const [x1, y1, x2, y2] = key.split(',').map(Number);
+
+    // Skip if this is the same bridge
+    const thisKey = bridgeKey(from, to);
+    if (key === thisKey) continue;
+
+    const existingIsHorizontal = y1 === y2;
+
+    // Parallel bridges cannot cross in grid-based Hashi
+    if (isHorizontal === existingIsHorizontal) continue;
+
+    // Perpendicular: check intersection
+    if (isHorizontal) {
+      // New bridge is horizontal, existing is vertical
+      const hMinX = Math.min(from.x, to.x);
+      const hMaxX = Math.max(from.x, to.x);
+      const hY = from.y;
+      const vX = x1; // vertical bridge x
+      const vMinY = Math.min(y1, y2);
+      const vMaxY = Math.max(y1, y2);
+
+      if (vX > hMinX && vX < hMaxX && hY > vMinY && hY < vMaxY) {
+        return true;
+      }
+    } else {
+      // New bridge is vertical, existing is horizontal
+      const vMinY = Math.min(from.y, to.y);
+      const vMaxY = Math.max(from.y, to.y);
+      const vX = from.x;
+      const hY = y1; // horizontal bridge y
+      const hMinX = Math.min(x1, x2);
+      const hMaxX = Math.max(x1, x2);
+
+      if (vX > hMinX && vX < hMaxX && hY > vMinY && hY < vMaxY) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Validate if a bridge can be added
+// delta is the amount to add (usually 1 for cycling up)
+export function canAddBridge(islands, bridges, from, to, delta) {
+  // Degenerate case
+  if (from.id === to.id) {
+    return { valid: false, error: "Cannot connect non-adjacent islands" };
+  }
+
+  // Check adjacency
+  if (!areAdjacent(islands, from, to)) {
+    return { valid: false, error: "Cannot connect non-adjacent islands" };
+  }
+
+  const key = bridgeKey(from, to);
+  const current = bridges.get(key) || 0;
+  const newCount = current + delta;
+
+  // Check max bridges
+  if (newCount > 2) {
+    return { valid: false, error: "Max 2 bridges per pair" };
+  }
+
+  // Check island capacity
+  const fromCounts = computeCurrentCounts(islands, bridges);
+  const fromCurrent = fromCounts.get(from.id) || 0;
+  const toCurrent = fromCounts.get(to.id) || 0;
+
+  if (fromCurrent + delta > from.value) {
+    return { valid: false, error: "Island would exceed its number" };
+  }
+  if (toCurrent + delta > to.value) {
+    return { valid: false, error: "Island would exceed its number" };
+  }
+
+  // Check crossing
+  if (delta > 0 && current === 0) {
+    // Only check crossing when adding a new bridge (not incrementing existing)
+    if (wouldCross(islands, bridges, from, to)) {
+      return { valid: false, error: "Bridges would cross" };
+    }
+  }
+
+  return { valid: true, error: null };
+}
+
+// Compute current bridge counts for each island
+export function computeCurrentCounts(islands, bridges) {
+  const counts = new Map();
+  islands.forEach(i => counts.set(i.id, 0));
+
+  for (const [key, count] of bridges.entries()) {
+    if (count === 0) continue;
+    const [x1, y1, x2, y2] = key.split(',').map(Number);
+    const island1 = islands.find(i => i.x === x1 && i.y === y1);
+    const island2 = islands.find(i => i.x === x2 && i.y === y2);
+    if (island1) counts.set(island1.id, (counts.get(island1.id) || 0) + count);
+    if (island2) counts.set(island2.id, (counts.get(island2.id) || 0) + count);
+  }
+
+  return counts;
+}
+
+// Check if all islands are connected via bridges
+export function checkConnectivity(islands, bridges) {
+  if (islands.length === 0) return true;
+  if (islands.length === 1) return true;
+
+  // Build adjacency from bridges
+  const adj = new Map();
+  islands.forEach(i => adj.set(i.id, []));
+
+  for (const [key, count] of bridges.entries()) {
+    if (count === 0) continue;
+    const [x1, y1, x2, y2] = key.split(',').map(Number);
+    const island1 = islands.find(i => i.x === x1 && i.y === y1);
+    const island2 = islands.find(i => i.x === x2 && i.y === y2);
+    if (island1 && island2) {
+      adj.get(island1.id).push(island2.id);
+      adj.get(island2.id).push(island1.id);
+    }
+  }
+
+  // BFS from first island
+  const visited = new Set();
+  const queue = [islands[0].id];
+  visited.add(islands[0].id);
+
+  while (queue.length > 0) {
+    const curr = queue.shift();
+    for (const neighbor of adj.get(curr)) {
+      if (!visited.has(neighbor)) {
+        visited.add(neighbor);
+        queue.push(neighbor);
+      }
+    }
+  }
+
+  return visited.size === islands.length;
+}
+
+// Check if the puzzle is solved
+export function isVictory(islands, bridges) {
+  // Check all counts match
+  const counts = computeCurrentCounts(islands, bridges);
+  for (const island of islands) {
+    if ((counts.get(island.id) || 0) !== island.value) return false;
+  }
+
+  // Check connectivity
+  if (!checkConnectivity(islands, bridges)) return false;
+
+  return true;
+}
+root@c76eac6a0558:/app#

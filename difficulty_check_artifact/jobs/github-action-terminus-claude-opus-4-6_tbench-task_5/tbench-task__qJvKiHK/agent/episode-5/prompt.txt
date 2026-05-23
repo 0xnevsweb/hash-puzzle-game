@@ -1,0 +1,318 @@
+New Terminal Output:
+
+root@c76eac6a0558:/app# cat > /app/src/App.jsx << 'ENDOFFILE'
+> import React, { useState, useEffect, useCallback } from 'react';
+> import { puzzles } from './data/puzzles.js';
+> import {
+>   bridgeKey,
+>   canAddBridge,
+>   computeCurrentCounts,
+>   isVictory,
+>   areAdjacent
+> } from './utils/hashiLogic.js';
+>
+> const GRID = 40;
+> const WIDTH = 800;
+> const HEIGHT = 600;
+>
+> function App() {
+>   const [puzzleIndex, setPuzzleIndex] = useState(0);
+>   const [bridges, setBridges] = useState(new Map());
+>   const [selectedIsland, setSelectedIsland] = useState(null);
+>   const [error, setError] = useState(null);
+>   const [victory, setVictory] = useState(false);
+>   const [cursorIslandId, setCursorIslandId] = useState(0);
+>   const [kbSelected, setKbSelected] = useState(false);
+>
+>   const puzzle = puzzles[puzzleIndex];
+>   const islands = puzzle.islands;
+>
+>   // Reset state when puzzle changes
+>   const resetPuzzle = useCallback((newIndex) => {
+>     setPuzzleIndex(newIndex);
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setError(null);
+>     setVictory(false);
+>     setCursorIslandId(0);
+>     setKbSelected(false);
+>   }, []);
+>
+>   // Handle clicking an island (mouse)
+>   const handleIslandClick = useCallback((island) => {
+>     if (victory) return;
+>
+,>     if (selectedIsland === null) {
+>       // First selection
+>       setSelectedIsland(island.id);
+>       setError(null);
+>     } else if (selectedIsland === island.id) {
+>       // Deselect same island
+>       setSelectedIsland(null);
+>     } else {
+>       // Second selection - try to toggle bridge
+>       const from = islands.find(i => i.id === selectedIsland);
+>       const to = island;
+>       toggleBridge(from, to);
+>     }
+>   }, [selectedIsland, islands, bridges, victory]);
+>
+ >   const toggleBridge = useCallback((from, to) => {
+>     const key = bridgeKey(from, to);
+>     const current = bridges.get(key) || 0;
+>
+>     if (current === 2) {
+>       // Cycle to 0 (remove)
+>       const newBridges = new Map(bridges);
+>       newBridges.delete(key);
+>       setBridges(newBridges);
+>       setSelectedIsland(null);
+>       setError(null);
+>       setVictory(false);
+>     } else {
+>       // Try to add
+>       const delta = 1;
+>       const result = canAddBridge(islands, bridges, from, to, delta);
+>       if (result.valid) {
+>         const newBridges = new Map(bridges);
+>         newBridges.set(key, current + 1);
+>         setBridges(newBridges);
+>         setSelectedIsland(null);
+>         setError(null);
+>         // Check victory
+>         if (isVictory(islands, newBridges)) {
+>           setVictory(true);
+>         }
+>       } else {
+>         setError(result.error);
+>         setSelectedIsland(null);
+>       }
+>     }
+>   }, [bridges, islands]);
+>
+>   // Handle right-click or ctrl+click on a bridge line to remove it
+>   const handleBridgeRemove = useCallback((e, key) => {
+>     e.preventDefault();
+>     e.stopPropagation();
+>     const newBridges = new Map(bridges);
+>     newBridges.delete(key);
+>     setBridges(newBridges);
+>     setError(null);
+>     setVictory(false);
+>   }, [bridges]);
+>
+>   // Keyboard navigation
+>   useEffect(() => {
+>     const handleKeyDown = (e) => {
+>       const currentIslands = puzzles[puzzleIndex].islands;
+>       const cursorIsland = currentIslands.find(i => i.id === cursorIslandId);
+>       if (!cursorIsland) return;
+>
+>       if (e.key === 'Escape') {
+>         setKbSelected(false);
+>         setSelectedIsland(null);
+>         return;
+>       }
+>
+>       if (e.key === 'Enter') {
+>         if (!kbSelected) {
+>           // Select current cursor island
+>           setKbSelected(true);
+>           setSelectedIsland(cursorIsland.id);
+>           setError(null);
+>         } else {
+>           // Try toggle bridge between selected and cursor
+>           if (selectedIsland !== null && selectedIsland !== cursorIsland.id) {
+>             const from = currentIslands.find(i => i.id === selectedIsland);
+>             const to = cursorIsland;
+>             // We need to inline the toggle logic to use current state
+>             setBridges(prevBridges => {
+>               const key = bridgeKey(from, to);
+>               const current = prevBridges.get(key) || 0;
+>
+>               if (current === 2) {
+>                 const newBridges = new Map(prevBridges);
+>                 newBridges.delete(key);
+>                 setError(null);
+>                 setVictory(false);
+>                 setSelectedIsland(null);
+>                 setKbSelected(false);
+>                 return newBridges;
+>               } else {
+>                 const delta = 1;
+>                 const result = canAddBridge(currentIslands, prevBridges, from, to, delta);
+>                 if (result.valid) {
+>                   const newBridges = new Map(prevBridges);
+>                   newBridges.set(key, current + 1);
+>                   setError(null);
+>                   setSelectedIsland(null);
+>                   se
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+1 === y2;
+>       const offset = 4;
+>
+e>       if (count === 1) {
+>         lines.push(
+>           <line
+>             key={key}
+>             x1={px1} y1={py1} x2={px2} y2={py2}
+>             stroke="#0f0"
+>             strokeWidth="2"
+>             style={{ cursor: 'pointer' }}
+>             onClick={(e) => {
+>               if (e.ctrlKey || e.metaKey) {
+>                 handleBridgeRemove(e, key);
+>               }
+>             }}
+>             onContextMenu={(e) => handleBridgeRemove(e, key)}
+>           />
+>         );
+>       } else if (count === 2) {
+>         const dx = isHorizontal ? 0 : offset;
+>         const dy = isHorizontal ? offset : 0;
+>         lines.push(
+>           <line
+>             key={key + '_a'}
+>             x1={px1 - dx} y1={py1 - dy} x2={px2 - dx} y2={py2 - dy}
+>             stroke="#0f0"
+>             strokeWidth="2"
+>             style={{ cursor: 'pointer' }}
+>             onClick={(e) => {
+>               if (e.ctrlKey || e.metaKey) {
+>                 handleBridgeRemove(e, key);
+>               }
+>             }}
+>             onContextMenu={(e) => handleBridgeRemove(e, key)}
+>           />
+>         );
+>         lines.push(
+>           <line
+>             key={key + '_b'}
+>             x1={px1 + dx} y1={py1 + dy} x2={px2 + dx} y2={py2 + dy}
+>             stroke="#0f0"
+>             strokeWidth="2"
+>             style={{ cursor: 'pointer' }}
+>             onClick={(e) => {
+>               if (e.ctrlKey || e.metaKey) {
+>                 handleBridgeRemove(e, key);
+>               }
+>             }}
+>             onContextMenu={(e) => handleBridgeRemove(e, key)}
+>           />
+>         );
+>       }
+>     }
+>     return lines;
+>   };
+>
+>   // Render islands
+>   const renderIslands = () => {
+>     return islands.map(island => {
+>       const px = island.x * GRID;
+>       const py = island.y * GRID;
+>       const isSelected = selectedIsland === island.id;
+>
+>       return (
+>         <g key={island.id} onClick={() => handleIslandClick(island)} style={{ cursor: 'pointer' }}>
+>           <circle
+>             cx={px}
+>             cy={py}
+>             r={16}
+>             fill="black"
+>             stroke={isSelected ? '#ff0' : '#0f0'}
+>             strokeWidth={isSelected ? 3 : 2}
+>           />
+>           <text
+>             x={px}
+>             y={py}
+>             textAnchor="middle"
+>             dominantBaseline="central"
+>             fill="#0f0"
+>             fontSize="14"
+>             fontFamily="monospace"
+>           >
+>             {island.value}
+>           </text>
+>         </g>
+>       );
+>     });
+>   };
+>
+>   // Render keyboard cursor (rect, not circle)
+>   const renderCursor = () => {
+>     const cursorIsland = islands.find(i => i.id === cursorIslandId);
+>     if (!cursorIsland) return null;
+>     const px = cursorIsland.x * GRID;
+>     const py = cursorIsland.y * GRID;
+>     return (
+>       <rect
+>         x={px - 20}
+>         y={py - 20}
+>         width={40}
+>         height={40}
+>         fill="none"
+>         stroke={kbSelected ? '#ff0' : '#0ff'}
+>         strokeWidth={2}
+>         strokeDasharray="4 2"
+>         pointerEvents="none"
+>       />
+>     );
+>   };
+>
+>   return (
+>     <div style={{ background: 'black', minHeight: '100vh', padding: 0, margin: 0 }}>
+>       <div style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+>         <select
+>           value={puzzleIndex}
+>           onChange={(e) => resetPuzzle(Number(e.target.value))}
+>           style={{
+>             background: 'black',
+>             color: '#0f0',
+>             border: '1px solid #0f0',
+>             fontFamily: 'monospace',
+>             padding: '4px'
+>           }}
+>         >
+>           {puzzles.map((p, idx) => (
+>             <option key={p.id} value={idx}>{p.name}</option>
+>           ))}
+>         </select>
+>         <button
+>           onClick={() => {
+>             setBridges(new Map());
+>             setSelectedIsland(null);
+>             setError(null);
+>             setVictory(false);
+>             setCursorIslandId(0);
+>             setKbSelected(false);
+>           }}
+>           style={{
+>             background: 'black',
+>             color: '#0f0',
+>             border: '1px solid #0f0',
+>             fontFamily: 'monospace',
+>             padding: '4px 8px',
+>             cursor: 'pointer'
+>           }}
+>         >
+>           Reset
+>         </button>
+>         {error && <span className="error-message" style={{ color: '#f00', fontFamily: 'monospace' }}>{error}</span>}
+>         {victory && <span className="victory-banner" style={{ color: '#0f0', fontFamily: 'monospace', fontSize: '20px', fontWeight: 'bold' }}>SOLVED!</span>}
+>       </div>
+>       <svg
+>         width={WIDTH}
+>         height={HEIGHT}
+>         style={{ display: 'block' }}
+>       >
+>         {renderBridges()}
+>         {renderIslands()}
+>         {renderCursor()}
+>       </svg>
+>     </div>
+>   );
+> }
+>
+> export default App;
+> ENDOFFILE
+root@c76eac6a0558:/app#

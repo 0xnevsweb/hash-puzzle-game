@@ -1,0 +1,316 @@
+New Terminal Output:
+
+root@c192c6efbdf1:/app# sed -n '1,260p' src/utils/hashiLogic.js
+const keyFromCoords = (a, b) => {
+  // a,b are {x,y} in grid units
+  const first = a.x < b.x || (a.x === b.x && a.y <= b.y) ? a : b;
+  const second = first === a ? b : a;
+  return `${first.x},${first.y},${second.x},${second.y}`;
+};
+
+export const makeBridgeKey = (from, to) => keyFromCoords(from, to);
+
+export const computeCurrentCounts = (islands, bridges) => {
+  const counts = new Map();
+  for (const isl of islands) counts.set(isl.id, 0);
+
+  for (const [k, n] of bridges.entries()) {
+    if (!n) continue;
+    const [x1, y1, x2, y2] = k.split(',').map(Number);
+    const a = islands.find((i) => i.x === x1 && i.y === y1);
+    const b = islands.find((i) => i.x === x2 && i.y === y2);
+    if (!a || !b) continue;
+    counts.set(a.id, (counts.get(a.id) ?? 0) + n);
+    counts.set(b.id, (counts.get(b.id) ?? 0) + n);
+  }
+  return counts;
+};
+
+const segmentCrosses = (a1, a2, b1, b2) => {
+  // only consider strict crossings between orthogonal segments (no shared endpoints)
+  const aVert = a1.x === a2.x;
+  const bVert = b1.x === b2.x;
+  if (aVert === bVert) return false;
+
+  const v1 = aVert ? a1 : b1;
+  const v2 = aVert ? a2 : b2;
+  const h1 = aVert ? b1 : a1;
+  const h2 = aVert ? b2 : a2;
+
+  const vx = v1.x;
+  const hy = h1.y;
+
+  const vMinY = Math.min(v1.y, v2.y);
+  const vMaxY = Math.max(v1.y, v2.y);
+  const hMinX = Math.min(h1.x, h2.x);
+  const hMaxX = Math.max(h1.x, h2.x);
+
+  // strict interior intersection (not at endpoints)
+  if (vx <= hMinX || vx >= hMaxX) return false;
+  if (hy <= vMinY || hy >= vMaxY) return false;
+
+  return true;
+};
+
+const bridgesWouldCross = (islands, bridges, from, to, keyToIgnore = null) => {
+  const a1 = { x: from.x, y: from.y };
+  const a2 = { x: to.x, y: to.y };
+
+  for (const [k, n] of bridges.entries()) {
+    if (!n) continue;
+    if (keyToIgnore && k === keyToIgnore) continue;
+
+    const [x1, y1, x2, y2] = k.split(',').map(Number);
+    const b1 = { x: x1, y: y1 };
+    const b2 = { x: x2, y: y2 };
+
+    // skip if share endpoints
+    const sharesEndpoint =
+      (a1.x === b1.x && a1.y === b1.y) ||
+      (a1.x === b2.x && a1.y === b2.y) ||
+      (a2.x === b1.x && a2.y === b1.y) ||
+      (a2.x === b2.x && a2.y === b2.y);
+    if (sharesEndpoint) continue;
+
+    if (segmentCrosses(a1, a2, b1, b2)) return true;
+  }
+  return false;
+};
+
+const areAdjacent = (islands, from, to) => {
+  if (from.x !== to.x && from.y !== to.y) return false;
+  // must have no island between them
+  if (from.x === to.x) {
+    const x = from.x;
+    const minY = Math.min(from.y, to.y);
+    const maxY = Math.max(from.y, to.y);
+    for (const isl of islands) {
+      if (isl.id === from.id || isl.id === to.id) continue;
+      if (isl.x === x && isl.y > minY && isl.y < maxY) return false;
+    }
+    return true;
+  }
+
+  const y = from.y;
+  const minX = Math.min(from.x, to.x);
+  const maxX = Math.max(from.x, to.x);
+  for (const isl of islands) {
+    if (isl.id === from.id || isl.id === to.id) continue;
+    if (isl.y === y && isl.x > minX && isl.x < maxX) return false;
+  }
+  return true;
+};
+
+export const canAddBridge = (islands, bridges, from, to, delta) => {
+  if (!from || !to) return { valid: false, error: 'Invalid islands' };
+  if (from.id === to.id) return { valid: false, error: 'Cannot connect island to itself' };
+
+  if (!areAdjacent(islands, from, to)) {
+    return { valid: false, error: 'Cannot connect non-adjacent islands' };
+  }
+
+  const key = makeBridgeKey(from, to);
+  const current = bridges.get(key) ?? 0;
+  const next = current + delta;
+
+  if (next > 2) return { valid: false, error: 'Max 2 bridges per pair' };
+  if (next < 0) return { valid: false, error: 'Invalid bridge count' };
+
+  // crossing check only when adding (not when removing)
+  if (delta > 0) {
+    if (bridgesWouldCross(islands, bridges, from, to, key)) {
+      return { valid: false, error: 'Bridges would cross' };
+    }
+  }
+
+  // island capacity check
+  const counts = computeCurrentCounts(islands, bridges);
+  const fromCount = counts.get(from.id) ?? 0;
+  const toCount = counts.get(to.id) ?? 0;
+
+  if (delta > 0) {
+    if (fromCount + delta > from.value || toCount + delta > to.value) {
+      return { valid: false, error: 'Island would exceed its number' };
+    }
+  }
+
+  return { valid: true, error: null };
+};
+
+export const checkConnectivity = (islands, bridges) => {
+  if (!islands.length) return true;
+
+  const adj = new Map();
+  for (const isl of islands) adj.set(isl.id, new Set());
+
+  for (const [k, n] of bridges.entries()) {
+    if (!n) continue;
+    const [x1, y1, x2, y2] = k.split(',').map(Number);
+    const a = islands.find((i) => i.x === x1 && i.y === y1);
+    const b = islands.find((i) => i.x === x2 && i.y === y2);
+    if (!a || !b) continue;
+    adj.get(a.id).add(b.id);
+    adj.get(b.id).add(a.id);
+  }
+
+  const start = islands[0].id;
+  const q = [start];
+  const seen = new Set([start]);
+  while (q.length) {
+    const cur = q.shift();
+    for (const nxt of adj.get(cur) 
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+ x: x1, y: y1 };
+>     const b2 = { x: x2, y: y2 };
+>
+>     const sharesEndpoint =
+>       (a1.x === b1.x && a1.y === b1.y) ||
+>       (a1.x === b2.x && a1.y === b2.y) ||
+>       (a2.x === b1.x && a2.y === b1.y) ||
+>       (a2.x === b2.x && a2.y === b2.y);
+>     if (sharesEndpoint) continue;
+>
+>     if (segmentCrosses(a1, a2, b1, b2)) return true;
+>   }
+>   return false;
+> };
+>
+> const areAdjacent = (islands, from, to) => {
+>   if (from.x !== to.x && from.y !== to.y) return false;
+>
+>   if (from.x === to.x) {
+>     const x = from.x;
+>     const minY = Math.min(from.y, to.y);
+>     const maxY = Math.max(from.y, to.y);
+>     for (const isl of islands) {
+>       if (isl.id === from.id || isl.id === to.id) continue;
+>       if (isl.x === x && isl.y > minY && isl.y < maxY) return false;
+>     }
+>     return true;
+>   }
+>
+>   const y = from.y;
+>   const minX = Math.min(from.x, to.x);
+>   const maxX = Math.max(from.x, to.x);
+>   for (const isl of islands) {
+>     if (isl.id === from.id || isl.id === to.id) continue;
+>     if (isl.y === y && isl.x > minX && isl.x < maxX) return false;
+>   }
+>   return true;
+> };
+>
+> export const canAddBridge = (islands, bridges, from, to, delta) => {
+>   if (!from || !to) return { valid: false, error: 'Invalid islands' };
+>   if (from.id === to.id) return { valid: false, error: 'Cannot connect island to itself' };
+>
+>   if (!areAdjacent(islands, from, to)) {
+>     return { valid: false, error: 'Cannot connect non-adjacent islands' };
+>   }
+>
+>   const key = makeBridgeKey(from, to);
+>   const current = bridges.get(key) ?? 0;
+>   const next = current + delta;
+>
+>   if (next > 2) return { valid: false, error: 'Max 2 bridges per pair' };
+>   if (next < 0) return { valid: false, error: 'Invalid bridge count' };
+>
+>   if (delta > 0) {
+>     if (bridgesWouldCross(islands, bridges, from, to, key)) {
+>       return { valid: false, error: 'Bridges would cross' };
+>     }
+>   }
+>
+>   const counts = computeCurrentCounts(islands, bridges);
+>   const fromCount = counts.get(from.id) ?? 0;
+>   const toCount = counts.get(to.id) ?? 0;
+>
+>   if (delta > 0) {
+>     if (fromCount + delta > from.value || toCount + delta > to.value) {
+>       return { valid: false, error: 'Island would exceed its number' };
+>     }
+>   }
+>
+>   return { valid: true, error: null };
+> };
+>
+> export const checkConnectivity = (islands, bridges) => {
+>   if (!islands.length) return true;
+>
+>   const adj = new Map();
+>   for (const isl of islands) adj.set(isl.id, new Set());
+>
+>   for (const [k, n] of bridges.entries()) {
+>     if (!n) continue;
+>     const [x1, y1, x2, y2] = k.split(',').map(Number);
+>     const a = islands.find((i) => i.x === x1 && i.y === y1);
+>     const b = islands.find((i) => i.x === x2 && i.y === y2);
+>     if (!a || !b) continue;
+>     adj.get(a.id).add(b.id);
+>     adj.get(b.id).add(a.id);
+>   }
+>
+>   const start = islands[0].id;
+>   const q = [start];
+>   const seen = new Set([start]);
+>   while (q.length) {
+>     const cur = q.shift();
+>     for (const nxt of adj.get(cur) ?? []) {
+>       if (seen.has(nxt)) continue;
+>       seen.add(nxt);
+>       q.push(nxt);
+>     }
+>   }
+>
+>   return seen.size === islands.length;
+> };
+>
+> export const isVictory = (islands, bridges) => {
+>   const entries = [...bridges.entries()].filter(([, n]) => n);
+>
+>   // defensive crossing check
+>   for (let i = 0; i < entries.length; i++) {
+>     const [k1] = entries[i];
+>     const [a1x, a1y, a2x, a2y] = k1.split(',').map(Number);
+>     const a1 = { x: a1x, y: a1y };
+>     const a2 = { x: a2x, y: a2y };
+>     for (let j = i + 1; j < entries.length; j++) {
+>       const [k2] = entries[j];
+>       const [b1x, b1y, b2x, b2y] = k2.split(',').map(Number);
+>       const b1 = { x: b1x, y: b1y };
+>       const b2 = { x: b2x, y: b2y };
+>
+>       const sharesEndpoint =
+>         (a1.x === b1.x && a1.y === b1.y) ||
+>         (a1.x === b2.x && a1.y === b2.y) ||
+>         (a2.x === b1.x && a2.y === b1.y) ||
+>         (a2.x === b2.x && a2.y === b2.y);
+>       if (sharesEndpoint) continue;
+>
+>       if (segmentCrosses(a1, a2, b1, b2)) return false;
+>     }
+>   }
+>
+>   const counts = computeCurrentCounts(islands, bridges);
+>   for (const isl of islands) {
+>     if ((counts.get(isl.id) ?? 0) !== isl.value) return false;
+>   }
+>
+>   return checkConnectivity(islands, bridges);
+> };
+> EOF
+root@c192c6efbdf1:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-C67_UIMz.css    0.16 kB │ gzip:  0.13 kB
+dist/assets/index-Cm9PD9-8.js   150.37 kB │ gzip: 48.71 kB
+✓ built in 989ms
+root@c192c6efbdf1:/app# grep -R "error-message\|victory-banner\|onContextMenu" -n src/App.jsx
+234:        onContextMenu: (e) => {
+350:          <div className="error-message" style={{ marginTop: 8 }}>
+355:          <div className="victory-banner" style={{ marginTop: 8, fontWeight: 'bold' }}>
+root@c192c6efbdf1:/app#

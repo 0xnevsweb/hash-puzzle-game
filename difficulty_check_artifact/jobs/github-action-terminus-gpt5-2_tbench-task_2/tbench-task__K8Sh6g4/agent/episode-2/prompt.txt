@@ -1,0 +1,378 @@
+New Terminal Output:
+
+root@edf4ce9dc4d4:/app# sed -n '1,200p' src/App.jsx
+import React from 'react';
+
+function App() {
+  return <div>Hashi Puzzle – implement the game</div>;
+}
+
+export default App;
+root@edf4ce9dc4d4:/app# cat src/data/puzzles.js
+export const puzzles = [
+  {
+    id: 1,
+    name: "Easy",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 2 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 2, y: 6, value: 2 },
+      { id: 3, x: 6, y: 6, value: 2 }
+    ]
+  },
+  {
+    id: 2,
+    name: "Medium",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 3 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 10, y: 2, value: 3 },
+      { id: 3, x: 4, y: 6, value: 2 },
+      { id: 4, x: 8, y: 6, value: 2 }
+    ]
+  },
+  {
+    id: 3,
+    name: "Hard",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 4 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 10, y: 2, value: 4 },
+      { id: 3, x: 2, y: 6, value: 2 },
+      { id: 4, x: 6, y: 6, value: 4 },
+      { id: 5, x: 10, y: 6, value: 2 }
+    ]
+  }
+];
+root@edf4ce9dc4d4:/app# cat src/index.jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+root@edf4ce9dc4d4:/app# cat src/index.css
+body {
+  margin: 0;
+  font-family: monospace;
+  background-color: black;
+  color: #0f0;
+}
+root@edf4ce9dc4d4:/app# mkdir -p src/utils
+root@edf4ce9dc4d4:/app# cat > src/utils/hashiLogic.js <<'EOF'
+> // Hashi (Bridges) game logic utilities
+>
+> export function canonicalBridgeKey(a, b) {
+>   // key is based on grid coordinates (x,y) not ids
+>   const p1 = { x: a.x, y: a.y };
+>   const p2 = { x: b.x, y: b.y };
+>
+>   let first = p1;
+>   let second = p2;
+>   if (p2.x < p1.x || (p2.x === p1.x && p2.y < p1.y)) {
+>     first = p2;
+>     second = p1;
+>   }
+>   return `${first.x},${first.y},${second.x},${second.y}`;
+> }
+>
+> export function parseBridgeKey(key) {
+>   const [x1, y1, x2, y2] = key.split(',').map((n) => Number(n));
+>   return { x1, y1, x2, y2 };
+> }
+>
+.> export function isAxisAligned(a, b) {
+>   return a.x === b.x || a.y === b.y;
+> }
+>
+> export function areAdjacent(islands, a, b) {
+>   if (!isAxisAligned(a, b)) return false;
+>
+>   if (a.x === b.x) {
+>     const x = a.x;
+>     const yMin = Math.min(a.y, b.y);
+>     const yMax = Math.max(a.y, b.y);
+>     // adjacent if no island strictly between them on the same column
+>     return !islands.some((i) => i.id !== a.id && i.id !== b.id && i.x === x && i.y > yMin && i.y < yMax);
+>   }
+>
+>   const y = a.y;
+>   const xMin = Math.min(a.x, b.x);
+>   const xMax = Math.max(a.x, b.x);
+>   return !islands.some((i) => i.id !== a.id && i.id !== b.id && i.y === y && i.x > xMin && i.x < xMax);
+> }
+>
+> function rangesOverlap(a1, a2, b1, b2) {
+>   const minA = Math.min(a1, a2);
+>   const maxA = Math.max(a1, a2);
+>   const minB = Math.min(b1, b2);
+>   const maxB = Math.max(b1, b2);
+>   return Math.max(minA, minB) < Math.min(maxA, maxB);
+> }
+>
+> export function bridgesWouldCross(islands, bridges, a, b) {
+>   if (!isAxisAligned(a, b)) return false;
+>
+>   const newIsVertical = a.x === b.x;
+>   const newX1 = a.x;
+>   const newY1 = a.y;
+>   const newX2 = b.x;
+>   const newY2 = b.y;
+>
+>   for (const [key, count] of bridges.entries()) {
+>     if (!count) continue;
+>     const { x1, y1, x2, y2 } = parseBridgeKey(key);
+>     const existingVertical = x1 === x2;
+>
+>     // Same orientation can overlap/duplicate but not "cross" in Hashi terms.
+>     if (existingVertical === newIsVertical) continue;
+>
+>     // Check proper intersection (not at endpoints).
+>     // vertical segment at x = xv, y in (yvMin, yvMax)
+>     // horizontal segment at y = yh, x in (xhMin, xhMax)
+>     let xv, yv1, yv2, yh, xh1, xh2;
+>     if (existingVertical) {
+>       xv = x1;
+>       yv1 = y1;
+>       yv2 = y2;
+>       yh = newY1;
+>       xh1 = newX1;
+>       xh2 = newX2;
+>     } else {
+>       xv = newX1;
+>       yv1 = newY1;
+>       yv2 = newY2;
+>       yh = y1;
+>       xh1 = x1;
+>       xh2 = x2;
+>     }
+>
+>     // intersection at (xv, yh)
+>     const vMin = Math.min(yv1, yv2);
+>     const vMax = Math.max(yv1, yv2);
+>     const hMin = Math.min(xh1, xh2);
+>     const hMax = Math.max(xh1, xh2);
+>
+>     const intersects = xv > hMin && xv < hMax && yh > vMin && yh < vMax;
+>     if (!intersects) continue;
+>
+>     // If intersection point is an island coordinate, allow (it means meeting at island).
+>     const intersectionIsIsland = islands.some((i) => i.x === xv && i.y === yh);
+>     if (!intersectionIsIsland) return true;
+>   }
+>
+>   return false;
+> }
+>
+> export function computeCurrentCounts(islands, bridges) {
+>   const counts = new Map();
+>   for (const isl of islands) counts.set(isl.id, 0);
+>
+>   for (const [key, count] of bridges.entries()) {
+>     if (!count) continue;
+>     const { x1, y1, x2, y2 } = parseBridgeKey(key);
+>     const a = islands.find((i) => i.x === x1 && i.y === y1);
+>     const b = islands.fi
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+        <select
+>             value={puzzleKey}
+>             onChange={(e) => {
+>               // Fully reset bridges/selection/error/victory in same update as swapping puzzle
+>               setPuzzleKey(e.target.value);
+>             }}
+>           >
+>             {PUZZLE_OPTIONS.map((k) => (
+>               <option key={k} value={k}>
+>                 {k}
+>               </option>
+>             ))}
+>           </select>
+>         </label>
+>         <button onClick={resetAll}>Reset</button>
+>         {victory ? <div className="victory-banner">SOLVED!</div> : null}
+>         {error ? <div className="error-message">{error}</div> : null}
+>       </div>
+>
+>       <svg className="board" width={SVG_W} height={SVG_H} viewBox={`0 0 ${SVG_W} ${SVG_H}`}>
+>         {/* Bridges */}
+>         {bridgeRenderList.map((b) => (
+>           <line
+>             key={`${b.key}:${b.idx}`}
+>             x1={b.x1 * GRID}
+>             y1={b.y1 * GRID}
+>             x2={b.x2 * GRID}
+>             y2={b.y2 * GRID}
+>             className="bridge"
+>             onContextMenu={(e) => onBridgeLineContextMenu(e, b.key)}
+>             onClick={(e) => onBridgeLineClick(e, b.key)}
+>           />
+>         ))}
+>
+>         {/* Cursor (not a circle) */}
+>         {cursorIsland ? (
+>           <rect
+>             x={cursorIsland.x * GRID - 18}
+>             y={cursorIsland.y * GRID - 18}
+>             width={36}
+>             height={36}
+>             className={selectedId === cursorIsland.id ? 'cursor cursor-selected' : 'cursor'}
+>           />
+>         ) : null}
+>
+>         {/* Islands */}
+>         {islands.map((isl) => {
+>           const px = isl.x * GRID;
+>           const py = isl.y * GRID;
+>           const isSelected = selectedId === isl.id;
+>           const curCount = counts.get(isl.id) ?? 0;
+>           return (
+>             <g key={isl.id} onClick={() => onIslandActivate(isl.id)} className="island-group">
+>               <circle cx={px} cy={py} r={16} className={isSelected ? 'island island-selected' : 'island'} />
+>               <text x={px} y={py + 5} textAnchor="middle" className="island-text">
+>                 {isl.value}
+>               </text>
+>               <text x={px} y={py + 28} textAnchor="middle" className="island-subtext">
+>                 {curCount}/{isl.value}
+>               </text>
+>             </g>
+>           );
+>         })}
+>       </svg>
+>     </div>
+>   );
+> }
+> EOF
+root@edf4ce9dc4d4:/app# cat > src/index.css <<'EOF'
+> :root {
+>   color-scheme: dark;
+> }
+>
+> html,
+> body {
+>   margin: 0;
+>   padding: 0;
+>   background: #000;
+>   color: #00ff66;
+>   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+> }
+>
+> .app {
+>   margin: 0;
+>   padding: 0;
+> }
+>
+> .hud {
+>   position: fixed;
+>   top: 0;
+>   left: 0;
+>   display: flex;
+>   gap: 12px;
+>   align-items: center;
+>   padding: 8px 10px;
+>   background: rgba(0, 0, 0, 0.8);
+>   border-bottom: 1px solid rgba(0, 255, 102, 0.35);
+>   z-index: 10;
+> }
+>
+> select,
+> button {
+>   background: #000;
+>   color: #00ff66;
+>   border: 1px solid rgba(0, 255, 102, 0.5);
+>   font: inherit;
+>   padding: 4px 8px;
+> }
+>
+> button {
+>   cursor: pointer;
+> }
+>
+> .error-message {
+>   margin-left: 10px;
+>   color: #00ff66;
+>   border: 1px solid rgba(0, 255, 102, 0.5);
+>   padding: 4px 8px;
+> }
+>
+> .victory-banner {
+>   margin-left: 10px;
+>   color: #00ff66;
+>   border: 1px solid rgba(0, 255, 102, 0.9);
+>   padding: 4px 8px;
+>   font-weight: 700;
+> }
+>
+> .board {
+>   position: absolute;
+>   top: 0;
+>   left: 0;
+>   width: 800px;
+>   height: 600px;
+>   background: #000;
+> }
+>
+> .bridge {
+>   stroke: #00ff66;
+>   stroke-width: 4;
+>   stroke-linecap: round;
+> }
+>
+> .island {
+>   fill: #000;
+>   stroke: #00ff66;
+>   stroke-width: 2;
+> }
+>
+> .island-selected {
+>   stroke-width: 4;
+> }
+>
+> .island-text {
+>   fill: #00ff66;
+>   font-size: 16px;
+>   pointer-events: none;
+> }
+>
+> .island-subtext {
+>   fill: rgba(0, 255, 102, 0.8);
+>   font-size: 10px;
+>   pointer-events: none;
+> }
+>
+> .island-group {
+>   cursor: pointer;
+> }
+>
+> .cursor {
+>   fill: none;
+>   stroke: rgba(0, 255, 102, 0.8);
+>   stroke-width: 2;
+>   stroke-dasharray: 4 3;
+>   pointer-events: none;
+> }
+>
+> .cursor-selected {
+>   stroke-width: 3;
+> }
+> EOF
+root@edf4ce9dc4d4:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-CYoIbcVS.css    1.18 kB │ gzip:  0.53 kB
+dist/assets/index-D-bMx0rc.js   149.41 kB │ gzip: 48.43 kB
+✓ built in 944ms
+root@edf4ce9dc4d4:/app# ls -la dist || true
+total 16
+drwxr-xr-x 3 root root   75 May 23 03:30 .
+drwxr-xr-x 8 root root 4096 May 23 03:30 ..
+drwxr-xr-x 2 root root   57 May 23 03:30 assets
+-rw-r--r-- 1 root root  216 May 23 03:30 favicon.svg
+-rw-r--r-- 1 root root  404 May 23 03:30 index.html
+-rw-r--r-- 1 root root   23 May 23 03:30 robots.txt
+root@edf4ce9dc4d4:/app#

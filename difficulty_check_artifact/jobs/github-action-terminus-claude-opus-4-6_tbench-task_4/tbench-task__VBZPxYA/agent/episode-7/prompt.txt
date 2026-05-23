@@ -1,0 +1,40 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+
+New Terminal Output:
+
+root@c95ff8f43374:/app# grep -n 'handleBridgeRemove\|onContextMenu\|ctrlKey' /app/src/App.jsx
+90:  const handleBridgeRemove = useCallback((e, key) => {
+180:        handleBridgeRemove(e, key);
+183:        if (e.ctrlKey) {
+184:          handleBridgeRemove(e, key);
+196:            onContextMenu={handleContext}
+211:            onContextMenu={handleContext}
+223:            onContextMenu={handleContext}
+root@c95ff8f43374:/app# grep -n 'cursorIslandId\|setCursorIslandId' /app/src/App.jsx | head -20
+11:  const [cursorIslandId, setCursorIslandId] = useState(0);
+22:    setCursorIslandId(0);
+31:    setCursorIslandId(0);
+80:      setCursorIslandId(island.id);
+111:      const cursorIsland = islands.find(i => i.id === cursorIslandId);
+120:          if (island.id === cursorIslandId) continue;
+146:          setCursorIslandId(bestIsland.id);
+154:        const island = islands.find(i => i.id === cursorIslandId);
+163:  }, [islands, cursorIslandId, selectedIsland, victory, handleIslandClick]);
+265:    const island = islands.find(i => i.id === cursorIslandId);
+root@c95ff8f43374:/app# grep -n 'error-message\|victory-banner\|SOLVED' /app/src/App.jsx
+298:        <div className="error-message" style={{ position: 'absolute', bottom: '20px', left: '20px', color: '#f00', fontFamily: 'monospace', fontSize: '14px'
+ }}>
+303:        <div className="victory-banner" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#0f0', fontFamil
+y: 'monospace', fontSize: '48px', border: '2px solid #0f0', padding: '20px', background: 'rgba(0,0,0,0.9)' }}>
+304:          SOLVED!
+root@c95ff8f43374:/app# grep -n 'canAddBridge\|computeCurrentCounts\|checkConnectivity\|isVictory' /app/src/utils/hashiLogic.js
+88:export function computeCurrentCounts(islands, bridges) {
+108:export function checkConnectivity(islands, bridges) {
+148:export function isVictory(islands, bridges) {
+149:  const counts = computeCurrentCounts(islands, bridges);
+157:  if (!checkConnectivity(islands, bridges)) return false;
+178:// canAddBridge: checks if we can add delta bridges between from and to
+180:export function canAddBridge(islands, bridges, from, to, delta) {
+201:  const counts = computeCurrentCounts(islands, bridges);
+root@c95ff8f43374:/app#

@@ -1,0 +1,340 @@
+Current terminal state:
+New Terminal Output:
+
+root@666a35584647:/app# cat > src/App.jsx <<'EOF'
+> import React, { useEffect, useMemo, useState } from 'react';
+> import { PUZZLES, PUZZLE_OPTIONS } from './data/puzzles';
+> import { canAddBridge, canonicalKey, computeCurrentCounts, isVictory } from './utils/hashiLogic';
+>
+r> const GRID = 40;
+> const SVG_W = 800;
+> const SVG_H = 600;
+>
+> function px(n) {
+>   return n * GRID;
+> }
+>
+> function islandAt(islands, id) {
+>   return islands.find((i) => i.id === id) || null;
+> }
+>
+ > function buildNeighborsByDirection(islands) {
+>   // For keyboard navigation: for each island, find nearest island in each dir.
+>   const result = new Map();
+>
+>   for (const a of islands) {
+>     const cand = { left: null, right: null, up: null, down: null };
+>     for (const b of islands) {
+>       if (a.id === b.id) continue;
+>       if (a.y === b.y) {
+>         if (b.x < a.x) {
+>           if (!cand.left || b.x > cand.left.x) cand.left = b;
+>         } else if (b.x > a.x) {
+>           if (!cand.right || b.x < cand.right.x) cand.right = b;
+>         }
+>       }
+>       if (a.x === b.x) {
+>         if (b.y < a.y) {
+>           if (!cand.up || b.y > cand.up.y) cand.up = b;
+>         } else if (b.y > a.y) {
+>           if (!cand.down || b.y < cand.down.y) cand.down = b;
+>         }
+>       }
+>     }
+>     result.set(a.id, {
+>       left: cand.left ? cand.left.id : null,
+>       right: cand.right ? cand.right.id : null,
+>       up: cand.up ? cand.up.id : null,
+>       down: cand.down ? cand.down.id : null
+>     });
+>   }
+>
+>   return { neighbors: result };
+> }
+d>
+> function bridgeLinesForKey(key, count) {
+>   // returns array of {x1,y1,x2,y2, dx,dy} where dx/dy are pixel offsets for parallel lines
+>   const [x1, y1, x2, y2] = key.split(',').map(Number);
+>   const horizontal = y1 === y2;
+>
+>   if (count === 1) return [{ x1, y1, x2, y2, dx: 0, dy: 0 }];
+>
+>   if (count === 2) {
+>     const sep = 6;
+>     if (horizontal) {
+>       return [
+>         { x1, y1, x2, y2, dx: 0, dy: -sep / 2 },
+>         { x1, y1, x2, y2, dx: 0, dy: sep / 2 }
+>       ];
+>     }
+>     return [
+>       { x1, y1, x2, y2, dx: -sep / 2, dy: 0 },
+>       { x1, y1, x2, y2, dx: sep / 2, dy: 0 }
+>     ];
+>   }
+>
+>   return [];
+> }
+>
+> export default function App() {
+>   const [puzzleKey, setPuzzleKey] = useState('Easy');
+>   const islands = PUZZLES[puzzleKey].islands;
+>
+>   const nav = useMemo(() => buildNeighborsByDirection(islands), [islands]);
+>
+>   const [bridges, setBridges] = useState(() => new Map());
+>   const [selectedId, setSelectedId] = useState(null);
+>   const [cursorId, setCursorId] = useState(0);
+>   const [error, setError] = useState(null);
+>
+>   const counts = useMemo(() => computeCurrentCounts(islands, bridges), [islands, bridges]);
+>   const victory = useMemo(() => isVictory(islands, bridges), [islands, bridges]);
+>
+>   // cursor parked on island id 0 from page load and after any puzzle change
+>   useEffect(() => {
+>     setCursorId(0);
+>   }, [puzzleKey]);
+={>
+>   function resetAll() {
+>     setBridges(new Map());
+>     setSelectedId(null);
+>     setError(null);
+>     setCursorId(0);
+>   }
+>
+>   function changePuzzle(nextKey) {
+>     setPuzzleKey(nextKey);
+>     // fully reset in the same update batch
+>     setBridges(new Map());
+>     setSelectedId(null);
+>     setError(null);
+>     setCursorId(0);
+>   }
+>
+>   function removeBridgeByKey(key) {
+>     if (!(bridges.get(key) > 0)) return;
+>     const nb = new Map(bridges);
+>     nb.delete(key);
+>     setBridges(nb);
+>     setSelectedId(null);
+>     setError(null);
+>     setCursorId(0);
+>   }
+>
+>   function applyToggle(from, to) {
+>     const key = canonicalKey(from, to);
+>     const current = bridges.get(key) ?? 0;
+>     const next = (current + 1) % 3; // none -> single -> double -> none
+>     const delta = next - current;
+>
+>     const { valid, error: err } = canAddBridge(islands, bridges, from, to, delta);
+>     if (!valid) {
+>       // clear selection on error so the next click starts a fresh A->B pair
+>       setSelectedId(null);
+>       setError(err);
+>       return;
+>     }
+>
+ >     const nb = new Map(bridges);
+>     if (next === 0) nb.delete(key);
+>     else nb.set(key, next);
+>
+>     setBridges(nb);
+>     setSelectedId(null);
+>     setError(null); // remove error-message immediately on next valid toggle
+>     setCursorId(0);
+>   }
+>
+>   function onIslandClick(id) {
+>     const isl = islandAt(islands, id);
+>     if (!isl) return;
+>
+>     if (selectedId == null) {
+>       setSelectedId(id);
+>       setCursorId(id);
+>       return;
+>     }
+  >
+>     if (selectedId === id) {
+>       // selection only
+>       setSelectedId(id);
+>       setCursorId(id);
+>       return;
+>     }
+>
+>     const from = islandAt(islands, selectedId);
+>     const to = isl;
+>     applyToggle(from, to);
+>   }
+>
+>   // key listeners on window/document (not focused node)
+>   useEffect(() => {
+>     function onKeyDown(e) {
+>       if (e.key === 'Escape') {
+>         setSelectedId(null);
+>         setError
+[... output limited to 10000 bytes; 1408 interior bytes omitted ...]
+egments[idx];
+>       const x1 = px(seg.x1) + seg.dx;
+>       const y1 = px(seg.y1) + seg.dy;
+>       const x2 = px(seg.x2) + seg.dx;
+>       const y2 = px(seg.y2) + seg.dy;
+>       const lineKey = `${key}:${idx}`;
+>
+>       bridgeLineEls.push(
+>         <line
+>           key={lineKey}
+>           x1={x1}
+>           y1={y1}
+>           x2={x2}
+>           y2={y2}
+>           stroke="#0f0"
+>           strokeWidth={4}
+>           strokeLinecap="round"
+>           onClick={(e) => {
+>             if (e.ctrlKey) {
+>               e.preventDefault();
+>               removeBridgeByKey(key);
+>             }
+>           }}
+>           onContextMenu={(e) => {
+>             e.preventDefault();
+>             removeBridgeByKey(key);
+>           }}
+>         />
+>       );
+>     }
+>   }
+>
+>   return (
+>     <div style={{ position: 'relative', width: SVG_W, height: SVG_H, margin: 0, padding: 0 }}>
+>       {/* SVG anchored at viewport top-left */}
+>       <svg width={SVG_W} height={SVG_H} style={{ display: 'block', background: 'black' }}>
+>         {bridgeLineEls}
+>
+>         {/* Cursor (not a circle) */}
+>         {(() => {
+>           const c = islandAt(islands, cursorId);
+>           if (!c) return null;
+>           const size = islandRadius * 2 + 10;
+>           return (
+>             <rect
+>               x={px(c.x) - size / 2}
+>               y={px(c.y) - size / 2}
+>               width={size}
+>               height={size}
+>               fill="none"
+>               stroke={selectedId === cursorId ? '#0f0' : '#0a0'}
+>               strokeWidth={2}
+>               strokeDasharray={selectedId === cursorId ? '0' : '4 4'}
+>             />
+>           );
+>         })()}
+>
+>         {/* Islands */}
+>         {islands.map((isl) => {
+>           const x = px(isl.x);
+>           const y = px(isl.y);
+>           const isSelected = selectedId === isl.id;
+>           return (
+>             <g key={isl.id}>
+>               <circle
+>                 cx={x}
+>                 cy={y}
+>                 r={islandRadius}
+>                 fill="black"
+>                 stroke="#0f0"
+>                 strokeWidth={2}
+>                 onClick={() => onIslandClick(isl.id)}
+>               />
+>               {isSelected ? (
+>                 <rect
+>                   x={x - islandRadius - 4}
+>                   y={y - islandRadius - 4}
+>                   width={(islandRadius + 4) * 2}
+>                   height={(islandRadius + 4) * 2}
+>                   fill="none"
+>                   stroke="#0f0"
+>                   strokeWidth={1}
+>                 />
+>               ) : null}
+>               <text
+>                 x={x}
+>                 y={y + 5}
+>                 textAnchor="middle"
+>                 fontFamily="monospace"
+>                 fontSize={16}
+>                 fill="#0f0"
+>                 style={{ userSelect: 'none', pointerEvents: 'none' }}
+>               >
+>                 {isl.value}
+>               </text>
+>             </g>
+>           );
+>         })}
+>       </svg>
+>
+>       {/* Overlay UI */}
+>       <div style={{ position: 'absolute', left: 0, top: 0, padding: 4, background: 'rgba(0,0,0,0.6)' }}>
+>         <label>
+>           Puzzle:{' '}
+>           <select
+>             value={puzzleKey}
+>             onChange={(e) => changePuzzle(e.target.value)}
+>             style={{
+>               background: 'black',
+>               color: '#0f0',
+>               border: '1px solid #0f0',
+>               fontFamily: 'monospace'
+>             }}
+>           >
+>             {PUZZLE_OPTIONS.map((opt) => (
+>               <option key={opt.key} value={opt.key}>
+>                 {opt.label}
+>               </option>
+>             ))}
+>           </select>
+>         </label>
+>         <button
+>           onClick={resetAll}
+>           style={{
+>             marginLeft: 8,
+>             background: 'black',
+>             color: '#0f0',
+>             border: '1px solid #0f0',
+>             fontFamily: 'monospace'
+>           }}
+>         >
+>           Reset
+>         </button>
+>         {victory ? <div className="victory-banner">SOLVED!</div> : null}
+>         {error ? <div className="error-message">{error}</div> : null}
+>       </div>
+>
+>       {/* optional tiny status (not required), kept out of svg */}
+>       <div style={{ position: 'absolute', left: 0, bottom: 0, padding: 4, background: 'rgba(0,0,0,0.6)', fontSize: 12 }}>
+>         {islands.map((isl) => (
+>           <span key={isl.id} style={{ marginRight: 8 }}>
+>             {isl.id}:{counts.get(isl.id) ?? 0}/{isl.value}
+>           </span>
+>         ))}
+>       </div>
+>     </div>
+>   );
+> }
+> EOF
+root@666a35584647:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-D36fXC7D.css    0.07 kB │ gzip:  0.08 kB
+dist/assets/index-uk4eP3hF.js   150.07 kB │ gzip: 48.76 kB
+✓ built in 997ms
+root@666a35584647:/app#
+
+
+Are you sure you want to mark the task as complete? This will trigger your solution to be graded and you won't be able to make any further corrections. If so, include "task_complete": true in your JSON response again.

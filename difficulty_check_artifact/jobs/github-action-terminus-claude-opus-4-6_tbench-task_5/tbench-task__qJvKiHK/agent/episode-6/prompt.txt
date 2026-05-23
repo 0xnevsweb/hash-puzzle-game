@@ -1,0 +1,14 @@
+New Terminal Output:
+
+root@c76eac6a0558:/app# cd /app && npm run build 2>&1
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-D36fXC7D.css    0.07 kB │ gzip:  0.08 kB
+dist/assets/index-BeLxROT-.js   149.83 kB │ gzip: 48.38 kB
+✓ built in 1.05s
+root@c76eac6a0558:/app#

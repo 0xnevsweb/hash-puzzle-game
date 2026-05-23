@@ -1,0 +1,192 @@
+[WebServer] [43m[1m WARN [22m[49m Checking for updates failed (use `--debug` to see full error)
+
+Running 11 tests using 1 worker
+
+  ✓   1 [chromium] › e2e/example.spec.ts:3:1 › initial render (143ms)
+  ✘   2 [chromium] › e2e/example.spec.ts:9:1 › mouse adds and removes bridge (167ms)
+  ✘   3 [chromium] › e2e/example.spec.ts:26:1 › invalid move shows error (5.2s)
+  ✘   4 [chromium] › e2e/example.spec.ts:34:1 › victory banner appears (5.2s)
+  ✘   5 [chromium] › e2e/example.spec.ts:51:1 › reset clears bridges (5.2s)
+  ✓   6 [chromium] › e2e/example.spec.ts:62:1 › puzzle change resets board (171ms)
+  ✓   7 [chromium] › e2e/example.spec.ts:72:1 › keyboard navigation toggles bridge (155ms)
+  ✘   8 [chromium] › e2e/example.spec.ts:84:1 › right-click removes a bridge (153ms)
+  ✓   9 [chromium] › e2e/example.spec.ts:105:1 › escape cancels keyboard selection (198ms)
+  ✘  10 [chromium] › e2e/example.spec.ts:117:1 › ctrl+click removes a bridge (157ms)
+  ✘  11 [chromium] › e2e/example.spec.ts:137:1 › error message clears on next valid move (5.2s)
+
+
+  1) [chromium] › e2e/example.spec.ts:9:1 › mouse adds and removes bridge ──────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m1[39m
+    Received: [31m0[39m
+
+      13 |   await page.mouse.click(80, 80);
+      14 |   await page.mouse.click(240, 80);
+    > 15 |   expect(await page.locator('line').count()).toBe(1);
+         |                                              ^
+      16 |   // pair 2: 1 → 2 bridges
+      17 |   await page.mouse.click(80, 80);
+      18 |   await page.mouse.click(240, 80);
+        at /tests/e2e/example.spec.ts:15:46
+
+    Error Context: test-results/example-mouse-adds-and-removes-bridge-chromium/error-context.md
+
+  2) [chromium] › e2e/example.spec.ts:26:1 › invalid move shows error ──────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('.error-message')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.error-message')[22m
+
+
+      29 |   await page.mouse.click(80, 80);
+      30 |   await page.mouse.click(240, 240);
+    > 31 |   await expect(page.locator('.error-message')).toBeVisible();
+         |                                                ^
+      32 | });
+      33 |
+      34 | test('victory banner appears', async ({ page }) => {
+        at /tests/e2e/example.spec.ts:31:48
+
+    Error Context: test-results/example-invalid-move-shows-error-chromium/error-context.md
+
+  3) [chromium] › e2e/example.spec.ts:34:1 › victory banner appears ────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('.victory-banner')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.victory-banner')[22m
+
+
+      45 |   await page.mouse.click(240, 240);
+      46 |   const banner = page.locator('.victory-banner');
+    > 47 |   await expect(banner).toBeVisible();
+         |                        ^
+      48 |   await expect(banner).toContainText('SOLVED!');
+      49 | });
+      50 |
+        at /tests/e2e/example.spec.ts:47:24
+
+    Error Context: test-results/example-victory-banner-appears-chromium/error-context.md
+
+  4) [chromium] › e2e/example.spec.ts:51:1 › reset clears bridges ──────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveCount[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  locator('line')
+    Expected: [32m1[39m
+    Received: [31m0[39m
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toHaveCount" with timeout 5000ms[22m
+    [2m  - waiting for locator('line')[22m
+    [2m    14 × locator resolved to 0 elements[22m
+    [2m       - unexpected value "0"[22m
+
+
+      55 |   await page.mouse.click(80, 80);
+      56 |   await page.mouse.click(240, 80);
+    > 57 |   await expect(page.locator('line')).toHaveCount(1);
+         |                                      ^
+      58 |   await page.click('button:has-text("Reset")');
+      59 |   await expect(page.locator('line')).toHaveCount(0);
+      60 | });
+        at /tests/e2e/example.spec.ts:57:38
+
+    Error Context: test-results/example-reset-clears-bridges-chromium/error-context.md
+
+  5) [chromium] › e2e/example.spec.ts:84:1 › right-click removes a bridge ──────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m2[39m
+    Received: [31m0[39m
+
+      92 |   await page.mouse.click(80, 80);
+      93 |   await page.mouse.click(240, 80);
+    > 94 |   expect(await page.locator('line').count()).toBe(2);
+         |                                              ^
+      95 |   // Click directly on one of the rendered <line> elements. Use boundingBox +
+      96 |   // mouse.click because Playwright's locator.click visibility check doesn't
+      97 |   // handle SVG <line> reliably (no HTML layout box); stroke offsets are
+        at /tests/e2e/example.spec.ts:94:46
+
+    Error Context: test-results/example-right-click-removes-a-bridge-chromium/error-context.md
+
+  6) [chromium] › e2e/example.spec.ts:117:1 › ctrl+click removes a bridge ──────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m2[39m
+    Received: [31m0[39m
+
+      124 |   await page.mouse.click(80, 80);
+      125 |   await page.mouse.click(240, 80);
+    > 126 |   expect(await page.locator('line').count()).toBe(2);
+          |                                              ^
+      127 |   // Same approach as the right-click test: compute the line's bounding box
+      128 |   // and mouse-click its center with the Control modifier held.
+      129 |   const ccBox = await page.locator('line').first().boundingBox();
+        at /tests/e2e/example.spec.ts:126:46
+
+    Error Context: test-results/example-ctrl-click-removes-a-bridge-chromium/error-context.md
+
+  7) [chromium] › e2e/example.spec.ts:137:1 › error message clears on next valid move ──────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('.error-message')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.error-message')[22m
+
+
+      141 |   await page.mouse.click(80, 80);
+      142 |   await page.mouse.click(240, 240);
+    > 143 |   await expect(page.locator('.error-message')).toBeVisible();
+          |                                                ^
+      144 |   await page.mouse.click(80, 80);
+      145 |   await page.mouse.click(240, 80);
+      146 |   await expect(page.locator('.error-message')).toHaveCount(0);
+        at /tests/e2e/example.spec.ts:143:48
+
+    Error Context: test-results/example-error-message-clears-on-next-valid-move-chromium/error-context.md
+
+  7 failed
+    [chromium] › e2e/example.spec.ts:9:1 › mouse adds and removes bridge ───────────────────────────
+    [chromium] › e2e/example.spec.ts:26:1 › invalid move shows error ───────────────────────────────
+    [chromium] › e2e/example.spec.ts:34:1 › victory banner appears ─────────────────────────────────
+    [chromium] › e2e/example.spec.ts:51:1 › reset clears bridges ───────────────────────────────────
+    [chromium] › e2e/example.spec.ts:84:1 › right-click removes a bridge ───────────────────────────
+    [chromium] › e2e/example.spec.ts:117:1 › ctrl+click removes a bridge ───────────────────────────
+    [chromium] › e2e/example.spec.ts:137:1 › error message clears on next valid move ───────────────
+  4 passed (27.8s)
+
+ RUN  v2.1.9 /tests
+
+ ✓ unit/hashiLogic.spec.ts (16 tests) 15ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  03:30:27
+   Duration  570ms (transform 64ms, setup 0ms, collect 58ms, tests 15ms, environment 256ms, prepare 53ms)
+

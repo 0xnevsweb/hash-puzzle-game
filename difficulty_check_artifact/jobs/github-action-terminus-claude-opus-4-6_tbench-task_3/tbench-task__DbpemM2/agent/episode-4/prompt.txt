@@ -1,0 +1,315 @@
+New Terminal Output:
+
+root@8d3b79672224:/app# cat > /app/vite.config.js << 'EOF'
+> import { defineConfig } from 'vite';
+> import react from '@vitejs/plugin-react';
+>
+> export default defineConfig({
+>   plugins: [react()],
+>   build: {
+>     outDir: 'dist',
+>   },
+> });
+> EOF
+root@8d3b79672224:/app# cat > /app/src/data/puzzles.js << 'EOF'
+> export const puzzles = [
+>   {
+>     id: 1,
+>     name: "Easy",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 2 },
+>       { id: 2, x: 2, y: 6, value: 2 },
+>       { id: 3, x: 6, y: 6, value: 2 }
+>     ]
+>   },
+>   {
+>     id: 2,
+>     name: "Medium",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 3 },
+>       { id: 1, x: 6, y: 2, value: 4 },
+>       { id: 2, x: 10, y: 2, value: 1 },
+>       { id: 3, x: 2, y: 6, value: 1 },
+>       { id: 4, x: 6, y: 6, value: 1 }
+>     ]
+>   },
+>   {
+>     id: 3,
+>     name: "Hard",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 4 },
+>       { id: 2, x: 10, y: 2, value: 2 },
+>       { id: 3, x: 2, y: 6, value: 2 },
+>       { id: 4, x: 6, y: 6, value: 4 },
+>       { id: 5, x: 10, y: 6, value: 2 }
+>     ]
+>   }
+> ];
+> EOF
+root@8d3b79672224:/app# mkdir -p /app/src/utils
+root@8d3b79672224:/app# cat > /app/src/utils/hashiLogic.js << 'EOF'
+
+    const maxX = Math.max(from.x, to.x);
+    for (const island of islands) {
+      if (island.id === from.id || island.id === to.id) continue;
+      if (island.y === from.y && island.x > minX && island.x < maxX) return false;
+    }
+  }
+  return true;
+}
+
+// Check if a bridge between from and to would cross any existing bridge
+function wouldCross(islands, bridges, from, to) {
+  const isHorizontal = from.y === to.y;
+
+  for (const [key, count] of bridges.entries()) {
+    if (count === 0) continue;
+    const parts = key.split(',').map(Number);
+    const [x1, y1, x2, y2] = parts;
+
+    // Check if segments cross
+    if (isHorizontal) {
+      // New bridge is horizontal, check against vertical existing bridges
+      if (y1 === y2) continue; // both horizontal, can't cross (parallel)
+      // Existing is vertical (x1 === x2)
+      const newMinX = Math.min(from.x, to.x);
+      const newMaxX = Math.max(from.x, to.x);
+      const newY = from.y;
+      const existMinY = Math.min(y1, y2);
+      const existMaxY = Math.max(y> // Bridge key: canonical "x1,y1,x2,y2" where endpoint with smaller (x, then y) sorts first
+> export function getBridgeKey(island1, island2) {
+>   const a = { x: island1.x, y: island1.y };
+>   const b = { x: island2.x, y: island2.y };
+>   if (a.x < b.x || (a.x === b.x && a.y < b.y)) {
+>     return `${a.x},${a.y},${b.x},${b.y}`;
+>   }
+>   return `${b.x},${b.y},${a.x},${a.y}`;
+> }
+>
+> // Check if two islands are adjacent (same row/col, no island between them)
+> function areAdjacent(islands, from, to) {
+>   if (from.x !== to.x && from.y !== to.y) return false;
+>   if (from.x === to.x && from.y === to.y) return false;
+>
+>   if (from.x === to.x) {
+>     // Vertical
+>     const minY = Math.min(from.y, to.y);
+>     const maxY = Math.max(from.y, to.y);
+>     for (const island of islands) {
+>       if (island.id === from.id || island.id === to.id) continue;
+>       if (island.x === from.x && island.y > minY && island.y < maxY) return false;
+>     }
+>   } else {
+>     // Horizontal
+>     const minX = Math.min(from.x, to.x);
+>     const maxX = Math.max(from.x, to.x);
+>     for (const island of islands) {
+>       if (island.id === from.id || island.id === to.id) continue;
+>       if (island.y === from.y && island.x > minX && island.x < maxX) return false;
+>     }
+>   }
+>   return true;
+> }
+>
+> // Check if a bridge between from and to would cross any existing bridge
+> function wouldCross(islands, bridges, from, to) {
+>   const isHorizontal = from.y === to.y;
+>
+>   for (const [key, count] of bridges.entries()) {
+>     if (count === 0) continue;
+>     const parts = key.split(',').map(Number);
+>     const [x1, y1, x2, y2] = parts;
+>
+>     // Check if segments cross
+>     if (isHorizontal) {
+>       // New bridge is horizontal, check against vertical existing bridges
+>       if (y1 === y2) continue; // both horizontal, can't cross (parallel)
+>       // Existing is vertical (x1 === x2)
+>       const newMinX = Math.min(from.x, to.x);
+>       const newMaxX = Math.max(from.x, to.x);
+>       const newY = from.y;
+>       const existMinY = Math.min(y1, y2);
+>       const existMaxY = Math.max(y1, y2);
+>       const existX = x1;
+>
+>       if (existX > newMinX && existX < newMaxX && newY > existMinY && newY < existMaxY) {
+>         return true;
+>       }
+>     } else {
+>       // New bridge is vertical, check against horizontal existing bridges
+>       if (x1 === x2) continue; // both vertical, can't cross (parallel)
+>       // Existing is horizontal (y1 === y2)
+>       const newMinY = Math.min(from.y, to.y);
+>       const newMaxY = Math.max(from.y, to.y);
+>       const newX = from.x;
+>       const existMinX = Math.min(x1, x2);
+>  
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+    y2={py2}
+>             stroke="#0f0"
+>             strokeWidth="2"
+>             style={{ cursor: 'pointer' }}
+>             onClick={(e) => handleBridgeClick(key, e)}
+>             onContextMenu={(e) => handleBridgeRemove(key, e)}
+>           />
+>         );
+>       } else if (count === 2) {
+>         const isHorizontal = y1 === y2;
+>         const offset = BRIDGE_OFFSET;
+>         if (isHorizontal) {
+>           lines.push(
+>             <line
+>               key={`${key}-a`}
+>               x1={px1}
+>               y1={py1 - offset}
+>               x2={px2}
+>               y2={py2 - offset}
+>               stroke="#0f0"
+>               strokeWidth="2"
+>               style={{ cursor: 'pointer' }}
+>               onClick={(e) => handleBridgeClick(key, e)}
+>               onContextMenu={(e) => handleBridgeRemove(key, e)}
+>             />
+>           );
+>           lines.push(
+>             <line
+>               key={`${key}-b`}
+>               x1={px1}
+>               y1={py1 + offset}
+>               x2={px2}
+>               y2={py2 + offset}
+>               stroke="#0f0"
+>               strokeWidth="2"
+>               style={{ cursor: 'pointer' }}
+>               onClick={(e) => handleBridgeClick(key, e)}
+>               onContextMenu={(e) => handleBridgeRemove(key, e)}
+>             />
+>           );
+>         } else {
+>           lines.push(
+>             <line
+>               key={`${key}-a`}
+>               x1={px1 - offset}
+>               y1={py1}
+>               x2={px2 - offset}
+>               y2={py2}
+>               stroke="#0f0"
+>               strokeWidth="2"
+>               style={{ cursor: 'pointer' }}
+>               onClick={(e) => handleBridgeClick(key, e)}
+>               onContextMenu={(e) => handleBridgeRemove(key, e)}
+>             />
+>           );
+>           lines.push(
+>             <line
+>               key={`${key}-b`}
+>               x1={px1 + offset}
+>               y1={py1}
+>               x2={px2 + offset}
+>               y2={py2}
+>               stroke="#0f0"
+>               strokeWidth="2"
+>               style={{ cursor: 'pointer' }}
+>               onClick={(e) => handleBridgeClick(key, e)}
+>               onContextMenu={(e) => handleBridgeRemove(key, e)}
+>             />
+>           );
+>         }
+>       }
+>     }
+>     return lines;
+>   };
+>
+>   // Render islands
+>   const renderIslands = () => {
+>     return islands.map(island => {
+>       const px = island.x * GRID_SIZE;
+>       const py = island.y * GRID_SIZE;
+>       const isSelected = selectedIsland === island.id;
+>
+>       return (
+>         <g key={`island-${island.id}`} onClick={() => handleIslandClick(island)} style={{ cursor: 'pointer' }}>
+>           <circle
+>             cx={px}
+>             cy={py}
+>             r={ISLAND_RADIUS}
+>             fill="#000"
+>             stroke={isSelected ? "#ff0" : "#0f0"}
+>             strokeWidth={isSelected ? 3 : 2}
+>           />
+>           <text
+>             x={px}
+>             y={py}
+>             textAnchor="middle"
+>             dominantBaseline="central"
+>             fill="#0f0"
+>             fontSize="14"
+>             fontFamily="'Courier New', monospace"
+>           >
+>             {island.value}
+>           </text>
+>         </g>
+>       );
+>     });
+>   };
+>
+>   // Render cursor (not a circle!)
+>   const renderCursor = () => {
+>     const island = islands.find(i => i.id === cursorIslandId);
+>     if (!island) return null;
+>     const px = island.x * GRID_SIZE;
+>     const py = island.y * GRID_SIZE;
+>     const size = ISLAND_RADIUS + 6;
+>
+>     return (
+>       <rect
+>         x={px - size}
+>         y={py - size}
+>         width={size * 2}
+>         height={size * 2}
+>         fill="none"
+>         stroke="#0ff"
+>         strokeWidth="2"
+>         strokeDasharray="4 2"
+>         pointerEvents="none"
+>       />
+>     );
+>   };
+>
+>   return (
+>     <div className="app-container">
+>       <svg width={SVG_WIDTH} height={SVG_HEIGHT} style={{ backgroundColor: '#000' }}>
+>         {renderBridges()}
+>         {renderIslands()}
+>         {renderCursor()}
+>       </svg>
+>       <div className="controls">
+>         <select value={puzzleIndex} onChange={handlePuzzleChange}>
+>           {puzzles.map((p, idx) => (
+>             <option key={p.id} value={idx}>{p.name}</option>
+>           ))}
+>         </select>
+>         <button onClick={handleReset}>Reset</button>
+>       </div>
+>       {errorMessage && <div className="error-message">{errorMessage}</div>}
+>       {victory && <div className="victory-banner">SOLVED!</div>}
+>     </div>
+>   );
+> }
+>
+> export default App;
+> JSXEOF
+root@8d3b79672224:/app# cd /app && npm run build 2>&1
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-B8P3TPXY.css    0.85 kB │ gzip:  0.39 kB
+dist/assets/index-DyYQlbg8.js   149.91 kB │ gzip: 48.23 kB
+✓ built in 925ms
+root@8d3b79672224:/app#

@@ -1,0 +1,35 @@
+New Terminal Output:
+
+root@c76eac6a0558:/app# cat > /app/src/index.css << 'EOF'
+> * {
+>   margin: 0;
+>   padding: 0;
+>   box-sizing: border-box;
+> }
+>
+> html, body {
+>   margin: 0;
+>   padding: 0;
+>   background-color: black;
+>   color: #0f0;
+>   font-family: monospace;
+>   overflow: hidden;
+> }
+>
+> #root {
+>   margin: 0;
+>   padding: 0;
+> }
+> EOF
+root@c76eac6a0558:/app# npm run build 2>&1
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-Brpq9Lzd.css    0.17 kB │ gzip:  0.13 kB
+dist/assets/index-DGCLhQDo.js   150.03 kB │ gzip: 48.43 kB
+✓ built in 1.02s
+root@c76eac6a0558:/app#

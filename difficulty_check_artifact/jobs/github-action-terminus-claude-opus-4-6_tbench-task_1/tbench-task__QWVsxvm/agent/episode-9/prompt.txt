@@ -1,0 +1,346 @@
+New Terminal Output:
+
+root@4b5e3617f4cf:/app# cat > /app/src/App.jsx << 'ENDOFFILE'
+> import React, { useState, useEffect, useCallback } from 'react';
+> import { puzzles } from './data/puzzles';
+> import {
+>   makeBridgeKey,
+>   canAddBridge,
+>   computeCurrentCounts,
+>   isVictory
+> } from './utils/hashiLogic';
+>
+> const GRID_SIZE = 40;
+> const SVG_WIDTH = 800;
+i> const SVG_HEIGHT = 600;
+> const ISLAND_RADIUS = 16;
+>
+> function App() {
+>   const [puzzleIndex, setPuzzleIndex] = useState(0);
+>   const [bridges, setBridges] = useState(new Map());
+>   const [selectedIsland, setSelectedIsland] = useState(null);
+>   const [cursorIslandId, setCursorIslandId] = useState(0);
+>   const [errorMessage, setErrorMessage] = useState(null);
+>   const [victory, setVictory] = useState(false);
+>   const [kbSelected, setKbSelected] = useState(false);
+>
+>   const puzzle = puzzles[puzzleIndex];
+>   const islands = puzzle.islands;
+>
+>   // Reset everything when puzzle changes
+>   const handlePuzzleChange = (e) => {
+>     const idx = parseInt(e.target.value, 10);
+>     setPuzzleIndex(idx);
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setCursorIslandId(0);
+>     setErrorMessage(null);
+>     setVictory(false);
+>     setKbSelected(false);
+>   };
+>
+>   const handleReset = () => {
+>     setBridges(new Map());
+>     setSelectedIsland(null);
+>     setCursorIslandId(0);
+>     setErrorMessage(null);
+>     setVictory(false);
+>     setKbSelected(false);
+>   };
+>
+>   // Toggle bridge between two islands (none -> single -> double -> none)
+>   const toggleBridge = useCallback((fromIsland, toIsland) => {
+>     const key = makeBridgeKey(fromIsland, toIsland);
+>     const current = bridges.get(key) || 0;
+>
+>     if (current === 2) {
+>       // Remove bridge (double -> none)
+>       const newBridges = new Map(bridges);
+>       newBridges.delete(key);
+>       setBridges(newBridges);
+>       setSelectedIsland(null);
+>       setErrorMessage(null);
+>       setVictory(isVictory(islands, newBridges));
+>       return;
+>     }
+>
+>     // Try to add one bridge
+>     const delta = 1;
+>     const result = canAddBridge(islands, bridges, fromIsland, toIsland, delta);
+>
+>     if (!result.valid) {
+>       setErrorMessage(result.error);
+>       setSelectedIsland(null);
+>       return;
+>     }
+>
+>     const newBridges = new Map(bridges);
+>     newBridges.set(key, current + 1);
+>     setBridges(newBridges);
+>     setSelectedIsland(null);
+>     setErrorMessage(null);
+>     setVictory(isVictory(islands, newBridges));
+>   }, [bridges, islands]);
+>
+>   // Handle island click
+>   const handleIslandClick = useCallback((island) => {
+>     if (victory) return;
+>
+>     setCursorIslandId(island.id);
+>
+>     if (selectedIsland === null) {
+>       setSelectedIsland(island.id);
+>       setKbSelected(false);
+>     } else if (selectedIsland === island.id) {
+>       // Deselect
+>       setSelectedIsland(null);
+>     } else {
+>       const fromIsland = islands.find(i => i.id === selectedIsland);
+>       toggleBridge(fromIsland, island);
+>     }
+>   }, [selectedIsland, islands, toggleBridge, victory]);
+>
+>   // Handle bridge right-click or ctrl-click removal
+>   const handleBridgeRemove = useCallback((e, key) => {
+>     e.preventDefault();
+>     e.stopPropagation();
+>     if (victory) return;
+>
+ >     const newBridges = new Map(bridges);
+>     newBridges.delete(key);
+>     setBridges(newBridges);
+>     setSelectedIsland(null);
+>     setErrorMessage(null);
+>     setVictory(isVictory(islands, newBridges));
+>   }, [bridges, islands, victory]);
+>
+>   // Keyboard navigation
+>   useEffect(() => {
+>     const handleKeyDown = (e) => {
+>       if (victory) return;
+>
+>       const currentIsland = islands.find(i => i.id === cursorIslandId);
+>       if (!currentIsland) return;
+>
+>       if (e.key === 'Escape') {
+>         setSelectedIsland(null);
+>         setKbSelected(false);
+>         return;
+>       }
+>
+>       if (e.key === 'Enter') {
+>         if (!kbSelected) {
+>           setKbSelected(true);
+>           setSelectedIsland(cursorIslandId);
+>         } else {
+>           if (selectedIsland !== null && selectedIsland !== cursorIslandId) {
+>             const fromIsland = islands.find(i => i.id === selectedIsland);
+>             const toIsland = islands.find(i => i.id === cursorIslandId);
+>             toggleBridge(fromIsland, toIsland);
+>             setKbSelected(false);
+>           } else {
+>             setSelectedIsland(null);
+>             setKbSelected(false);
+>           }
+>         }
+>         return;
+>       }
+>
+>       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+>         e.preventDefault();
+>         let bestIsland = null;
+>         let bestDist = Infinity;
+>
+o>         for (const isl of islands) {
+>           if (isl.id === cursorIslandId) continue;
+>
+ >           let valid = false;
+>           let dist = 0;
+>
+l>           if (e.key === 'ArrowUp' && isl.y < currentIsland.y) {
+>             valid = true;
+>             dist = Ma
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+line
+>             key={key}
+>             x1={px1}
+>             y1={py1}
+>             x2={px2}
+>             y2={py2}
+>             stroke="#0f0"
+>             strokeWidth="3"
+>             style={{ cursor: 'pointer' }}
+>             onContextMenu={handleContext}
+>             onClick={handleClick}
+>           />
+>         );
+>       } else if (count === 2) {
+>         const dx = isHorizontal ? 0 : offset;
+>         const dy = isHorizontal ? offset : 0;
+>
+>         elements.push(
+>           <line
+>             key={key + '-a'}
+>             x1={px1 - dx}
+>             y1={py1 - dy}
+>             x2={px2 - dx}
+>             y2={py2 - dy}
+>             stroke="#0f0"
+>             strokeWidth="3"
+>             style={{ cursor: 'pointer' }}
+>             onContextMenu={handleContext}
+>             onClick={handleClick}
+>           />
+>         );
+>         elements.push(
+>           <line
+>             key={key + '-b'}
+>             x1={px1 + dx}
+>             y1={py1 + dy}
+>             x2={px2 + dx}
+>             y2={py2 + dy}
+>             stroke="#0f0"
+>             strokeWidth="3"
+>             style={{ cursor: 'pointer' }}
+>             onContextMenu={handleContext}
+>             onClick={handleClick}
+>           />
+>         );
+>       }
+>     }
+>     return elements;
+>   };
+>
+>   // Render islands
+>   const renderIslands = () => {
+>     return islands.map(island => {
+>       const px = island.x * GRID_SIZE;
+>       const py = island.y * GRID_SIZE;
+>       const isSelected = selectedIsland === island.id;
+>
+>       return (
+>         <g key={island.id} onClick={() => handleIslandClick(island)} style={{ cursor: 'pointer' }}>
+>           <circle
+>             cx={px}
+>             cy={py}
+>             r={ISLAND_RADIUS}
+>             fill="black"
+>             stroke={isSelected ? '#ff0' : '#0f0'}
+>             strokeWidth={isSelected ? 3 : 2}
+>           />
+>           <text
+>             x={px}
+>             y={py}
+>             textAnchor="middle"
+>             dominantBaseline="central"
+>             fill="#0f0"
+>             fontSize="14"
+>             fontFamily="monospace"
+>           >
+>             {island.value}
+>           </text>
+>         </g>
+>       );
+>     });
+>   };
+>
+>   // Render cursor (rect, not circle)
+>   const renderCursor = () => {
+>     const island = islands.find(i => i.id === cursorIslandId);
+>     if (!island) return null;
+>     const px = island.x * GRID_SIZE;
+>     const py = island.y * GRID_SIZE;
+>     const size = ISLAND_RADIUS + 6;
+>
+>     return (
+>       <rect
+>         x={px - size}
+>         y={py - size}
+>         width={size * 2}
+>         height={size * 2}
+>         fill="none"
+>         stroke="#0ff"
+>         strokeWidth="2"
+>         strokeDasharray="4 2"
+>         pointerEvents="none"
+>       />
+>     );
+>   };
+>
+>   return (
+>     <div>
+>       <svg
+>         width={SVG_WIDTH}
+>         height={SVG_HEIGHT}
+>         style={{ display: 'block', position: 'absolute', top: 0, left: 0, background: 'black' }}
+>       >
+>         {renderBridges()}
+>         {renderIslands()}
+>         {renderCursor()}
+>       </svg>
+>       <div style={{
+>         position: 'absolute',
+>         top: SVG_HEIGHT + 'px',
+>         left: 0,
+>         padding: '8px',
+>         display: 'flex',
+>         gap: '12px',
+>         alignItems: 'center'
+>       }}>
+>         <select
+>           value={puzzleIndex}
+>           onChange={handlePuzzleChange}
+>           style={{
+>             background: 'black',
+>             color: '#0f0',
+>             border: '1px solid #0f0',
+>             fontFamily: 'monospace',
+>             padding: '4px'
+>           }}
+>         >
+>           {puzzles.map((p, idx) => (
+>             <option key={p.id} value={idx}>{p.name}</option>
+>           ))}
+>         </select>
+>         <button
+>           onClick={handleReset}
+>           style={{
+>             background: 'black',
+>             color: '#0f0',
+>             border: '1px solid #0f0',
+>             fontFamily: 'monospace',
+>             padding: '4px 8px',
+>             cursor: 'pointer'
+>           }}
+>         >
+>           Reset
+>         </button>
+>         {errorMessage && (
+>           <span className="error-message" style={{ color: '#f00', fontFamily: 'monospace' }}>
+>             {errorMessage}
+>           </span>
+>         )}
+>         {victory && (
+>           <span className="victory-banner" style={{ color: '#0f0', fontFamily: 'monospace', fontSize: '20px', fontWeight: 'bold' }}>
+>             SOLVED!
+>           </span>
+>         )}
+>       </div>
+>     </div>
+>   );
+> }
+>
+> export default App;
+> ENDOFFILE
+root@4b5e3617f4cf:/app# cd /app && npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.27 kB
+dist/assets/index-d2xwJoXf.css    0.17 kB │ gzip:  0.15 kB
+dist/assets/index-DcBwBBbl.js   149.45 kB │ gzip: 48.30 kB
+✓ built in 941ms
+root@4b5e3617f4cf:/app#

@@ -1,0 +1,286 @@
+New Terminal Output:
+
+root@9ccdd54d65b8:/app# mkdir -p /app/src/utils
+root@9ccdd54d65b8:/app# cat > /app/src/data/puzzles.js << 'EOF'
+> export const puzzles = [
+>   {
+>     id: 1,
+>     name: "Easy",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 2 },
+>       { id: 2, x: 2, y: 6, value: 2 },
+>       { id: 3, x: 6, y: 6, value: 2 }
+>     ]
+>   },
+>   {
+>     id: 2,
+>     name: "Medium",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 3 },
+>       { id: 2, x: 10, y: 2, value: 1 },
+>       { id: 3, x: 2, y: 6, value: 2 },
+>       { id: 4, x: 6, y: 6, value: 2 }
+>     ]
+>   },
+>   {
+>     id: 3,
+>     name: "Hard",
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 3 },
+>       { id: 1, x: 6, y: 2, value: 4 },
+>       { id: 2, x: 10, y: 2, value: 3 },
+>       { id: 3, x: 2, y: 6, value: 3 },
+>       { id: 4, x: 6, y: 6, value: 4 },
+>       { id: 5, x: 10, y: 6, value: 3 }
+>     ]
+>   }
+> ];
+> EOF
+root@9ccdd54d65b8:/app# cat > /app/src/utils/hashiLogic.js << 'EOF'
+> // Generate canonical bridge key: smaller endpoint first (by x, then y)
+> export function bridgeKey(x1, y1, x2, y2) {
+>   if (x1 < x2 || (x1 === x2 && y1 < y2)) {
+>     return `${x1},${y1},${x2},${y2}`;
+>   }
+>   return `${x2},${y2},${x1},${y1}`;
+> }
+>
+> // Parse a bridge key back to coordinates
+> export function parseBridgeKey(key) {
+>   const [x1, y1, x2, y2] = key.split(',').map(Number);
+>   return { x1, y1, x2, y2 };
+> }
+>
+> // Check if two islands are adjacent (same row/col, no island between)
+> export function areAdjacent(islands, from, to) {
+>   if (from.x === to.x) {
+C>     // Same column - check no island between
+>     const minY = Math.min(from.y, to.y);
+>     const maxY = Math.max(from.y, to.y);
+>     for (const island of islands) {
+>       if (island.id === from.id || island.id === to.id) continue;
+>       if (island.x === from.x && island.y > minY && island.y < maxY) {
+>         return false;
+>       }
+>     }
+>     return true;
+>   } else if (from.y === to.y) {
+>     // Same row - check no island between
+>     const minX = Math.min(from.x, to.x);
+>     const maxX = Math.max(from.x, to.x);
+>     for (const island of islands) {
+>       if (island.id === from.id || island.id === to.id) continue;
+>       if (island.y === from.y && island.x > minX && island.x < maxX) {
+>         return false;
+>       }
+>     }
+>     return true;
+>   }
+>   return false; // Not same row or column
+> }
+>
+> // Check if a bridge between two points would cross any existing bridge
+> export function wouldCross(bridges, x1, y1, x2, y2) {
+>   const isHorizontal = y1 === y2;
+>
+>   for (const [key, count] of bridges) {
+>     if (count === 0) continue;
+>     const b = parseBridgeKey(key);
+>     const bIsHorizontal = b.y1 === b.y2;
+>
+>     // Parallel bridges can't cross
+>     if (isHorizontal === bIsHorizontal) continue;
+>
+>     // Perpendicular bridges: check intersection
+>     if (isHorizontal) {
+>       // Our bridge is horizontal, existing is vertical
+>       const ourMinX = Math.min(x1, x2);
+>       const ourMaxX = Math.max(x1, x2);
+>       const ourY = y1;
+>       const theirX = b.x1;
+>       const theirMinY = Math.min(b.y1, b.y2);
+>       const theirMaxY = Math.max(b.y1, b.y2);
+>
+>       if (theirX > ourMinX && theirX < ourMaxX &&
+>           ourY > theirMinY && ourY < theirMaxY) {
+>         return true;
+>       }
+>     } else {
+>       // Our bridge is vertical, existing is horizontal
+>       const ourMinY = Math.min(y1, y2);
+>       const ourMaxY = Math.max(y1, y2);
+>       const ourX = x1;
+>       const theirY = b.y1;
+>       const theirMinX = Math.min(b.x1, b.x2);
+>       const theirMaxX = Math.max(b.x1, b.x2);
+>
+>       if (ourX > theirMinX && ourX < theirMaxX &&
+>           theirY > ourMinY && theirY < ourMaxY) {
+>         return true;
+>       }
+>     }
+>   }
+>   return false;
+> }
+f>
+a> // Compute current bridge counts per island
+> export function computeCurrentCounts(islands, bridges) {
+>   const counts = new Map();
+>   for (const island of islands) {
+>     counts.set(island.id, 0);
+>   }
+>
+>   for (const [key, count] of bridges) {
+>     if (count === 0) continue;
+>     const { x1, y1, x2, y2 } = parseBridgeKey(key);
+>
+>     for (const island of islands) {
+>       if (island.x === x1 && island.y === y1) {
+>         counts.set(island.id, (counts.get(island.id) || 0) + count);
+>       }
+>       if (island.x === x2 && island.y === y2) {
+>         counts.set(island.id, (counts.get(island.id) || 0) + count);
+>       }
+>     }
+>   }
+>
+>   return counts;
+> }
+>
+> // Check if adding delta bridges is valid
+> export function canAddBridge(islands, bridges, from, to, delta) {
+>   // Guard: same island
+>   if (from.id === to.id) {
+>     return { valid: false, error: "Cannot connect non-adjacent islands" };
+>   }
+>
+>   // Check adjacency
+>   if (!areAdjacent(islands, from, to)) {
+>     return { valid: false, error: "Cannot connect non-adjacent islands" };
+>   }
+>
+>   const key = bridgeKey(from.x, from.y, to.x, to.y);
+>   const current = bridges.get(key) || 0;
+>   const newCount = current + delta;
+>
+>   // Check max bridges
+>   if (newCount > 2) {
+>     return { valid: false, error: "Max 2 bridges per pair" };
+>   }
+>
+>   // Check island capacity
+>   const counts = computeCurrentCounts(islands, bridges);
+>   const fromCount = counts.get(from.id) || 0;
+>   const toCount = counts.get(to.id) || 0;
+>
+>   if (fromCount + delta > from.value || toCount + delta > to.value) {
+>     return { valid: false, error: "Island would exceed its number" };
+>   }
+>
+>   // Check crossing (only for new bridges, not when adding second to existing)
+>   if (current === 0) {
+>     if (wouldCross(bridges, from.x, from.y, to.x, to.y)) {
+>       return { valid: false, error: "Bridges would cross" };
+>     }
+>   }
+>
+>   return { valid: true, error: null };
+> }
+>
+> // Check connectivity: all islands with bridges are connected
+> export function checkConnectivity(islands, bridges) {
+>   if (islands.length === 0) return true;
+>
+>   // Build adjacency list
+>   const adj = new Map();
+>   for (const island of islands) {
+>     adj.set(island.id, []);
+>   }
+>
+>   for (const [key, count] of bridges) {
+>     if (count === 0) continue;
+>     const { x1, y1, x2, y2 } = parseBridgeKey(key);
+>
+>     let fromId = null, toId = null;
+>     for (const island of islands) {
+>       if (island.x === x1 && island.y === y1) fromId = island.id;
+>       if (island.x === x2 && island.y === y2) toId = island.id;
+>     }
+>
+>     if (fromId !== null && toId !== null) {
+>       adj.get(fromId).push(toId);
+>       adj.get(toId).push(fromId);
+>     }
+>   }
+>
+>   // BFS from first island
+>   const visited = new Set();
+>   const queue = [islands[0].id];
+>   visited.add(islands[0].id);
+>
+>   while (queue.length > 0) {
+>     const curr = queue.shift();
+>     for (const neighbor of adj.get(curr)) {
+>       if (!visited.has(neighbor)) {
+>         visited.add(neighbor);
+>         queue.push(neighbor);
+>       }
+>     }
+>   }
+>
+>   return visited.size === islands.length;
+> }
+>
+> // Check if puzzle is solved
+> export function isVictory(islands, bridges) {
+>   // Check all counts satisfied
+>   const counts = computeCurrentCounts(islands, bridges);
+>   for (const island of islands) {
+>     if ((counts.get(island.id) || 0) !== island.value) {
+>       return false;
+>     }
+>   }
+>
+>   // Check no bridges cross
+>   const activeBridges = [];
+>   for (const [key, count] of bridges) {
+>     if (count === 0) continue;
+>     activeBridges.push(parseBridgeKey(key));
+>   }
+>
+>   for (let i = 0; i < activeBridges.length; i++) {
+>     for (let j = i + 1; j < activeBridges.length; j++) {
+>       const a = activeBridges[i];
+>       const b = activeBridges[j];
+>       const aHoriz = a.y1 === a.y2;
+>       const bHoriz = b.y1 === b.y2;
+>
+>       if (aHoriz === bHoriz) continue;
+>
+>       if (aHoriz) {
+>         const minX = Math.min(a.x1, a.x2);
+>         const maxX = Math.max(a.x1, a.x2);
+>         const aY = a.y1;
+>         const bX = b.x1;
+>         const minY = Math.min(b.y1, b.y2);
+>         const maxY = Math.max(b.y1, b.y2);
+>         if (bX > minX && bX < maxX && aY > minY && aY < maxY) return false;
+>       } else {
+>         const minY = Math.min(a.y1, a.y2);
+>         const maxY = Math.max(a.y1, a.y2);
+>         const aX = a.x1;
+>         const bY = b.y1;
+>         const minX = Math.min(b.x1, b.x2);
+>         const maxX = Math.max(b.x1, b.x2);
+>         if (aX > minX && aX < maxX && bY > minY && bY < maxY) return false;
+>       }
+>     }
+>   }
+>
+>   // Check connectivity
+>   return checkConnectivity(islands, bridges);
+> }
+> EOF
+root@9ccdd54d65b8:/app#

@@ -1,0 +1,23 @@
+{
+  "analysis": "Vite+React project is present. Current App.jsx is a placeholder. src/data/puzzles.js already exists but contents not yet inspected. Need to implement full game: puzzles data (3 difficulties), hashi logic utilities under src/utils/hashiLogic.js, and the UI in App.jsx with SVG board, retro styling, mouse/keyboard interactions, error/victory rendering, reset/puzzle switching behavior. Also ensure build outputs to dist via vite build.",
+  "plan": "1) Inspect existing puzzles.js and index entrypoints/CSS. 2) Replace/extend index.css to enforce black background + green monospace + no padding + SVG top-left. 3) Create src/utils/hashiLogic.js implementing: canonical keying, adjacency checks, crossing detection, counts, connectivity, victory. 4) Implement App.jsx with state: selectedPuzzle, bridges Map, selection (first island), cursor island id, error string, victory boolean. Ensure: first click selects, second toggles, errors reset selection in same update, error cleared on next valid move. Render bridges as <line> elements (double = two lines) each with onClick (ctrl+click removal) and onContextMenu removal; removing either line clears pair. Keyboard listeners on window/document: arrows move cursor to nearest island in direction, Enter selects/toggles, Esc cancels; cursor resets to island id 0 after any puzzle change/reset/toggle. 5) Run npm run build and fix issues.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '1,200p' src/data/puzzles.js\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' src/index.jsx\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,200p' src/index.css\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "mkdir -p src/utils\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

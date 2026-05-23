@@ -1,0 +1,331 @@
+New Terminal Output:
+
+root@666a35584647:/app# sed -n '1,200p' src/data/puzzles.js
+export const puzzles = [
+  {
+    id: 1,
+    name: "Easy",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 2 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 2, y: 6, value: 2 },
+      { id: 3, x: 6, y: 6, value: 2 }
+    ]
+  },
+  {
+    id: 2,
+    name: "Medium",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 3 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 10, y: 2, value: 3 },
+      { id: 3, x: 4, y: 6, value: 2 },
+      { id: 4, x: 8, y: 6, value: 2 }
+    ]
+  },
+  {
+    id: 3,
+    name: "Hard",
+    islands: [
+      { id: 0, x: 2, y: 2, value: 4 },
+      { id: 1, x: 6, y: 2, value: 2 },
+      { id: 2, x: 10, y: 2, value: 4 },
+      { id: 3, x: 2, y: 6, value: 2 },
+      { id: 4, x: 6, y: 6, value: 4 },
+      { id: 5, x: 10, y: 6, value: 2 }
+    ]
+  }
+];
+root@666a35584647:/app# mkdir -p src/utils
+root@666a35584647:/app# cat > src/data/puzzles.js <<'EOF'
+> export const PUZZLES = {
+>   Easy: {
+>     name: 'Easy',
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 2 },
+>       { id: 1, x: 6, y: 2, value: 2 },
+>       { id: 2, x: 2, y: 6, value: 2 },
+>       { id: 3, x: 6, y: 6, value: 2 }
+>     ]
+>   },
+>   Medium: {
+>     name: 'Medium',
+>     islands: [
+>       { id: 0, x: 2, y: 2, value: 3 },
+>       { id: 1, x: 8, y: 2, value: 2 },
+>       { id: 2, x: 5, y: 5, value: 4 },
+>       { id: 3, x: 2, y: 8, value: 2 },
+>       { id: 4, x: 8, y: 8, value: 3 }
+>     ]
+>   },
+>   Hard: {
+>     name: 'Hard',
+>     islands: [
+>       { id: 0, x: 1, y: 1, value: 2 },
+>       { id: 1, x: 6, y: 1, value: 4 },
+>       { id: 2, x: 11, y: 1, value: 2 },
+>       { id: 3, x: 1, y: 5, value: 3 },
+>       { id: 4, x: 6, y: 5, value: 5 },
+>       { id: 5, x: 11, y: 5, value: 3 },
+>       { id: 6, x: 1, y: 9, value: 2 },
+>       { id: 7, x: 6, y: 9, value: 4 },
+>       { id: 8, x: 11, y: 9, value: 2 },
+>       { id: 9, x: 6, y: 13, value: 3 }
+>     ]
+>   }
+> };
+>
+> export const PUZZLE_OPTIONS = [
+>   { label: 'Easy', key: 'Easy' },
+>   { label: 'Medium', key: 'Medium' },
+>   { label: 'Hard', key: 'Hard' }
+> ];
+> EOF
+root@666a35584647:/app# cat > src/utils/hashiLogic.js <<'EOF'
+> // Hashi (Bridges) logic utilities
+>
+> export const ERR_NON_ADJACENT = 'Cannot connect non-adjacent islands';
+> export const ERR_MAX_PER_PAIR = 'Max 2 bridges per pair';
+> export const ERR_EXCEED_ISLAND = 'Island would exceed its number';
+> export const ERR_CROSSING = 'Bridges would cross';
+>
+> export function isOrthogonal(a, b) {
+>   return a.x === b.x || a.y === b.y;
+> }
+>
+> export function canonicalKey(from, to) {
+>   // key is in grid units: "x1,y1,x2,y2" sorted by (x, then y)
+>   const a = { x: from.x, y: from.y };
+>   const b = { x: to.x, y: to.y };
+>   const first = a.x < b.x || (a.x === b.x && a.y <= b.y) ? a : b;
+>   const second = first === a ? b : a;
+>   return `${first.x},${first.y},${second.x},${second.y}`;
+> }
+>
+r> export function parseKey(key) {
+>   const [x1, y1, x2, y2] = key.split(',').map((n) => Number(n));
+>   return { x1, y1, x2, y2 };
+> }
+>
+> export function buildCoordToIsland(islands) {
+>   const m = new Map();
+>   for (const isl of islands) {
+>     m.set(`${isl.x},${isl.y}`, isl);
+>   }
+>   return m;
+> }
+>
+> export function areAdjacent(islands, from, to) {
+>   if (!from || !to) return false;
+>   if (from.id === to.id) return false;
+>   if (!isOrthogonal(from, to)) return false;
+>
+s>   const coordToIsland = buildCoordToIsland(islands);
+>
+>   if (from.x === to.x) {
+>     const x = from.x;
+>     const yMin = Math.min(from.y, to.y);
+>     const yMax = Math.max(from.y, to.y);
+>     for (let y = yMin + 1; y <= yMax - 1; y++) {
+>       if (coordToIsland.has(`${x},${y}`)) return false;
+>     }
+>     return true;
+>   }
+>
+c>   // from.y === to.y
+>   const y = from.y;
+>   const xMin = Math.min(from.x, to.x);
+>   const xMax = Math.max(from.x, to.x);
+>   for (let x = xMin + 1; x <= xMax - 1; x++) {
+>     if (coordToIsland.has(`${x},${y}`)) return false;
+>   }
+>   return true;
+co> }
+>
+> function segmentsCross(segA, segB) {
+>   // seg: {x1,y1,x2,y2} in grid units, axis-aligned
+>   // Only count crossing when one horizontal and one vertical intersect at interior points.
+>   const aVert = segA.x1 === segA.x2;
+>   const bVert = segB.x1 === segB.x2;
+>   if (aVert === bVert) return false;
+>
+>   const v = aVert ? segA : segB;
+>   const h = aVert ? segB : segA;
+>
+>   const vx = v.x1;
+>   const vyMin = Math.min(v.y1, v.y2);
+>   const vyMax = Math.max(v.y1, v.y2);
+>
+>   const hy = h.y1;
+>   const hxMin = Math.min(h.x1, h.x2);
+>   const hxMax = Math.max(h.x1, h.x2);
+>
+>   // intersection point
+>   const ix = vx;
+>   const iy = hy;
+>
+>   // must be strictly inside both segments, not at endpoints
+>   const vInside = iy > vyMin && iy < vyMax;
+>   const hInside = ix > hxMin && ix < hxMax;
+>   return vInside && hInside;
+> }
+>
+> export function wouldCrossExisting(bridges, newKey) {
+>   const newSeg = parseKey(newKey);
+>   for (const [key, count] of bridg
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+    const y1 = px(seg.y1) + seg.dy;
+>       const x2 = px(seg.x2) + seg.dx;
+>       const y2 = px(seg.y2) + seg.dy;
+>       const lineKey = `${key}:${idx}`;
+>
+>>       bridgeLineEls.push(
+>         <line
+>           key={lineKey}
+>           x1={x1}
+>           y1={y1}
+>           x2={x2}
+>           y2={y2}
+>           stroke="#0f0"
+>           strokeWidth={4}
+>           strokeLinecap="round"
+>           onClick={(e) => {
+>             if (e.ctrlKey) {
+>               e.preventDefault();
+>               removeBridgeByKey(key);
+>             }
+>           }}
+>           onContextMenu={(e) => {
+>             e.preventDefault();
+>             removeBridgeByKey(key);
+>           }}
+>         />
+>       );
+>     }
+>   }
+>
+>   return (
+>     <div style={{ width: SVG_W, height: SVG_H }}>
+>       <div style={{ position: 'absolute', left: 0, top: 0, padding: 0, margin: 0 }}>
+>         <div style={{ padding: 8 }}>
+>           <label>
+>             Puzzle:{' '}
+>             <select
+>               value={puzzleKey}
+>               onChange={(e) => changePuzzle(e.target.value)}
+>               style={{ background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace' }}
+>             >
+>               {PUZZLE_OPTIONS.map((opt) => (
+>                 <option key={opt.key} value={opt.key}>
+>                   {opt.label}
+>                 </option>
+>               ))}
+>             </select>
+>           </label>
+>           <button
+>             onClick={resetAll}
+>             style={{ marginLeft: 8, background: 'black', color: '#0f0', border: '1px solid #0f0', fontFamily: 'monospace' }}
+>           >
+>             Reset
+>           </button>
+>           {victory ? <div className="victory-banner" style={{ marginTop: 8 }}>SOLVED!</div> : null}
+>           {error ? <div className="error-message" style={{ marginTop: 8 }}>{error}</div> : null}
+>         </div>
+>
+>         <svg
+>           width={SVG_W}
+>           height={SVG_H}
+>           style={{ display: 'block', background: 'black' }}
+>         >
+>           {/* Bridges */}
+>           {bridgeLineEls}
+>
+>           {/* Cursor (not a circle) */}
+>           {(() => {
+>             const c = islandAt(islands, cursorId);
+>             if (!c) return null;
+>             const size = islandRadius * 2 + 10;
+>             return (
+>               <rect
+>                 x={px(c.x) - size / 2}
+>                 y={px(c.y) - size / 2}
+>                 width={size}
+>                 height={size}
+>                 fill="none"
+>                 stroke={selectedId === cursorId ? '#0f0' : '#0a0'}
+>                 strokeWidth={2}
+>                 strokeDasharray={selectedId === cursorId ? '0' : '4 4'}
+>               />
+>             );
+>           })()}
+>
+>           {/* Islands */}
+>           {islands.map((isl) => {
+>             const x = px(isl.x);
+>             const y = px(isl.y);
+>             const isSelected = selectedId === isl.id;
+>             return (
+>               <g key={isl.id}>
+>                 <circle
+>                   cx={x}
+>                   cy={y}
+>                   r={islandRadius}
+>                   fill="black"
+>                   stroke="#0f0"
+>                   strokeWidth={2}
+>                   onClick={() => onIslandClick(isl.id)}
+>                 />
+>                 {isSelected ? (
+>                   <rect
+>                     x={x - islandRadius - 4}
+>                     y={y - islandRadius - 4}
+>                     width={(islandRadius + 4) * 2}
+>                     height={(islandRadius + 4) * 2}
+>                     fill="none"
+>                     stroke="#0f0"
+>                     strokeWidth={1}
+>                   />
+>                 ) : null}
+>                 <text
+>                   x={x}
+>                   y={y + 5}
+>                   textAnchor="middle"
+>                   fontFamily="monospace"
+>                   fontSize={16}
+>                   fill="#0f0"
+>                   style={{ userSelect: 'none', pointerEvents: 'none' }}
+>                 >
+>                   {isl.value}
+>                 </text>
+>                 <text
+>                   x={x}
+>                   y={y + 26}
+>                   textAnchor="middle"
+>                   fontFamily="monospace"
+>                   fontSize={10}
+>                   fill="#0a0"
+>                   style={{ userSelect: 'none', pointerEvents: 'none' }}
+>                 >
+>                   {counts.get(isl.id) ?? 0}/{isl.value}
+>                 </text>
+>               </g>
+>             );
+>           })}
+>         </svg>
+>       </div>
+>     </div>
+>   );
+> }
+> EOF
+root@666a35584647:/app# npm run build
+
+> hashi-puzzle@0.1.0 build
+> vite build
+
+vite v5.4.21 building for production...
+✓ 33 modules transformed.
+dist/index.html                   0.40 kB │ gzip:  0.28 kB
+dist/assets/index-D36fXC7D.css    0.07 kB │ gzip:  0.08 kB
+dist/assets/index-BYn8mU2g.js   150.16 kB │ gzip: 48.78 kB
+✓ built in 985ms
+root@666a35584647:/app#
